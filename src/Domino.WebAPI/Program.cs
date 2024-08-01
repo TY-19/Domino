@@ -1,3 +1,5 @@
+using Domino.Application.Services;
+using Domino.Domain.Entities;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
 using Microsoft.OpenApi.Models;
@@ -8,6 +10,10 @@ namespace Domino.WebAPI
     {
         public static async Task Main(string[] args)
         {
+            var service = new GameService();
+            service.Play();
+            return;
+
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddElectron();
             builder.WebHost.UseElectron(args);

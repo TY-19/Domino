@@ -17,4 +17,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Domino.Infrastructure\Domino.Infrastructure.csproj" />
+  </ItemGroup>
 </Project>
