@@ -4,6 +4,7 @@ public class Player
 {
     public string Name { get; }
     private protected List<DominoTile> _hand = [];
+    public List<DominoTile> Hand { get => _hand; }
     public Player()
     {
         Name = "test";
@@ -22,8 +23,7 @@ public class Player
     }
     public DominoTile? GetTileFromHand(string tileId)
     {
-        DominoTile? tile = _hand.FirstOrDefault(t => t.TileId == tileId);
-        return tile;
+        return _hand.FirstOrDefault(t => t.TileId == tileId);
     }
     public void PlayTile(DominoTile tile)
     {
@@ -32,9 +32,5 @@ public class Player
             return;
         }
         _hand.Remove(tile);
-    }
-    public List<DominoTile> GetHand()
-    {
-        return _hand;
     }
 }

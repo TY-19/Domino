@@ -1,3 +1,4 @@
+using Domino.Application.Interfaces;
 using Domino.Application.Services;
 using Domino.Domain.Entities;
 using ElectronNET.API;
@@ -10,14 +11,11 @@ namespace Domino.WebAPI
     {
         public static async Task Main(string[] args)
         {
-            var service = new GameService();
-            service.Play();
-            return;
-
             var builder = WebApplication.CreateBuilder(args);
             builder.Services.AddElectron();
             builder.WebHost.UseElectron(args);
 
+            builder.Services.AddMemoryCache();
             builder.Services.AddCors(options => {
                 options.AddPolicy(name: "FreeCorsPolicy", cfg =>
                     {
@@ -31,6 +29,9 @@ namespace Domino.WebAPI
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "Domino", Version = "v1" });
             });
             builder.Services.AddControllers();
+            builder.Services.AddScoped<IGameService, GameService>();
+            builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+
             var app = builder.Build();
             
             app.UseSwagger();

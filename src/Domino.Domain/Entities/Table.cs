@@ -6,6 +6,7 @@ public class Table
     private int _rightEnd = -1;
     private LinkedListNode<DominoTile>? startNode;
     private LinkedList<DominoTile> _row = new();
+    public LinkedList<DominoTile> TilesOnTable { get => _row; }
     public void PlaceTile(DominoTile toPlace, DominoTile? nextTo = null)
     {
         if (nextTo == null && startNode == null)
@@ -28,10 +29,6 @@ public class Table
             }
         }
     }
-    public LinkedList<DominoTile> GetTilesOnTable()
-    {
-        return _row;
-    }
     public (int left, int right) GetFreeEnds()
     {
         return (_leftEnd, _rightEnd);
@@ -39,6 +36,7 @@ public class Table
     public bool CanBePlayed(DominoTile tile)
     {
         return tile.A == _leftEnd || tile.A == _rightEnd
-            || tile.B == _leftEnd || tile.B == _rightEnd;
+            || tile.B == _leftEnd || tile.B == _rightEnd
+            || (_leftEnd == -1 && _rightEnd == -1);
     }
 }

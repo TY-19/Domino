@@ -19,7 +19,6 @@ public class DominoSet
                 Tiles.Add(new DominoTile(i, j));
             }
         }
-        Console.WriteLine(Tiles.Count);
     }
     public DominoTile? ServeTile()
     {
