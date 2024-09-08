@@ -1,8 +1,72 @@
 .domino-tile {
+    display: flex;
     background-color: orange;
-    height: 5%;
+    &-vertical {
+        flex-direction: column;
+        height: 12vh;
+        width: 6vh;
+    }
+    &-horizontal {
+        flex-direction: row;
+        height: 6vh;
+        width: 12vh;
+    }
 }
 .line {
     background-color: blue;
-    
+    &-vertical {
+        width: 100%;
+        height: 4%;
+    }
+    &-horizontal {
+        width: 4%;
+        height: 100%;
+    }
+}
+.square {
+    border-radius: 5px;
+    position: relative;
+    &-vertical {
+        height: 48%;
+        width: 100%;
+    }
+    &-horizontal {
+        height: 100%;
+        width: 48%;
+    }
+}
+.dot {
+    height: 27.5%;
+    width: 27.5%;
+    border-radius: 50%;
+    background-color: green;
+    position: absolute;
+}
+.center-dot {
+    top: 36.25%;
+    left: 36.25%;
+}
+.top-left-dot {
+    top: 5%;
+    left: 5%;
+}
+.top-center-dot {
+    top: 5%;
+    left: 36.25%;
+}
+.top-right-dot {
+    top: 5%;
+    right: 5%;
+}
+.bottom-left-dot {
+    bottom: 5%;
+    left: 5%;
+}
+.bottom-center-dot {
+    bottom: 5%;
+    left: 36.25%;
+}
+.bottom-right-dot {
+    bottom: 5%;
+    right: 5%;
 }

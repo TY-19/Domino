@@ -1,4 +1,5 @@
-<div class="domino-tile">
-    <div class="line">
-    </div>
+<div class="domino-tile" [class]="isHorizontal ? 'domino-tile-horizontal' : 'domino-tile-vertical'">
+    <div #squareOne class="square" [class]="isHorizontal ? 'square-horizontal' : 'square-vertical'"></div>
+    <div class="line" [class]="isHorizontal ? 'line-horizontal' : 'line-vertical'"></div>
+    <div #squareTwo class="square" [class]="isHorizontal ? 'square-horizontal' : 'square-vertical'"></div>
 </div>
