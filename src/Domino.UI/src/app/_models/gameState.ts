@@ -1,4 +1,5 @@
 import { DominoTile } from "./dominoTile"
+import { LogEvent } from "./logEvent"
 import { Player } from "./player"
 
 export interface GameState {
@@ -11,6 +12,6 @@ export interface GameState {
     player: Player,
     opponent: Player,
     log: {
-        events: Event[]
+        events: LogEvent[]
     }
 }

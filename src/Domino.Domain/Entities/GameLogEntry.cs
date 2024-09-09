@@ -8,4 +8,5 @@ public class GameLogEntry
     public string PlayerName { get; set; } = "";
     public MoveType Type { get; set; }
     public DominoTile? Tile { get; set; }
+    public DominoTile? NextToTile { get; set; }
 }

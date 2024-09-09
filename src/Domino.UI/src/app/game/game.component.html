@@ -1,16 +1,21 @@
 <div class="grid-container">
     <div class="grid-item opponent-hand">Opponent hand</div>
-    <div class="grid-item table">
-        Table
-        {{game|json}}
-        <Dom-tile></Dom-tile>
+    <div #GameTable class="grid-item game-table">
+        @if(game.table.tilesOnTable) {
+            @for(tile of this.game.table.tilesOnTable; track tile.tileId)
+            {
+                <div [style]="getGridPosition(tile)">
+                    <Dom-tile [tile]="tile" [isHorizontal]="!tile.isDouble"></Dom-tile>
+                </div>
+            }
+        }
     </div>
     <div class="grid-item market">Market</div>
     <div class="grid-item player-hand">
         @if(game) {
             @for(tile of this.game.player.hand; track tile.tileId)
             {
-                <Dom-tile [tile]="tile" [isHorizontal]="true"></Dom-tile>
+                <Dom-tile [tile]="tile" [isHorizontal]="false"></Dom-tile>
             }
         }
     </div>

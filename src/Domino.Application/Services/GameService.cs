@@ -39,21 +39,34 @@ public class GameService : IGameService
     {
         return GetGame().Table.TilesOnTable;
     }
-    public Game PlayTile(string tileId)
+    public Game PlayTile(string tileId, string? nextTo)
     {
         var game = GetGame();
         var tile = game.Player.GetTileFromHand(tileId)
             ?? throw new ArgumentException("Wrong tile id");
+        DominoTile? nextToTile = null;
+        if(nextTo != null)
+        {
+            if(game.Table.TilesOnTable.First?.Value?.TileId == nextTo)
+            {
+                nextToTile = game.Table.TilesOnTable.First?.Value;
+            }
+            else if(game.Table.TilesOnTable.Last?.Value?.TileId == nextTo)
+            {
+                nextToTile = game.Table.TilesOnTable.Last?.Value;
+            }
+        }
         if (tile != null && game.Table.CanBePlayed(tile))
         {
             game.Player.PlayTile(tile);
-            game.Table.PlaceTile(tile);
+            game.Table.PlaceTile(tile, nextToTile);
             game.Log.AddEntry(new GameLogEntry()
             {
-                MoveNumber = 1,
+                MoveNumber = GetCurrentMoveNumber(game),
                 PlayerName = game.Player.Name,
                 Type = Domain.Enums.MoveType.PlayTile,
-                Tile = tile
+                Tile = tile,
+                NextToTile = nextToTile
             });
         }
         return game;
@@ -67,7 +80,7 @@ public class GameService : IGameService
             game.Player.GrabTile(tile);
             game.Log.AddEntry(new GameLogEntry()
             {
-                MoveNumber = 1,
+                MoveNumber = GetCurrentMoveNumber(game),
                 PlayerName = game.Player.Name,
                 Type = Domain.Enums.MoveType.GrabTile
             });
@@ -85,22 +98,25 @@ public class GameService : IGameService
                 game.Table.PlaceTile(ptm.Tile);
                 game.Log.AddEntry(new GameLogEntry()
                 {
-                    MoveNumber = 1,
+                    MoveNumber = GetCurrentMoveNumber(game),
                     PlayerName = game.Opponent.Name,
                     Type = Domain.Enums.MoveType.PlayTile,
-                    Tile = ptm.Tile
+                    Tile = ptm.Tile,
+                    NextToTile = ptm.NextTo
                 });
                 break;
             case GrabTileMove:
                 if(game.Log.CanGrabAnotherTile(game.Opponent.Name))
                 {
-                    WaitOpponentTurn();
+                    var tile = game.Set.ServeTile();
+                    game.Opponent.GrabTile(tile);
                     game.Log.AddEntry(new GameLogEntry()
                     {
-                        MoveNumber = 1,
+                        MoveNumber = GetCurrentMoveNumber(game),
                         PlayerName = game.Opponent.Name,
                         Type = Domain.Enums.MoveType.GrabTile
                     });
+                    WaitOpponentTurn();
                 }
                 break;
             default:
@@ -120,5 +136,10 @@ public class GameService : IGameService
     private Game GetGame()
     {
         return _game ?? StartGame("Player", "AI");
+    }
+
+    private static int GetCurrentMoveNumber(Game game)
+    {
+        return game.Log.Events.DefaultIfEmpty().MaxBy(e => e?.MoveNumber)?.MoveNumber + 1 ?? 1;
     }
 }

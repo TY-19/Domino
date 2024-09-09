@@ -1,8 +1,9 @@
 import { DominoTile } from "./dominoTile";
 
-export interface Event {
+export interface LogEvent {
     moveNumber: number,
     playerName: string,
     type: number,
-    tile: DominoTile
+    tile: DominoTile,
+    nextToTile: DominoTile | null
 }

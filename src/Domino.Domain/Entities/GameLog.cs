@@ -29,6 +29,6 @@ public class GameLog
             return true;
         }
         var previous = _entries.Last();
-        return previous.PlayerName == playerName && grabbed < 3;
+        return previous.PlayerName != playerName || grabbed < 3;
     }
 }

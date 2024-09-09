@@ -7,7 +7,7 @@ public interface IGameService
     Game StartGame(string playerName, string opponentName);
     List<DominoTile> GetHand();
     LinkedList<DominoTile> GetTable();
-    Game PlayTile(string tileId);
+    Game PlayTile(string tileId, string? nextTo);
     Game GrabTile();
     Game WaitOpponentTurn();
 }

@@ -9,7 +9,7 @@ import { DominoTile } from '../_models/dominoTile';
   styleUrl: './tile.component.scss'
 })
 export class TileComponent implements AfterViewInit {
-  private dots: Map<number, string[]> = new Map<number, string[]>([
+  private dotsHorizontal: Map<number, string[]> = new Map<number, string[]>([
     [0, []],
     [1, ['center-dot']],
     [2, ['top-left-dot', 'bottom-right-dot']],
@@ -17,6 +17,15 @@ export class TileComponent implements AfterViewInit {
     [4, ['top-left-dot', 'top-right-dot', 'bottom-left-dot', 'bottom-right-dot']],
     [5, ['top-left-dot', 'top-right-dot', 'center-dot', 'bottom-left-dot', 'bottom-right-dot']],
     [6, ['top-left-dot', 'top-center-dot', 'top-right-dot', 'bottom-left-dot', 'bottom-center-dot', 'bottom-right-dot']]
+  ]);
+  private dotsVertical: Map<number, string[]> = new Map<number, string[]>([
+    [0, []],
+    [1, ['center-dot']],
+    [2, ['top-right-dot', 'bottom-left-dot']],
+    [3, ['top-right-dot', 'center-dot', 'bottom-left-dot']],
+    [4, ['top-left-dot', 'top-right-dot', 'bottom-left-dot', 'bottom-right-dot']],
+    [5, ['top-left-dot', 'top-right-dot', 'center-dot', 'bottom-left-dot', 'bottom-right-dot']],
+    [6, ['top-left-dot', 'middle-left-dot', 'top-right-dot', 'bottom-left-dot', 'middle-right-dot', 'bottom-right-dot']]
   ]);
 
   @Input() tile: DominoTile = null!;
@@ -43,7 +52,13 @@ export class TileComponent implements AfterViewInit {
   }
   private buildSquare(dotsCount: number): any[] {
     let children: any[] = [];
-    let classes = this.dots.get(dotsCount);
+    let classes: string[] | undefined = [];
+    if(this.isHorizontal) {
+      classes = this.dotsHorizontal.get(dotsCount);
+    }
+    else {
+      classes = this.dotsVertical.get(dotsCount);
+    }
     if(classes) {
       for(let aclass of classes) {
         let div: any = this.renderer.createElement('div');

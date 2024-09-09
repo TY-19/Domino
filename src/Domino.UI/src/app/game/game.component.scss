@@ -19,12 +19,17 @@
     border-right: none;
     border-left: none;
 }
-.table {
+.game-table {
     grid-column-start: 1;
     grid-column-end: 11;
     grid-row-start: 4;
     grid-row-end: 22;
     border-left: none;
+    padding: 5px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, 3vh);
+    grid-template-rows: repeat(auto-fill, 3vh);
+    gap: 0;
 }
 .market {
     grid-column-start: 11;

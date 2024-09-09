@@ -1,6 +1,7 @@
 .domino-tile {
     display: flex;
     background-color: orange;
+    border: 2px solid black;
     &-vertical {
         flex-direction: column;
         height: 12vh;
@@ -56,6 +57,14 @@
 }
 .top-right-dot {
     top: 5%;
+    right: 5%;
+}
+.middle-left-dot {
+    top: 36.25%;
+    left: 5%;
+}
+.middle-right-dot {
+    top: 36.25%;
     right: 5%;
 }
 .bottom-left-dot {
