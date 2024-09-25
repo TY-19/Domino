@@ -4,7 +4,7 @@
         @if(game.table.tilesOnTable) {
             @for(tile of this.game.table.tilesOnTable; track tile.tile.tileId)
             {
-                <div [style]="getGridPosition(tile)">
+                <div [id]="tile.tile.tileId" [style]="getGridPosition(tile)">
                     <Dom-tile [tile]="tile.tile" [isHorizontal]="isHorizontal(tile)"></Dom-tile>
                 </div>
             }
