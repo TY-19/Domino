@@ -416,7 +416,19 @@ export class GameComponent implements OnInit {
       ]
     }
   };
-  tileDispays: Map<string, TileDisplay> = new Map<string, TileDisplay>();
+  tileDispays: Map<number, TileDisplay> = new Map<number, TileDisplay>();
+  private leftEdgePos: EdgePosition = {
+    type: EdgeType.Left,
+    column: 0,
+    row: 0,
+    direction: Direction.Left
+  };
+  private rightEdgePos: EdgePosition = {
+    type: EdgeType.Right,
+    column: 0,
+    row: 0,
+    direction: Direction.Right
+  };
   constructor(private gameService: GameService) {
     
   }
@@ -426,7 +438,6 @@ export class GameComponent implements OnInit {
     if(this.game === null) {
       this.start();
     }
-    this.reorderTilesOnTable();
     this.columnsNumber = this.calculateColumnsNumber();
     this.populateTileDisplays();
   }
@@ -441,11 +452,21 @@ export class GameComponent implements OnInit {
     return Math.floor(gameTableWidth / columnWidth);
   }
   populateTileDisplays() {
-    for(let tilePosition of this.game.table.tilesOnTable) {
-      this.setGridPosition(tilePosition);
+    let sortedTilePositions = this.game.table.tilesOnTable.sort((a, b) => {
+      return Math.abs(a.position) - Math.abs(b.position);
+    });
+    for(let tilePosition of sortedTilePositions) {
+      this.calculatePositions(tilePosition);
+      // let tileDisplay: TileDisplay = {
+      //   id: tilePosition.tile.tileId,
+      //   styleProps: this.calculatePositions(tilePosition),
+      //   isHorizontal: this.isHorizontal(tilePosition),
+      //   tilePosition: tilePosition
+      // };
+      // this.tileDispays.set(tilePosition.tile.tileId, tileDisplay); 
     }
   }
-  private buildStyle(styleProp: StyleProp): string {
+  buildStyle(styleProp: StyleProp): string {
     let style: string = "grid-row-start: " + styleProp.startRow + ";"
       + " grid-column-start: " + styleProp.startColumn + ";";
     if(styleProp.transformX !== 1 || styleProp.transformY !== 1) {
@@ -453,387 +474,480 @@ export class GameComponent implements OnInit {
     }
     return style;
   }
-  getGridPosition(tilePosition: DominoTilePosition): string {
-    let tileDisplay = this.tileDispays.get(tilePosition.tile.tileId);
-    if(tileDisplay) {
-      return this.buildStyle(tileDisplay.styles);
-    } else {
-      this.setGridPosition(tilePosition);
-      tileDisplay = this.tileDispays.get(tilePosition.tile.tileId);
-      return tileDisplay ? this.buildStyle(tileDisplay.styles) : "";
-    }
-  }
-  setGridPosition(tilePosition: DominoTilePosition): void {
-    let elPosStyle: ElementPositionStyle = {
-      row: 0,
-      column: 0,
-      transform: [1, 1]
-    };
+  private calculatePositions(tilePosition: DominoTilePosition) {
     if(tilePosition.position === 0) {
-      elPosStyle = this.getStartTilePosition(tilePosition);
+      this.getStartTilePosition(tilePosition);
     } else {
       let edgeType: EdgeType = tilePosition.position < 0 ? EdgeType.Left : EdgeType.Right;
-      let edgePosition = this.getEdgePosition(edgeType);
-      switch(edgePosition[2]) {
+      let edgePosition = this.getEdgePos(edgeType);
+      switch(edgePosition.direction) {
         case Direction.Left:
-          elPosStyle = this.getToLeftTilePosition(edgeType, tilePosition);
+          this.getToLeftTilePosition(edgeType, tilePosition);
           break;
         case Direction.Top:
-          elPosStyle = this.getToTopTilePosition(edgeType, tilePosition);
+          this.getToTopTilePosition(edgeType, tilePosition);
           break;
         case Direction.Right:
-          elPosStyle = this.getToRightTilePosition(edgeType, tilePosition);
+          this.getToRightTilePosition(edgeType, tilePosition);
           break;
         case Direction.Down:
-          elPosStyle = this.getToDownTilePosition(edgeType, tilePosition);
+          this.getToDownTilePosition(edgeType, tilePosition);
           break;
       }
     }
-    let style: string = "grid-row-start: " + elPosStyle.row + ";"
-      + " grid-column-start: " + elPosStyle.column + ";";
-    if(elPosStyle.transform[0] !== 1 || elPosStyle.transform[1] !== 1) {
-      style += " transform: scaleX(" + elPosStyle.transform[0] + ") scaleY(" + elPosStyle.transform[1] + ");";
-    }
-    let tileDisplay: TileDisplay = {
-      id: tilePosition.tile.tileId,
-      styles: {
-        startRow: elPosStyle.row,
-        startColumn: elPosStyle.column,
-        transformX: elPosStyle.transform[0],
-        transformY: elPosStyle.transform[1]
-      },
-      isHorizontal: this.isHorizontal(tilePosition),
-      tilePosition: tilePosition
-    };
-    this.tileDispays.set(tilePosition.tile.tileId, tileDisplay);  
   }
-  getStartTilePosition(tilePosition: DominoTilePosition): ElementPositionStyle {
-    let elPosStyle: ElementPositionStyle = {
-      row: Math.floor(this.rowsNumber / 2),
-      column: Math.floor(this.columnsNumber / 2),
-      transform: [1, 1]
+  private getStartTilePosition(tilePosition: DominoTilePosition) {
+    let elemStyle: StyleProp = {
+      startRow: Math.floor(this.rowsNumber / 2),
+      startColumn: Math.floor(this.columnsNumber / 2),
+      transformX: 1,
+      transformY: 1
     };
     if(tilePosition.tile.isDouble) {
-      elPosStyle.row--;
-      this.setEdgePosition(EdgeType.Left, [elPosStyle.row + 1, elPosStyle.column, Direction.Left]);
-      this.setEdgePosition(EdgeType.Right, [elPosStyle.row + 1, elPosStyle.column + 1, Direction.Right]);
+      elemStyle.startRow--;
+      this.leftEdgePos.row = elemStyle.startRow + 1;
+      this.leftEdgePos.column = elemStyle.startColumn;
+      this.leftEdgePos.direction = Direction.Left;
+      this.rightEdgePos.row = elemStyle.startRow + 1;
+      this.rightEdgePos.column = elemStyle.startColumn + 1;
+      this.rightEdgePos.direction = Direction.Right;
     }
     else {
-      elPosStyle.column--;
-      this.setEdgePosition(EdgeType.Left, [elPosStyle.row, elPosStyle.column, Direction.Left]);
-      this.setEdgePosition(EdgeType.Right, [elPosStyle.row, elPosStyle.column + 3, Direction.Right]);
+      elemStyle.startColumn--;
+      this.leftEdgePos.row = elemStyle.startRow;
+      this.leftEdgePos.column = elemStyle.startColumn;
+      this.leftEdgePos.direction = Direction.Left;
+      this.rightEdgePos.row = elemStyle.startRow;
+      this.rightEdgePos.column = elemStyle.startColumn + 3;
+      this.rightEdgePos.direction = Direction.Right;
     }
-    return elPosStyle;
+    this.setTileDisplays(elemStyle, !tilePosition.tile.isDouble, tilePosition);
   }
-  private setEdgePosition(edgeType: EdgeType, position: [row: number, column: number, direction: Direction]) {
-    if(edgeType === EdgeType.Left) {
-      this.leftEdgePosition = position;
+  
+
+  placeLeftTile(edgePosition: EdgePosition, tilePosition: DominoTilePosition) {
+    let styleShifts: StylePropShifts = {
+      isHorizontal: true,
+      columnShift: -4,
+      reverseColumnShift: 3,
+      reverseTransformX: -1,
     }
-    else if (edgeType === EdgeType.Right) {
-      this.rightEdgePosition = position;
+    this.placeTile(edgePosition, tilePosition, styleShifts);
+    edgePosition.column -= 4;
+  }
+  placeLeftDouble(edgePosition: EdgePosition, tilePosition: DominoTilePosition) {
+    let styleShifts: StylePropShifts = {
+      isHorizontal: false,
+      rowShift: -1,
+      columnShift: -2
     }
+    this.placeTile(edgePosition, tilePosition, styleShifts);
+    edgePosition.column -= 2;
   }
-  private getEdgePosition(edgeType: EdgeType) {
-    return edgeType === EdgeType.Left ? this.leftEdgePosition : this.rightEdgePosition;
+  placeLeftCornerInLine(edgePosition: EdgePosition, tilePosition: DominoTilePosition) {
+    let styleShifts: StylePropShifts = {
+      isHorizontal: false,
+      rowShift: -2,
+      columnShift: -2,
+      reverseRowShift: 3,
+      reverseTransformY: -1,
+    }
+    this.placeTile(edgePosition, tilePosition, styleShifts);
+    edgePosition.direction = Direction.Top;
+    edgePosition.row -= 2;
+    edgePosition.column -= 2;
   }
-  getToLeftTilePosition(edgeType: EdgeType, tilePosition: DominoTilePosition): ElementPositionStyle {
-    let elPosStyle: ElementPositionStyle = {
-      row: 0,
-      column: 0,
-      transform: [1, 1]
+  placeLeftCornerOnTopDouble(edgePosition: EdgePosition, tilePosition: DominoTilePosition) {
+    let styleShifts: StylePropShifts = {
+      isHorizontal: false,
+      rowShift: -5,
+      reverseRowShift: 3,
+      reverseTransformY: -1,
+    }
+    this.placeTile(edgePosition, tilePosition, styleShifts);
+    edgePosition.direction = Direction.Top;
+    edgePosition.row -= 5;
+    edgePosition.column -= 2;
+  }
+  placeTopTile(edgePosition: EdgePosition, tilePosition: DominoTilePosition) {
+    let styleShifts: StylePropShifts = {
+      isHorizontal: false,
+      rowShift: -4,
+      reverseRowShift: 3,
+      reverseTransformY: -1,
+    }
+    this.placeTile(edgePosition, tilePosition, styleShifts);
+    edgePosition.direction = Direction.Top;
+    edgePosition.row -= 4;
+  }
+  placeTopDouble(edgePosition: EdgePosition, tilePosition: DominoTilePosition) {
+    let styleShifts: StylePropShifts = {
+      isHorizontal: true,
+      rowShift: -2,
+      columnShift: -1,
+    }
+    this.placeTile(edgePosition, tilePosition, styleShifts);
+    edgePosition.direction = Direction.Top;
+    edgePosition.row -= 2;
+  }
+  placeTopCornerInLine(edgePosition: EdgePosition, tilePosition: DominoTilePosition) {
+    let styleShifts: StylePropShifts = {
+      isHorizontal: true,
+      rowShift: -2,
+      reverseRowShift: 3,
+      reverseTransformX: -1,
+    }
+    this.placeTile(edgePosition, tilePosition, styleShifts);
+    edgePosition.direction = Direction.Right;
+    edgePosition.row -= 2;
+    edgePosition.column += 3;
+  }
+  placeTopCornerRightToDouble(edgePosition: EdgePosition, tilePosition: DominoTilePosition) {
+    let styleShifts: StylePropShifts = {
+      isHorizontal: true,
+      columnShift: 3,
+      reverseRowShift: 3,
+      reverseTransformX: -1,
+    }
+    this.placeTile(edgePosition, tilePosition, styleShifts);
+    edgePosition.direction = Direction.Right;
+    // edgePosition.row += 6;
+    edgePosition.column += 6;
+  }
+  placeRightTile(edgePosition: EdgePosition, tilePosition: DominoTilePosition) {
+    let styleShifts: StylePropShifts = {
+      isHorizontal: true,
+      columnShift: 1,
+      reverseColumnShift: 3,
+      reverseTransformX: -1
+    }
+    this.placeTile(edgePosition, tilePosition, styleShifts);
+    edgePosition.direction = Direction.Right;
+    edgePosition.column += 4;
+  }
+  placeRightDouble(edgePosition: EdgePosition, tilePosition: DominoTilePosition) {
+    let styleShifts: StylePropShifts = {
+      isHorizontal: false,
+      rowShift: -1,
+      columnShift: 1
+    }
+    this.placeTile(edgePosition, tilePosition, styleShifts);
+    edgePosition.direction = Direction.Right;
+    edgePosition.column += 2;
+  }
+  placeDownTile(edgePosition: EdgePosition, tilePosition: DominoTilePosition) {
+    let styleShifts: StylePropShifts = {
+      isHorizontal: false,
+      rowShift: 1,
+      columnShift: -1,
+      reverseRowShift: -3,
+      reverseTransformY: -1,
+    }
+    this.placeTile(edgePosition, tilePosition, styleShifts);
+    edgePosition.direction = Direction.Down;
+    edgePosition.row += 4;
+  }
+  placeDownDouble(edgePosition: EdgePosition, tilePosition: DominoTilePosition) {
+    let styleShifts: StylePropShifts = {
+      isHorizontal: true,
+      rowShift: 2,
+      columnShift: -2,
+    }
+    this.placeTile(edgePosition, tilePosition, styleShifts);
+    edgePosition.direction = Direction.Down;
+    edgePosition.row = 2;
+  }
+
+  private placeTile(edgePosition: EdgePosition, tilePosition: DominoTilePosition,
+    stylePropShift: StylePropShifts) {
+    let styleProp: StyleProp = {
+      startRow: edgePosition.row + (stylePropShift.rowShift ?? 0),
+      startColumn: edgePosition.column + (stylePropShift.columnShift ?? 0),
+      transformX: 1,
+      transformY: 1
     };
-    let edgePosition = this.getEdgePosition(edgeType);
-    if(edgePosition[1] > 4)
-    {
-      elPosStyle.row = tilePosition.tile.isDouble ? edgePosition[0] - 1 : edgePosition[0];
-      elPosStyle.column = tilePosition.tile.isDouble ? edgePosition[1] - 2 : edgePosition[1] - 4;
-      let rowEdge = tilePosition.tile.isDouble ? elPosStyle.row + 1 : elPosStyle.row;
-      this.setEdgePosition(edgeType, [rowEdge, elPosStyle.column, Direction.Left]);
-      if(tilePosition.contactEdge !== tilePosition.tile.b) {
-        elPosStyle.transform = [-1, 1];
-        elPosStyle.column += 3;
-      }
+    if(this.needReverseTile(edgePosition, tilePosition)) {
+      styleProp.startRow += (stylePropShift.reverseRowShift ?? 0);
+      styleProp.startColumn += (stylePropShift.reverseColumnShift ?? 0);
+      styleProp.transformX = stylePropShift.reverseTransformX ?? 1;
+      styleProp.transformY = stylePropShift.reverseTransformY ?? 1;
     }
-    else if(edgePosition[1] > 3) {
-      elPosStyle.row = edgePosition[0] - 2;
-      elPosStyle.column = edgePosition[1] - 2;
-      this.orientation.push([tilePosition.position, 1]);
-      this.setEdgePosition(edgeType, [elPosStyle.row, elPosStyle.column, Direction.Top]);
-    }
-    else if(edgePosition[1] > 2 && tilePosition.tile.isDouble)
-    {
-      elPosStyle.row = edgePosition[0] - 1;
-      elPosStyle.column = edgePosition[1] - 2;
-      this.setEdgePosition(edgeType, [elPosStyle.row, elPosStyle.column, Direction.Top]);
-    }
-    else
-    {
-      if(tilePosition.tile.isDouble) {
-        elPosStyle.row = edgePosition[0] - 4;
-        elPosStyle.column = edgePosition[1] + 1;
-        this.setEdgePosition(edgeType, [elPosStyle.row, elPosStyle.column + 1, Direction.Top]);
-        this.orientation.push([tilePosition.position, 1]);
-        let cornerPosition: number = tilePosition.position < 0
-          ? tilePosition.position + 1 : tilePosition.position - 1;
-        this.rotateCornerTile(cornerPosition, "left-up");
-      } else {
-        elPosStyle.row = edgePosition[0] - 4;
-        elPosStyle.column = edgePosition[1];
-        this.setEdgePosition(edgeType, [elPosStyle.row, elPosStyle.column, Direction.Top]);
-        this.orientation.push([tilePosition.position, 1]);
-        if(tilePosition.contactEdge !== tilePosition.tile.b) {
-          elPosStyle.transform = [1, -1];
-          elPosStyle.row += 3;
-        }
-      }
-    }
-    return elPosStyle;
+    this.setTileDisplays(styleProp, stylePropShift.isHorizontal, tilePosition);
   }
-  getToTopTilePosition(edgeType: EdgeType, tilePosition: DominoTilePosition): ElementPositionStyle {
-    let elPosStyle: ElementPositionStyle = {
-      row: 0,
-      column: 0,
-      transform: [1, 1]
-    };
-    let edgePosition = this.getEdgePosition(edgeType);
-    if(edgePosition[0] > 4)
-    {
-      elPosStyle.row = tilePosition.tile.isDouble ? edgePosition[0] - 2 : edgePosition[0] - 4;
-      elPosStyle.column = tilePosition.tile.isDouble ? edgePosition[1] - 1 : edgePosition[1];
-      let edgeColumn = tilePosition.tile.isDouble ? elPosStyle.column + 1 : elPosStyle.column;
-      this.setEdgePosition(edgeType, [elPosStyle.row, edgeColumn, Direction.Top]);
-      if(tilePosition.contactEdge !== tilePosition.tile.b) {
-        elPosStyle.transform = [1, -1];
-        elPosStyle.row += 3;
-      }
-      let tileDisplay: TileDisplay = {
-        id: tilePosition.tile.tileId,
-        styles: {
-          startRow: elPosStyle.row,
-          startColumn: elPosStyle.column,
-          transformX: elPosStyle.transform[0],
-          transformY: elPosStyle.transform[1]
-        },
-        isHorizontal: tilePosition.tile.isDouble,
-        tilePosition: tilePosition
-      };
-      this.tileDispays.set(tilePosition.tile.tileId, tileDisplay);
+  private needReverseTile(edgePosition: EdgePosition, tilePosition: DominoTilePosition): boolean {
+    if(tilePosition.tile.isDouble) {
+      return false;
     }
-    else if(edgePosition[0] > 2 && tilePosition.tile.isDouble)
-    {
-      elPosStyle.row = edgePosition[0] - 2;
-      elPosStyle.column = edgePosition[1] - 1;
-      let tileDisplay: TileDisplay = {
-        id: tilePosition.tile.tileId,
-        styles: {
-          startRow: elPosStyle.row,
-          startColumn: elPosStyle.column,
-          transformX: elPosStyle.transform[0],
-          transformY: elPosStyle.transform[1]
-        },
-        isHorizontal: true,
-        tilePosition: tilePosition
-      };
-      this.tileDispays.set(tilePosition.tile.tileId, tileDisplay);
-      this.setEdgePosition(edgeType, [elPosStyle.row, elPosStyle.column + 3, Direction.Right]);
-    }
-    else
-    {
-      if(tilePosition.tile.isDouble) {
-        elPosStyle.row = edgePosition[0] - 1;
-        elPosStyle.column = edgePosition[1] + 2;
-        this.setEdgePosition(edgeType, [elPosStyle.row + 1, elPosStyle.column + 1, Direction.Right]);
-        this.orientation.push([tilePosition.position, 0]);
-        // let cornerPosition: number = tilePosition.position < 0
-        //   ? tilePosition.position + 1 : tilePosition.position - 1;
-        // this.rotateCornerTile(cornerPosition, "left-up");
-      } else {
-        elPosStyle.row = edgePosition[0] - 2;
-        elPosStyle.column = edgePosition[1] + 2;
-        this.setEdgePosition(edgeType, [elPosStyle.row, elPosStyle.column, Direction.Right]);
-        this.orientation.push([tilePosition.position, 0]);
-        if(tilePosition.contactEdge !== tilePosition.tile.b) {
-          elPosStyle.transform = [1, -1];
-          elPosStyle.row += 3;
-        }
-      }
-    }
-    return elPosStyle;
-  }
-  getToRightTilePosition(edgeType: EdgeType, tilePosition: DominoTilePosition): ElementPositionStyle {
-    let elPosStyle: ElementPositionStyle = {
-      row: 0,
-      column: 0,
-      transform: [1, 1]
-    };
-    let edgePosition = this.getEdgePosition(edgeType);
-    if(edgePosition[1] < this.columnsNumber - 4)
-    {
-      elPosStyle.row = tilePosition.tile.isDouble ? edgePosition[0] : edgePosition[0];
-      elPosStyle.column = tilePosition.tile.isDouble ? edgePosition[1] + 1 : edgePosition[1] + 1;
-      let edgeColumn = tilePosition.tile.isDouble ? elPosStyle.column + 3 : elPosStyle.column + 3;
-      this.setEdgePosition(edgeType, [elPosStyle.row, edgeColumn, Direction.Right]);
-      if(tilePosition.contactEdge !== tilePosition.tile.a) {
-        elPosStyle.transform = [-1, 1];
-        elPosStyle.column += 3;
-      }
-      let tileDisplay: TileDisplay = {
-        id: tilePosition.tile.tileId,
-        styles: {
-          startRow: elPosStyle.row,
-          startColumn: elPosStyle.column,
-          transformX: elPosStyle.transform[0],
-          transformY: elPosStyle.transform[1]
-        },
-        isHorizontal: !tilePosition.tile.isDouble,
-        tilePosition: tilePosition
-      };
-      this.tileDispays.set(tilePosition.tile.tileId, tileDisplay);
-    }
-    else if(edgePosition[1] < this.columnsNumber - 2 && tilePosition.tile.isDouble)
-    {
-      elPosStyle.row = edgePosition[0] - 1;
-      elPosStyle.column = edgePosition[1] + 1;
-      let tileDisplay: TileDisplay = {
-        id: tilePosition.tile.tileId,
-        styles: {
-          startRow: elPosStyle.row,
-          startColumn: elPosStyle.column,
-          transformX: elPosStyle.transform[0],
-          transformY: elPosStyle.transform[1]
-        },
-        isHorizontal: false,
-        tilePosition: tilePosition
-      };
-      this.tileDispays.set(tilePosition.tile.tileId, tileDisplay);
-      this.setEdgePosition(edgeType, [elPosStyle.row + 3, elPosStyle.column, Direction.Down]);
+    let isContactedSideA: boolean = tilePosition.contactEdge === tilePosition.tile.a;
+    if (isContactedSideA) {
+      return edgePosition.direction === Direction.Left || edgePosition.direction === Direction.Top;
     } else {
-      console.log("Not implemented getToRightTilePosition else");
+      return edgePosition.direction === Direction.Right || edgePosition.direction === Direction.Down;
     }
-    return elPosStyle;
   }
-  getToDownTilePosition(edgeType: EdgeType, tilePosition: DominoTilePosition): ElementPositionStyle {
-    let elPosStyle: ElementPositionStyle = {
-      row: 0,
-      column: 0,
-      transform: [1, 1]
+  private setTileDisplays(styleProps: StyleProp, isHorizontal: boolean, tilePosition: DominoTilePosition) {
+    let tileDisplay: TileDisplay = {
+      id: tilePosition.tile.tileId,
+      styleProps: styleProps,
+      isHorizontal: isHorizontal,
+      tilePosition: tilePosition
     };
-    let edgePosition = this.getEdgePosition(edgeType);
-    if(edgePosition[0] < this.rowsNumber - 4)
-    {
-      elPosStyle.row = tilePosition.tile.isDouble ? edgePosition[0] + 1 : edgePosition[0] + 1;
-      elPosStyle.column = tilePosition.tile.isDouble ? edgePosition[1] - 1 : edgePosition[1];
-      let edgeColumn = tilePosition.tile.isDouble ? elPosStyle.column + 1 : elPosStyle.column;
-      let edgeRow = tilePosition.tile.isDouble ? elPosStyle.row + 1 : elPosStyle.row + 3;
-      this.setEdgePosition(edgeType, [edgeRow, edgeColumn, Direction.Down]);
-      if(tilePosition.contactEdge !== tilePosition.tile.a) {
-        elPosStyle.transform = [1, -1];
-        elPosStyle.row += 3;
-      }
-      let tileDisplay: TileDisplay = {
-        id: tilePosition.tile.tileId,
-        styles: {
-          startRow: elPosStyle.row,
-          startColumn: elPosStyle.column,
-          transformX: elPosStyle.transform[0],
-          transformY: elPosStyle.transform[1]
-        },
-        isHorizontal: tilePosition.tile.isDouble,
-        tilePosition: tilePosition
-      };
-      this.tileDispays.set(tilePosition.tile.tileId, tileDisplay);
+    this.tileDispays.set(tilePosition.position, tileDisplay); 
+  }
+  private getEdgePos(edgeType: EdgeType): EdgePosition {
+    return edgeType === EdgeType.Left ? this.leftEdgePos : this.rightEdgePos;
+  }
+  private setEdgePos(edgePosition: EdgePosition): void {
+    if (edgePosition.type === EdgeType.Left) {
+      this.leftEdgePos = edgePosition;
+    } else {
+      this.rightEdgePos = edgePosition;
     }
-    else if(edgePosition[0] <= this.rowsNumber - 2 && tilePosition.tile.isDouble)
+  }
+  private getPreviousTilePosition(tilePosition: DominoTilePosition): number {
+    return tilePosition.position > 0 ? tilePosition.position - 1 : tilePosition.position + 1;
+  }
+  
+
+  private getToLeftTilePosition(edgeType: EdgeType, tilePosition: DominoTilePosition) {
+    let edgePosition = this.getEdgePos(edgeType);
+    if(edgePosition.column > 4)
     {
-      elPosStyle.row = edgePosition[0] + 1;
-      elPosStyle.column = edgePosition[1] - 1;
-      let tileDisplay: TileDisplay = {
-        id: tilePosition.tile.tileId,
-        styles: {
-          startRow: elPosStyle.row,
-          startColumn: elPosStyle.column,
-          transformX: elPosStyle.transform[0],
-          transformY: elPosStyle.transform[1]
-        },
-        isHorizontal: true,
-        tilePosition: tilePosition
-      };
-      this.tileDispays.set(tilePosition.tile.tileId, tileDisplay);
-      this.setEdgePosition(edgeType, [elPosStyle.row, elPosStyle.column, Direction.Left]);
+      if(tilePosition.tile.isDouble) {
+        this.placeLeftDouble(edgePosition, tilePosition);
+      } else {
+        this.placeLeftTile(edgePosition, tilePosition);
+      }
+    }
+    else if(edgePosition.column > 2 && tilePosition.tile.isDouble)
+    {
+      this.placeLeftDouble(edgePosition, tilePosition);
+      edgePosition.row--;
+    }
+    else if(edgePosition.column > 3) {
+      let previousTile = this.tileDispays.get(this.getPreviousTilePosition(tilePosition));
+      if(previousTile?.tilePosition.tile.isDouble === true) {
+        this.placeLeftCornerOnTopDouble(edgePosition, tilePosition);
+      } else {
+        this.placeLeftCornerInLine(edgePosition, tilePosition);
+      }
     }
     else
     {
-      console.log(tilePosition.tile);
-      console.log(edgePosition);
       if(tilePosition.tile.isDouble) {
-        elPosStyle.row = edgePosition[0] - 2;
-        elPosStyle.column = edgePosition[1] - 2;
-        this.setEdgePosition(edgeType, [elPosStyle.row + 1, elPosStyle.column, Direction.Left]);
-        this.orientation.push([tilePosition.position, 0]);
-        // let cornerPosition: number = tilePosition.position < 0
-        //   ? tilePosition.position + 1 : tilePosition.position - 1;
-        // this.rotateCornerTile(cornerPosition, "left-up");
+        this.placeTopDouble(edgePosition, tilePosition);
       } else {
-        elPosStyle.row = edgePosition[0] - 1;
-        elPosStyle.column = edgePosition[1] - 4;
-        this.setEdgePosition(edgeType, [elPosStyle.row, elPosStyle.column, Direction.Left]);
-        this.orientation.push([tilePosition.position, 0]);
-        if(tilePosition.contactEdge !== tilePosition.tile.b) {
-          elPosStyle.transform = [1, -1];
-          elPosStyle.row += 3;
-        }
+        this.placeTopTile(edgePosition, tilePosition);
       }
     }
-    return elPosStyle;
+  }
+  private getToTopTilePosition(edgeType: EdgeType, tilePosition: DominoTilePosition) {
+    let edgePosition = this.getEdgePos(edgeType);
+    if(edgePosition.row > 4)
+    {
+      if(tilePosition.tile.isDouble) {
+        this.placeTopDouble(edgePosition, tilePosition);
+      } else {
+        this.placeTopTile(edgePosition, tilePosition);
+      }
+    } else if(edgePosition.row > 2 && tilePosition.tile.isDouble) {
+        this.placeTopDouble(edgePosition, tilePosition);
+        edgePosition.row--;
+    } else if(edgePosition.row > 3) {
+      let previousTile = this.tileDispays.get(this.getPreviousTilePosition(tilePosition));
+      if(previousTile?.tilePosition.tile.isDouble === true) {
+        this.placeTopCornerRightToDouble(edgePosition, tilePosition);
+      } else {
+        this.placeTopCornerInLine(edgePosition, tilePosition);
+      }
+    }
+    else
+    {
+      edgePosition.column += 1;
+      if(tilePosition.tile.isDouble) {
+        this.placeRightDouble(edgePosition, tilePosition);
+      } else {
+        this.placeRightTile(edgePosition, tilePosition);
+      }
+      // if(tilePosition.tile.isDouble) {
+      //   elemStyle.startRow = edgePosition[0] - 1;
+      //   elemStyle.startColumn = edgePosition[1] + 2;
+      //   this.setEdgePosition(edgeType, [elemStyle.startRow + 1, elemStyle.startColumn + 1, Direction.Right]);
+      //   this.orientation.push([tilePosition.position, 0]);
+      //   // let cornerPosition: number = tilePosition.position < 0
+      //   //   ? tilePosition.position + 1 : tilePosition.position - 1;
+      //   // this.rotateCornerTile(cornerPosition, "left-up");
+      // } else {
+      //   elemStyle.startRow = edgePosition[0] - 2;
+      //   elemStyle.startColumn = edgePosition[1] + 2;
+      //   this.setEdgePosition(edgeType, [elemStyle.startRow, elemStyle.startColumn, Direction.Right]);
+      //   this.orientation.push([tilePosition.position, 0]);
+      //   if(tilePosition.contactEdge !== tilePosition.tile.b) {
+      //     elemStyle.transformX = 1;
+      //     elemStyle.transformY = -1;
+      //     elemStyle.startRow += 3;
+      //   }
+      // }
+    }
+  }
+  private getToRightTilePosition(edgeType: EdgeType, tilePosition: DominoTilePosition) {
+    let edgePosition = this.getEdgePos(edgeType);
+    if(edgePosition.column < this.columnsNumber - 4)
+    {
+      if(tilePosition.tile.isDouble) {
+        this.placeRightDouble(edgePosition, tilePosition);
+      } else {
+        this.placeRightTile(edgePosition, tilePosition);
+      }
+    }
+    else if(edgePosition.column <= this.columnsNumber - 2 && tilePosition.tile.isDouble)
+    {
+    //   elemStyle.startRow = edgePosition.row - 1;
+    //   elemStyle.startColumn = edgePosition.column + 1;
+    //   let tileDisplay: TileDisplay = {
+    //     id: tilePosition.tile.tileId,
+    //     styleProps: {
+    //       startRow: elemStyle.startRow,
+    //       startColumn: elemStyle.startColumn,
+    //       transformX: elemStyle.transformX,
+    //       transformY: elemStyle.transformY
+    //     },
+    //     isHorizontal: false,
+    //     tilePosition: tilePosition
+    //   };
+    //   this.tileDispays.set(tilePosition.position, tileDisplay);
+    //   this.setEdgePosition(edgeType, [elemStyle.startRow + 3, elemStyle.startColumn, Direction.Down]);
+    } else {
+    //   if(tilePosition.tile.isDouble) {
+    //     elemStyle.startRow = edgePosition.row + 2;
+    //     elemStyle.startColumn = edgePosition.column - 2;
+    //     this.setEdgePosition(edgeType, [elemStyle.startRow + 1, elemStyle.startColumn + 1, Direction.Down]);
+    //     this.orientation.push([tilePosition.position, 1]);
+    //     // let cornerPosition: number = tilePosition.position < 0
+    //     //   ? tilePosition.position + 1 : tilePosition.position - 1;
+    //     // this.rotateCornerTile(cornerPosition, "left-up");
+    //   } else {
+    //     elemStyle.startRow = edgePosition.row + 2;
+    //     elemStyle.startColumn = edgePosition.column - 1;
+    //     this.setEdgePosition(edgeType, [elemStyle.startRow, elemStyle.startColumn, Direction.Down]);
+    //     this.orientation.push([tilePosition.position, 1]);
+    //     if(tilePosition.contactEdge !== tilePosition.tile.b) {
+    //       elemStyle.transformX = 1;
+    //       elemStyle.transformY = -1;
+    //       elemStyle.startRow += 3;
+    //     }
+    //   }
+    }
+  }
+  private getToDownTilePosition(edgeType: EdgeType, tilePosition: DominoTilePosition) {
+    let edgePosition = this.getEdgePos(edgeType);
+    if(edgePosition.row < this.rowsNumber - 4)
+    {
+      if(tilePosition.tile.isDouble) {
+        this.placeDownDouble(edgePosition, tilePosition);
+      } else {
+        this.placeDownTile(edgePosition, tilePosition);
+      }
+      // elemStyle.startRow = tilePosition.tile.isDouble ? edgePosition[0] + 1 : edgePosition[0] + 1;
+      // elemStyle.startColumn = tilePosition.tile.isDouble ? edgePosition[1] - 1 : edgePosition[1];
+      // let edgeColumn = tilePosition.tile.isDouble ? elemStyle.startColumn + 1 : elemStyle.startColumn;
+      // let edgeRow = tilePosition.tile.isDouble ? elemStyle.startRow + 1 : elemStyle.startRow + 3;
+      // this.setEdgePosition(edgeType, [edgeRow, edgeColumn, Direction.Down]);
+      // if(tilePosition.contactEdge !== tilePosition.tile.a) {
+      //   elemStyle.transformX = 1;
+      //   elemStyle.transformY = -1;
+      //   elemStyle.startRow += 3;
+      // }
+      // let tileDisplay: TileDisplay = {
+      //   id: tilePosition.tile.tileId,
+      //   styleProps: {
+      //     startRow: elemStyle.startRow,
+      //     startColumn: elemStyle.startColumn,
+      //     transformX: elemStyle.transformX,
+      //     transformY: elemStyle.transformY
+      //   },
+      //   isHorizontal: tilePosition.tile.isDouble,
+      //   tilePosition: tilePosition
+      // };
+      // this.tileDispays.set(tilePosition.position, tileDisplay);
+    }
+    else if(edgePosition.row <= this.rowsNumber - 2 && tilePosition.tile.isDouble)
+    {
+      // elemStyle.startRow = edgePosition[0] + 1;
+      // elemStyle.startColumn = edgePosition[1] - 1;
+      // let tileDisplay: TileDisplay = {
+      //   id: tilePosition.tile.tileId,
+      //   styleProps: {
+      //     startRow: elemStyle.startRow,
+      //     startColumn: elemStyle.startColumn,
+      //     transformX: elemStyle.transformX,
+      //     transformY: elemStyle.transformY
+      //   },
+      //   isHorizontal: true,
+      //   tilePosition: tilePosition
+      // };
+      // this.tileDispays.set(tilePosition.position, tileDisplay);
+      // this.setEdgePosition(edgeType, [elemStyle.startRow, elemStyle.startColumn, Direction.Left]);
+    }
+    else
+    {
+      // if(tilePosition.tile.isDouble) {
+      //   elemStyle.startRow = edgePosition[0] - 2;
+      //   elemStyle.startColumn = edgePosition[1] - 2;
+      //   this.setEdgePosition(edgeType, [elemStyle.startRow + 1, elemStyle.startColumn, Direction.Left]);
+      //   this.orientation.push([tilePosition.position, 0]);
+      //   let cornerPosition: number = tilePosition.position < 0
+      //     ? tilePosition.position + 1 : tilePosition.position - 1;
+      //   this.rotateCornerTile(cornerPosition, "left-up");
+      // } else {
+      //   elemStyle.startRow = edgePosition[0] - 1;
+      //   elemStyle.startColumn = edgePosition[1] - 4;
+      //   this.setEdgePosition(edgeType, [elemStyle.startRow, elemStyle.startColumn, Direction.Left]);
+      //   this.orientation.push([tilePosition.position, 0]);
+      //   if(tilePosition.contactEdge !== tilePosition.tile.b) {
+      //     elemStyle.transformX = 1;
+      //     elemStyle.transformY = -1;
+      //     elemStyle.startRow += 3;
+      //   }
+      // }
+    }
   }
 
   private rotateCornerTile(position: number, type: string) {
     switch(type) {
       case "left-up":
         let tilePosition = this.game.table.tilesOnTable.find(t => t.position === position);
+        let previousPosition = position > 0 ? position - 1 : position + 1;
+        let previousTilePosition = this.game.table.tilesOnTable.find(t => t.position === previousPosition);
         if(tilePosition) {
-          let tileId = tilePosition?.tile.tileId;
-          let tileDisplay = this.tileDispays.get(tileId);
+          let tileDisplay = this.tileDispays.get(tilePosition.position);
           if(tileDisplay) {
-            if(tilePosition.contactEdge === tilePosition.tile.a) {
-              tileDisplay.isHorizontal = false;
-              tileDisplay.styles.transformY *= -1;
-              tileDisplay.styles.startRow += 1;
+            if(previousTilePosition?.tile.isDouble) {
+              if(tilePosition.contactEdge === tilePosition.tile.a) {
+                tileDisplay.isHorizontal = false;
+                tileDisplay.styleProps.transformY *= -1;
+                tileDisplay.styleProps.startRow += 1;
+              } else {
+                tileDisplay.isHorizontal = false;
+                tileDisplay.styleProps.startRow -= 5;
+                tileDisplay.styleProps.startColumn += 4;
+              }
             } else {
-              tileDisplay.isHorizontal = false;
-              tileDisplay.styles.startRow -= 2;
-              tileDisplay.styles.startColumn += 2;
+              if(tilePosition.contactEdge === tilePosition.tile.a) {
+                tileDisplay.isHorizontal = false;
+                tileDisplay.styleProps.transformY *= -1;
+                tileDisplay.styleProps.startRow += 1;
+              } else {
+                tileDisplay.isHorizontal = false;
+                tileDisplay.styleProps.startRow -= 2;
+                tileDisplay.styleProps.startColumn += 2;
+              }
             }
           }
         }
         break;
       default:
         break;
-    }
-  }
-
-  private leftEdgePosition: [row: number, column: number, dir: Direction] = [0, 0, Direction.Left];
-  private rightEdgePosition: [row: number, column: number, dir: Direction] = [0, 0, Direction.Right];
-
-  private orientation: [position: number, orientation: number][] = [];
-
-  private reorderTilesOnTable() {
-    this.game.table.tilesOnTable = 
-      this.game.table.tilesOnTable.sort((a, b) => {
-        return Math.abs(a.position) - Math.abs(b.position);
-      });
-  }
-  isHorizontal(tilePosition: DominoTilePosition): boolean {
-    let tileDisplay = this.tileDispays.get(tilePosition.tile.tileId);
-    if(tileDisplay) {
-      return tileDisplay.isHorizontal;
-    }
-    let or = this.orientation.find(p => p[0] === tilePosition.position);
-    if (or && or[1] !== 0) {
-      return tilePosition.tile.isDouble;
-    }
-    else {
-      return !tilePosition.tile.isDouble;
     }
   }
 }
@@ -847,16 +961,16 @@ enum EdgeType {
   Left,
   Right
 }
-
-interface ElementPositionStyle {
-  row: number;
-  column: number;
-  transform: [x: number, y: number];
+interface EdgePosition {
+  type: EdgeType,
+  row: number,
+  column: number,
+  direction: Direction
 }
 
 interface TileDisplay {
   id: string,
-  styles: StyleProp,
+  styleProps: StyleProp,
   isHorizontal: boolean,
   tilePosition: DominoTilePosition
 }
@@ -865,4 +979,13 @@ interface StyleProp {
   startColumn: number,
   transformX: number,
   transformY: number
+}
+interface StylePropShifts {
+  isHorizontal: boolean;
+  rowShift?: number;
+  columnShift?: number;
+  reverseRowShift?: number;
+  reverseColumnShift?: number;
+  reverseTransformX?: number;
+  reverseTransformY?: number;
 }

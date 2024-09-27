@@ -2,10 +2,10 @@
     <div class="grid-item opponent-hand">Opponent hand</div>
     <div #GameTable class="grid-item game-table">
         @if(game.table.tilesOnTable) {
-            @for(tile of this.game.table.tilesOnTable; track tile.tile.tileId)
+            @for(tile of this.tileDispays.values(); track tile.id)
             {
-                <div [style]="getGridPosition(tile)">
-                    <Dom-tile [tile]="tile.tile" [isHorizontal]="isHorizontal(tile)"></Dom-tile>
+                <div [style]="buildStyle(tile.styleProps)">
+                    <Dom-tile [tile]="tile.tilePosition.tile" [isHorizontal]="tile.isHorizontal"></Dom-tile>
                 </div>
             }
         }
