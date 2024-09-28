@@ -2,7 +2,7 @@
     <div class="grid-item opponent-hand">Opponent hand</div>
     <div #GameTable class="grid-item game-table">
         @if(game.table.tilesOnTable) {
-            @for(tile of this.tileDispays.values(); track tile.id)
+            @for(tile of this.tileDispays.values(); track tile.tilePosition)
             {
                 <div [style]="buildStyle(tile.styleProps)">
                     <Dom-tile [tile]="tile.tilePosition.tile" [isHorizontal]="tile.isHorizontal"></Dom-tile>
