@@ -4,7 +4,7 @@
         @if(game.table.tilesOnTable) {
             @for(tile of this.tileDispays.values(); track tile.tilePosition)
             {
-                <div [style]="buildStyle(tile.styleProps)">
+                <div [ariaLabel]="tile.tilePosition.position" [style]="buildStyle(tile.styleProps)">
                     <Dom-tile [tile]="tile.tilePosition.tile" [isHorizontal]="tile.isHorizontal"></Dom-tile>
                 </div>
             }
