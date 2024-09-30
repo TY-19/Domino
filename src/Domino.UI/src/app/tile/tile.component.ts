@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, Input, Renderer2, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, HostListener, Input, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { TileDetails } from '../_models/tileDetails';
 
 @Component({
@@ -27,6 +27,7 @@ export class TileComponent implements AfterViewInit {
     [5, ['top-left-dot', 'top-right-dot', 'center-dot', 'bottom-left-dot', 'bottom-right-dot']],
     [6, ['top-left-dot', 'middle-left-dot', 'top-right-dot', 'bottom-left-dot', 'middle-right-dot', 'bottom-right-dot']]
   ]);
+  private isViewInitialized: boolean = false;
 
   @Input() tile: TileDetails = null!;
   @Input() isHorizontal: boolean = false;
@@ -36,10 +37,18 @@ export class TileComponent implements AfterViewInit {
   constructor(private el: ElementRef, private renderer: Renderer2) {
   }
   
-  ngAfterViewInit(): void {
-    this.buildTile();
+  ngOnChanges(changes: SimpleChanges): void {
+    if (this.isViewInitialized && changes['isHorizontal']) {
+      this.clearTile();
+      this.buildTile();
+    }
   }
 
+  ngAfterViewInit(): void {
+    this.buildTile();
+    this.isViewInitialized = true;
+  }
+  
   private buildTile() {
     let squareOneDots = this.buildSquare(this.tile?.sideA ?? 0);
     for(let dot of squareOneDots) {
@@ -68,5 +77,13 @@ export class TileComponent implements AfterViewInit {
       }
     }
     return children;
+  }
+  private clearTile(): void {
+    while (this.squareOne.nativeElement.firstChild) {
+      this.squareOne.nativeElement.removeChild(this.squareOne.nativeElement.firstChild);
+    }
+    while (this.squareTwo.nativeElement.firstChild) {
+      this.squareTwo.nativeElement.removeChild(this.squareTwo.nativeElement.firstChild);
+    }
   }
 }

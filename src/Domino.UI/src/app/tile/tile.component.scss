@@ -1,5 +1,6 @@
 .domino-tile {
     display: flex;
+    position: relative;
     background-color: orange;
     border: 2px solid black;
     &-vertical {

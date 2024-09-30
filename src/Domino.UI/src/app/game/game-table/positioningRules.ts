@@ -1,6 +1,6 @@
-import { Direction } from "./enums/direction";
-import { MoveType } from "./enums/moveType";
-import { PositionShift } from "../_models/positionShift";
+import { Direction } from "../enums/direction";
+import { MoveType } from "../enums/moveType";
+import { PositionShift } from "../../_models/positionShift";
 
 export class PositioningRules {
     public static readonly positionShifts: Map<number, PositionShift> = new Map<number, PositionShift>([

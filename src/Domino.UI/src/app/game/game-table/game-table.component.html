@@ -1,0 +1,8 @@
+@if(tiles) {
+  @for(tileDisplay of this.tileDisplays.values(); track tileDisplay.tile.position)
+  {
+    <div [ariaLabel]="tileDisplay.tile.position" [style]="buildStyle(tileDisplay.positioning)">
+      <Dom-tile [tile]="tileDisplay.tile.tileDetails" [isHorizontal]="tileDisplay.isHorizontal"></Dom-tile>
+    </div>
+  }
+}

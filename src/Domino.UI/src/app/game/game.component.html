@@ -1,15 +1,8 @@
 <div class="grid-container">
   <div class="grid-item opponent-hand">Opponent hand</div>
-  <div #GameTable class="grid-item game-table">
-    @if(game.table.tilesOnTable) {
-      @for(tileDisplay of this.tileDisplays.values(); track tileDisplay.tile.position)
-      {
-        <div [ariaLabel]="tileDisplay.tile.position" [style]="buildStyle(tileDisplay.positioning)">
-          <Dom-tile [tile]="tileDisplay.tile.tileDetails" [isHorizontal]="tileDisplay.isHorizontal"></Dom-tile>
-        </div>
-      }
-    }
-  </div>
+  @if(game.table.tilesOnTable) {
+    <Dom-game-table [tiles]="game.table.tilesOnTable" class="grid-item game-table"></Dom-game-table>
+  }
   <div class="grid-item market">Market</div>
   <div class="grid-item player-hand">
     @if(game) {
