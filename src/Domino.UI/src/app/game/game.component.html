@@ -1,24 +1,24 @@
 <div class="grid-container">
-    <div class="grid-item opponent-hand">Opponent hand</div>
-    <div #GameTable class="grid-item game-table">
-        @if(game.table.tilesOnTable) {
-            @for(tile of this.tileDispays.values(); track tile.tilePosition)
-            {
-                <div [ariaLabel]="tile.tilePosition.position" [style]="buildStyle(tile.styleProps)">
-                    <Dom-tile [tile]="tile.tilePosition.tile" [isHorizontal]="tile.isHorizontal"></Dom-tile>
-                </div>
-            }
-        }
-    </div>
-    <div class="grid-item market">Market</div>
-    <div class="grid-item player-hand">
-        @if(game) {
-            @for(tile of this.game.player.hand; track tile.tileId)
-            {
-                <Dom-tile [tile]="tile" [isHorizontal]="false"></Dom-tile>
-            }
-        }
-    </div>
-    <button type="button" class="grid-item play-button" (click)="start()">Start!</button>
+  <div class="grid-item opponent-hand">Opponent hand</div>
+  <div #GameTable class="grid-item game-table">
+    @if(game.table.tilesOnTable) {
+      @for(tileDisplay of this.tileDisplays.values(); track tileDisplay.tile.position)
+      {
+        <div [ariaLabel]="tileDisplay.tile.position" [style]="buildStyle(tileDisplay.positioning)">
+          <Dom-tile [tile]="tileDisplay.tile.tileDetails" [isHorizontal]="tileDisplay.isHorizontal"></Dom-tile>
+        </div>
+      }
+    }
+  </div>
+  <div class="grid-item market">Market</div>
+  <div class="grid-item player-hand">
+    @if(game) {
+      @for(tile of this.game.player.hand; track tile.tileId)
+      {
+        <Dom-tile [tile]="tile" [isHorizontal]="false"></Dom-tile>
+      }
+    }
+  </div>
+  <button type="button" class="grid-item play-button" (click)="start()">Start!</button>
 </div>
 

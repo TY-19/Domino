@@ -1,6 +1,6 @@
-import { DominoTile } from "./dominoTile"
+import { TileDetails } from "./tileDetails"
 
 export interface Player {
     name: string,
-    hand: DominoTile[]
+    hand: TileDetails[]
 }

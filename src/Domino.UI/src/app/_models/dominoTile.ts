@@ -1,7 +1,7 @@
-export interface DominoTile
-{
-    a: number,
-    b: number,
-    tileId: string,
-    isDouble: boolean
+import { TileDetails } from "./tileDetails";
+
+export interface DominoTile {
+    tileDetails: TileDetails;
+    position: number;
+    contactEdge: number;
 }

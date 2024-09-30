@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, HostListener, Input, Renderer2, ViewChild } from '@angular/core';
-import { DominoTile } from '../_models/dominoTile';
+import { TileDetails } from '../_models/tileDetails';
 
 @Component({
   selector: 'Dom-tile',
@@ -28,7 +28,7 @@ export class TileComponent implements AfterViewInit {
     [6, ['top-left-dot', 'middle-left-dot', 'top-right-dot', 'bottom-left-dot', 'middle-right-dot', 'bottom-right-dot']]
   ]);
 
-  @Input() tile: DominoTile = null!;
+  @Input() tile: TileDetails = null!;
   @Input() isHorizontal: boolean = false;
   @ViewChild('squareOne') squareOne!: ElementRef<HTMLDivElement>;
   @ViewChild('squareTwo') squareTwo!: ElementRef<HTMLDivElement>;
