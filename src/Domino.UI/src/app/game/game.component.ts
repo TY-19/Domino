@@ -43,10 +43,10 @@ export class GameComponent implements OnInit {
     this.gameService.startGame()
       .subscribe(gs => this.game = gs);
   }
-  buildStyle(styleProp: PositionOnTable): string {
-    let style: string = "grid-row-start: " + styleProp.row + ";"
-      + " grid-column-start: " + styleProp.column + ";";
-    if(styleProp.rotateTile === true) {
+  buildStyle(position: PositionOnTable): string {
+    let style: string = "grid-row-start: " + position.row + ";"
+      + " grid-column-start: " + position.column + ";";
+    if(position.rotateTile === true) {
       style += " transform: rotate(180deg)";
     }
     return style;
@@ -62,154 +62,128 @@ export class GameComponent implements OnInit {
   }
   
   private calculateColumnsNumber(): number {
-    const pixelsInVh = window.innerHeight / 100;
-    const columnWidth = 3 * pixelsInVh;
-    const gameTableWidth = window.innerWidth * 10 / 12 - 20;
+    const columnWidth: number = 3 * window.innerHeight / 100;
+    const gameTableWidth: number = window.innerWidth * 10 / 12 - 20;
     return Math.floor(gameTableWidth / columnWidth);
   }
   private populateTileDisplays(): void {
-    const sortedTilePositions = this.game.table.tilesOnTable.sort((a, b) => {
-      return Math.abs(a.position) - Math.abs(b.position);
-    });
+    const sortedTilePositions: DominoTile[] = this.game.table.tilesOnTable
+      .sort((a, b) => Math.abs(a.position) - Math.abs(b.position));
     for(const tilePosition of sortedTilePositions) {
       this.calculateDisplayParameters(tilePosition);
     }
   }
-  private calculateDisplayParameters(tilePosition: DominoTile): void {
-    if(tilePosition.position === 0) {
-      this.placeCenterTile(tilePosition);
+  private calculateDisplayParameters(tile: DominoTile): void {
+    if(tile.position === 0) {
+      this.placeCenterTile(tile);
     } else {
-      let edgePosition = tilePosition.position < 0 ? this.leftEdgePosition : this.rightEdgePosition;
-      let move = this.determineMoveType(edgePosition, tilePosition);
-      console.log("tile: " + tilePosition.tileDetails.tileId + "\tdirection: " + edgePosition.currentDirection + "\tmove: " + move)
-      this.placeTileOnTable(edgePosition.currentDirection!, move, edgePosition, tilePosition);
+      const edgePosition: PositionOnTable = tile.position < 0
+        ? this.leftEdgePosition
+        : this.rightEdgePosition;
+      const move: MoveType = this.determineMoveType(edgePosition, tile);
+      // console.log("tile: " + tile.tileDetails.tileId + "\tdirection: " + edgePosition.currentDirection + "\tmove: " + move);
+      this.placeTileOnTable(move, edgePosition, tile);
     }
   }
-  private determineMoveType(edgePosition: PositionOnTable, tilePosition: DominoTile): MoveType {
+  private placeCenterTile(tile: DominoTile): void {
+    const position: PositionOnTable = {
+      row: Math.floor(this.rowsNumber / 2),
+      column: Math.floor(this.columnsNumber / 2),
+    };
+    this.leftEdgePosition = {
+      row: position.row,
+      column: position.column,
+      currentDirection: Direction.Left
+    };
+    this.rightEdgePosition = {
+      row: position.row,
+      column: position.column,
+      currentDirection: Direction.Right
+    };
+    if(tile.tileDetails.isDouble) {
+      position.row--;
+      this.rightEdgePosition.column++;
+    }
+    else {
+      this.rightEdgePosition.column += 3;
+    }
+    this.setTileDisplays(position, tile, Direction.Left);
+  }
+  private determineMoveType(edgePosition: PositionOnTable, tile: DominoTile): MoveType {
     let moveType: MoveType = null!;
-    if(this.canContinueLine(edgePosition.currentDirection!, edgePosition)) {
-      moveType = tilePosition.tileDetails.isDouble ? MoveType.DoubleInLine : MoveType.TileInLine;
-    } else if(this.canRotateInLine(edgePosition.currentDirection!, edgePosition)) {
-      if(tilePosition.tileDetails.isDouble) {
+    if(this.canContinueLine(edgePosition)) {
+      moveType = tile.tileDetails.isDouble
+        ? MoveType.DoubleInLine
+        : MoveType.TileInLine;
+    } else if(this.canRotateInLine(edgePosition)) {
+      if(tile.tileDetails.isDouble) {
         moveType = MoveType.DoubleInLine;
       } else {
-        moveType = this.isPreviousTileDouble(tilePosition)
+        moveType = this.isPreviousTileDouble(tile)
           ? MoveType.CornerOutDouble
           : MoveType.CornerInLine;
       }
     } else {
-      if(tilePosition.tileDetails.isDouble) {
-        let previousTileDisplay = this.getPreviousTile(tilePosition);
-        moveType = this.isPreviousTileDouble(previousTileDisplay?.tile!)
+      if(tile.tileDetails.isDouble) {
+        const previousTileDisplay: TileDisplay = this.getPreviousTile(tile);
+        moveType = this.isPreviousTileDouble(previousTileDisplay.tile)
           ? MoveType.RotateCornerAfterDouble
           : MoveType.RotateCorner;
         moveType += MoveType.DoubleInLine;
       } else {
-        moveType = this.isPreviousTileDouble(tilePosition)
+        moveType = this.isPreviousTileDouble(tile)
           ? MoveType.CornerOutDouble
           : MoveType.CornerOut;
       }
     }
     return moveType;
   }
-  private canContinueLine(direction: Direction, edgePosition: PositionOnTable): boolean {
-    return direction === Direction.Left && edgePosition.column > 5
-      || direction === Direction.Top && edgePosition.row > 5
-      || direction === Direction.Right && edgePosition.column < this.columnsNumber - 4
-      || direction === Direction.Down && edgePosition.row < this.rowsNumber - 4;
+  private canContinueLine(edgePosition: PositionOnTable): boolean {
+    return edgePosition.currentDirection === Direction.Left && edgePosition.column > 5
+      || edgePosition.currentDirection === Direction.Top && edgePosition.row > 5
+      || edgePosition.currentDirection === Direction.Right && edgePosition.column < this.columnsNumber - 4
+      || edgePosition.currentDirection === Direction.Down && edgePosition.row < this.rowsNumber - 4;
   }
-  private canRotateInLine(direction: Direction, edgePosition: PositionOnTable): boolean {
-    return direction === Direction.Left && edgePosition.column > 3
-      || direction === Direction.Top && edgePosition.row > 3
-      || direction === Direction.Right && edgePosition.column < this.columnsNumber - 3
-      || direction === Direction.Down && edgePosition.row < this.rowsNumber - 3;
+  private canRotateInLine(edgePosition: PositionOnTable): boolean {
+    return edgePosition.currentDirection === Direction.Left && edgePosition.column > 3
+      || edgePosition.currentDirection === Direction.Top && edgePosition.row > 3
+      || edgePosition.currentDirection === Direction.Right && edgePosition.column < this.columnsNumber - 3
+      || edgePosition.currentDirection === Direction.Down && edgePosition.row < this.rowsNumber - 3;
   }
   
-  private placeCenterTile(tilePosition: DominoTile): void {
-    const elemStyle: PositionOnTable = {
-      row: Math.floor(this.rowsNumber / 2),
-      column: Math.floor(this.columnsNumber / 2),
-    };
-    this.leftEdgePosition = {
-      row: elemStyle.row,
-      column: elemStyle.column,
-      currentDirection: Direction.Left
-    };
-    this.rightEdgePosition = {
-      row: elemStyle.row,
-      column: elemStyle.column,
-      currentDirection: Direction.Right
-    };
-    
-    if(tilePosition.tileDetails.isDouble) {
-      elemStyle.row--;
-      this.rightEdgePosition.column++;
+  private placeTileOnTable(moveType: MoveType, edgePosition: PositionOnTable, tile: DominoTile): void {
+    if(this.needRotatePreviousTile(moveType)) {
+      this.rotatePreviousTile(moveType, edgePosition, tile);
+      moveType = moveType % 100;
     }
-    else {
-      elemStyle.column--;
-      this.rightEdgePosition.column += 3;
-    }
-    this.setTileDisplays(elemStyle, !tilePosition.tileDetails.isDouble, tilePosition, Direction.Left);
+    const positionShift = PositioningRules.positionShifts.get(edgePosition.currentDirection! + moveType);
+    edgePosition.currentDirection = this.getNewDirection(moveType, edgePosition.currentDirection);
+    this.placeTile(edgePosition, tile, positionShift);
+    this.updateEdgePosition(edgePosition, positionShift);
   }
-  private placeTileOnTable(direction: Direction, moveType: MoveType,
-    edgePosition: PositionOnTable, tilePosition: DominoTile): void {
-    if(moveType >= 100) {
-      let rotateMove: MoveType = moveType - (moveType % 100);
-      let startDirection: Direction = direction;
-      if(startDirection < 0) {
-        startDirection = 4;
-      }
-      let previousTile: TileDisplay = this.getPreviousTile(tilePosition);
-      this.rotateCorner(startDirection, edgePosition, previousTile);
-      moveType -= rotateMove;
-      direction++;
-      if(direction > 4) {
-        direction = 1;
-      }
-    }
-    const styleShifts = PositioningRules.positionShifts.get(direction + moveType);
-    if(!styleShifts) {
-      return;
-    }
-    let tileDirection = this.getTileDirection(edgePosition.currentDirection!, moveType);
-    this.placeTile(edgePosition, tilePosition, styleShifts, tileDirection);
-    this.updateEdgePosition(edgePosition, styleShifts, tileDirection);
+  private needRotatePreviousTile(moveType: MoveType) {
+    return moveType >= 100;
   }
-  private rotateCorner(direction: Direction, edgePosition: PositionOnTable, tileDisplay: TileDisplay) {
-    let moveType: MoveType = this.isPreviousTileDouble(tileDisplay.tile)
-      ? MoveType.RotateCornerAfterDouble
-      : MoveType.RotateCorner;
-    let rotateShift = PositioningRules.positionShifts.get(direction + moveType);
-    if(!rotateShift) {
-      console.error(`No positioning rules provided for direction ${direction} and movetype ${moveType}`);
-      return;
-    }
-    let tileDirection = this.getTileDirection(edgePosition.currentDirection!, moveType);
-    this.rotateCornerTile(tileDisplay, rotateShift);
-    this.updateEdgePosition(edgePosition, rotateShift, tileDirection);
-  }
-  private rotateCornerTile(tileDisplay: TileDisplay, tileShift: PositionShift) {
-    tileDisplay.direction += 1;
-    if(tileDisplay.direction > 4) {
-      tileDisplay.direction = 1;
-    }
+  private rotatePreviousTile(moveType: MoveType, edgePosition: PositionOnTable, tile: DominoTile) {
+    const tileDisplay = this.getPreviousTile(tile);
+    const rotationMove = moveType - moveType % 100;
+    const rotateShift = PositioningRules.positionShifts.get(tileDisplay.direction + rotationMove);
+    tileDisplay.direction = this.getNewDirection(rotationMove, tileDisplay.direction);
     tileDisplay.isHorizontal = this.isHorizontal(tileDisplay.direction, tileDisplay.tile);
-    tileDisplay.positioning.row += tileShift.rowShift ?? 0;
-    tileDisplay.positioning.column += tileShift.columnShift ?? 0;
     tileDisplay.positioning.rotateTile = false;
-    if(this.needReverseTile(tileDisplay.direction, tileDisplay.tile)) {
-      tileDisplay.positioning.rotateTile = true;
-      tileDisplay.positioning.row += tileShift.reverseRowShift ?? 0;
-      tileDisplay.positioning.column += tileShift.reverseColumnShift ?? 0;
-    }
+    edgePosition.currentDirection = tileDisplay.direction;
+    this.placeTile(edgePosition, tileDisplay.tile, rotateShift);
+    this.updateEdgePosition(edgePosition, rotateShift);
   }
-  private updateEdgePosition(edgePosition: PositionOnTable, styleShift: PositionShift, direction: Direction) {
-    edgePosition.currentDirection = direction;
-    edgePosition.row += styleShift.edgeRowShift ?? 0;
-    edgePosition.column += styleShift.edgeColumnShift ?? 0;
+  private updateEdgePosition(edgePosition: PositionOnTable, positionShift?: PositionShift) {
+    edgePosition.row += positionShift?.edgeRowShift ?? 0;
+    edgePosition.column += positionShift?.edgeColumnShift ?? 0;
     return edgePosition;
   }
-  private getTileDirection(direction: Direction, moveType: MoveType): Direction {
+  private getNewDirection(moveType: MoveType, direction?: Direction): Direction {
+    if(!direction) {
+      return Direction.Left;
+    }
     if(moveType === MoveType.TileInLine || moveType === MoveType.DoubleInLine) {
       return direction;
     } else {
@@ -217,56 +191,52 @@ export class GameComponent implements OnInit {
       return newDirection <= 4 ? newDirection : 1;
     }
   }
-  private placeTile(edgePosition: PositionOnTable, tilePosition: DominoTile,
-    stylePropShift: PositionShift, tileDirection: Direction) {
-    let styleProp: PositionOnTable = {
-      row: edgePosition.row + (stylePropShift.rowShift ?? 0),
-      column: edgePosition.column + (stylePropShift.columnShift ?? 0),
+  private placeTile(edgePosition: PositionOnTable, tile: DominoTile, positionShift?: PositionShift) {
+    const position: PositionOnTable = {
+      row: edgePosition.row + (positionShift?.rowShift ?? 0),
+      column: edgePosition.column + (positionShift?.columnShift ?? 0),
     };
-    if(this.needReverseTile(tileDirection, tilePosition)) {
-      styleProp.rotateTile = true;
-      styleProp.row += (stylePropShift.reverseRowShift ?? 0);
-      styleProp.column += (stylePropShift.reverseColumnShift ?? 0);
+    if(this.needReverseTile(edgePosition.currentDirection!, tile)) {
+      position.rotateTile = true;
+      position.row += (positionShift?.reverseRowShift ?? 0);
+      position.column += (positionShift?.reverseColumnShift ?? 0);
     }
-    let isHorizontal = this.isHorizontal(tileDirection, tilePosition);
-    this.setTileDisplays(styleProp, isHorizontal, tilePosition, tileDirection);
+    this.setTileDisplays(position, tile, edgePosition.currentDirection!);
   }
-  private needReverseTile(direction: Direction, tilePosition: DominoTile) {
-    if(tilePosition.tileDetails.isDouble) {
+  private needReverseTile(direction: Direction, tile: DominoTile) {
+    if(tile.tileDetails.isDouble) {
       return false;
     }
-    let isContactedSideA: boolean = tilePosition.contactEdge === tilePosition.tileDetails.a;
-    if(isContactedSideA) {
+    const isContactedEdgeAtSideA: boolean = tile.contactEdge === tile.tileDetails.sideA;
+    if(isContactedEdgeAtSideA) {
       return direction === Direction.Left || direction === Direction.Top;
     } else {
       return direction === Direction.Right || direction === Direction.Down;
     }
   }
-  private isHorizontal(direction: Direction, tilePosition: DominoTile) {
-    if(tilePosition.tileDetails.isDouble) {
+  private isHorizontal(direction: Direction, tile: DominoTile) {
+    if(tile.tileDetails.isDouble) {
       return direction === Direction.Top || direction === Direction.Down;
     } else {
       return direction === Direction.Left || direction === Direction.Right;
     }
   }
-  private setTileDisplays(styleProps: PositionOnTable, isHorizontal: boolean,
-    tilePosition: DominoTile, tileDirection: Direction) {
-    let tileDisplay: TileDisplay = {
-      id: tilePosition.tileDetails.tileId,
-      positioning: styleProps,
-      isHorizontal: isHorizontal,
-      tile: tilePosition,
-      direction: tileDirection
+  private setTileDisplays(positioning: PositionOnTable, tile: DominoTile, direction: Direction) {
+    const tileDisplay: TileDisplay = {
+      positioning: positioning,
+      isHorizontal: this.isHorizontal(direction, tile),
+      tile: tile,
+      direction: direction
     };
-    this.tileDisplays.set(tilePosition.position, tileDisplay);
+    this.tileDisplays.set(tile.position, tileDisplay);
   }
-  private getPreviousTile(tilePosition: DominoTile): TileDisplay {
-    let position = tilePosition.position > 0 ? tilePosition.position - 1 : tilePosition.position + 1;
-    let tile = this.tileDisplays.get(position);
-    if(!tile) {
+  private getPreviousTile(tile: DominoTile): TileDisplay {
+    let position = tile.position > 0 ? tile.position - 1 : tile.position + 1;
+    let tileDisplay = this.tileDisplays.get(position);
+    if(!tileDisplay) {
       console.error("Cannot get the tile on position " + position);
     }
-    return tile!;
+    return tileDisplay!;
   }
   private isPreviousTileDouble(tilePosition: DominoTile): boolean {
     return this.getPreviousTile(tilePosition)?.tile.tileDetails.isDouble ?? false;

@@ -1,7 +1,7 @@
 export interface TileDetails
 {
-    a: number,
-    b: number,
+    sideA: number,
+    sideB: number,
     tileId: string,
     isDouble: boolean
 }

@@ -38,6 +38,8 @@ export class PositioningRules {
     [(Direction.Left + MoveType.RotateCorner), {
       rowShift: -2,
       columnShift: 2,
+      reverseRowShift: 3,
+      reverseColumnShift: 1,
       edgeRowShift: -2,
       edgeColumnShift: 2
     }],
@@ -61,7 +63,8 @@ export class PositioningRules {
     }],
     [(Direction.Top + MoveType.CornerInLine), {
       rowShift: -2,
-      reverseRowShift: 3,
+      reverseRowShift: 1,
+      reverseColumnShift: 3,
       edgeRowShift: -2,
       edgeColumnShift: 3
     }],
@@ -78,10 +81,10 @@ export class PositioningRules {
       edgeColumnShift: 6
     }],
     [(Direction.Top + MoveType.RotateCorner), {
-      rowShift: -1,
-      columnShift: -1,
-      reverseRowShift: 4,
-      reverseColumnShift: 4,
+      rowShift: 2,
+      columnShift: 0,
+      reverseRowShift: 1,
+      reverseColumnShift: 3,
       edgeRowShift: 2,
       edgeColumnShift: 3
     }],
@@ -107,37 +110,40 @@ export class PositioningRules {
     }],
     [(Direction.Right + MoveType.CornerInLine), {
       columnShift: 1,
+      reverseColumnShift: 1,
       reverseRowShift: 3,
       edgeColumnShift: 1,
       edgeRowShift: 2,
     }],
     [(Direction.Right + MoveType.CornerOut), {
-      columnShift: -1,
       rowShift: 2,
+      columnShift: -1,
       reverseRowShift: 3,
+      reverseColumnShift: 1,
       edgeColumnShift: -1,
       edgeRowShift: 4
     }],
     [(Direction.Right + MoveType.CornerOutDouble), {
-      columnShift: 0,
       rowShift: 3,
+      columnShift: -1,
       reverseRowShift: 3,
+      reverseColumnShift: 1,
       edgeColumnShift: -1,
       edgeRowShift: 5
     }],
     [(Direction.Right + MoveType.RotateCorner), {
       rowShift: 0,
-      columnShift: 0,
-      reverseRowShift: 2,
-      reverseColumnShift: -2,
+      columnShift: -3,
+      reverseRowShift: 3,
+      reverseColumnShift: 1,
       edgeRowShift: 2,
       edgeColumnShift: -3,
     }],
     [(Direction.Right + MoveType.RotateCornerAfterDouble), {
       rowShift: 3,
-      columnShift: -4,
-      reverseRowShift: 2,
-      reverseColumnShift: 0,
+      columnShift: -5,
+      reverseRowShift: 3,
+      reverseColumnShift: 1,
       edgeRowShift: 5,
       edgeColumnShift: -5,
     }],
@@ -174,18 +180,18 @@ export class PositioningRules {
       edgeColumnShift: -5
     }],
     [(Direction.Down + MoveType.RotateCorner), {
-      rowShift: -3,
-      columnShift: -3,
-      reverseRowShift: 4,
-      reverseColumnShift: 4,
+      rowShift: -2,
+      columnShift: -2,
+      reverseRowShift: 1,
+      reverseColumnShift: 3,
       edgeRowShift: -2,
       edgeColumnShift: -2,
     }],
     [(Direction.Down + MoveType.RotateCornerAfterDouble), {
-      rowShift: -5,
-      columnShift: -6,
-      reverseRowShift: 4,
-      reverseColumnShift: 4,
+      rowShift: -4,
+      columnShift: -5,
+      reverseRowShift: 1,
+      reverseColumnShift: 3,
       edgeRowShift: -4,
       edgeColumnShift: -5,
     }],

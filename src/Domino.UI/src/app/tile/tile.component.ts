@@ -41,11 +41,11 @@ export class TileComponent implements AfterViewInit {
   }
 
   private buildTile() {
-    let squareOneDots = this.buildSquare(this.tile?.a ?? 0);
+    let squareOneDots = this.buildSquare(this.tile?.sideA ?? 0);
     for(let dot of squareOneDots) {
       this.squareOne.nativeElement.appendChild(dot);
     }
-    let squareTwoDots = this.buildSquare(this.tile?.b ?? 0);
+    let squareTwoDots = this.buildSquare(this.tile?.sideB ?? 0);
     for(let dot of squareTwoDots) {
       this.squareTwo.nativeElement.appendChild(dot);
     }

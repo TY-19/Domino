@@ -3,9 +3,8 @@ import { DominoTile } from "./dominoTile";
 import { PositionOnTable } from "./positionOnTable";
 
 export interface TileDisplay {
-    id: string,
+    tile: DominoTile,
     positioning: PositionOnTable,
     isHorizontal: boolean,
-    tile: DominoTile,
     direction: Direction
 }

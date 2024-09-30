@@ -2,7 +2,7 @@ import { GameState } from "../_models/gameState";
 
 export class TestGame {
   static getGame(): GameState {
-    return this.game1;
+    return this.game3;
   }
   private static game1: GameState =
   {
@@ -13,8 +13,8 @@ export class TestGame {
       tilesOnTable: [
         {
           tileDetails: {
-            a: 0,
-            b: 2,
+            sideA: 0,
+            sideB: 2,
             tileId: "02",
             isDouble: false
           },
@@ -23,8 +23,8 @@ export class TestGame {
         },
         {
           tileDetails: {
-            a: 0,
-            b: 0,
+            sideA: 0,
+            sideB: 0,
             tileId: "00",
             isDouble: true
           },
@@ -33,8 +33,8 @@ export class TestGame {
         },
         {
           tileDetails: {
-            a: 0,
-            b: 4,
+            sideA: 0,
+            sideB: 4,
             tileId: "04",
             isDouble: false
           },
@@ -43,8 +43,8 @@ export class TestGame {
         },
         {
           tileDetails: {
-            a: 4,
-            b: 4,
+            sideA: 4,
+            sideB: 4,
             tileId: "44",
             isDouble: true
           },
@@ -53,8 +53,8 @@ export class TestGame {
         },
         {
           tileDetails: {
-            a: 4,
-            b: 6,
+            sideA: 4,
+            sideB: 6,
             tileId: "46",
             isDouble: false
           },
@@ -63,8 +63,8 @@ export class TestGame {
         },
         {
           tileDetails: {
-            a: 2,
-            b: 6,
+            sideA: 2,
+            sideB: 6,
             tileId: "26",
             isDouble: false
           },
@@ -73,8 +73,8 @@ export class TestGame {
         },
         {
           tileDetails: {
-            a: 1,
-            b: 2,
+            sideA: 1,
+            sideB: 2,
             tileId: "12",
             isDouble: false
           },
@@ -83,8 +83,8 @@ export class TestGame {
         },
         {
           tileDetails: {
-            a: 0,
-            b: 1,
+            sideA: 0,
+            sideB: 1,
             tileId: "01",
             isDouble: false
           },
@@ -93,8 +93,8 @@ export class TestGame {
         },
         {
           tileDetails: {
-            a: 0,
-            b: 3,
+            sideA: 0,
+            sideB: 3,
             tileId: "03",
             isDouble: false
           },
@@ -103,8 +103,8 @@ export class TestGame {
         },
         {
           tileDetails: {
-            a: 3,
-            b: 3,
+            sideA: 3,
+            sideB: 3,
             tileId: "33",
             isDouble: true
           },
@@ -113,8 +113,8 @@ export class TestGame {
         },
         {
           tileDetails: {
-            a: 1,
-            b: 3,
+            sideA: 1,
+            sideB: 3,
             tileId: "13",
             isDouble: false
           },
@@ -123,8 +123,8 @@ export class TestGame {
         },
         {
           tileDetails: {
-            a: 1,
-            b: 6,
+            sideA: 1,
+            sideB: 6,
             tileId: "16",
             isDouble: false
           },
@@ -133,8 +133,8 @@ export class TestGame {
         },
         {
           tileDetails: {
-            a: 0,
-            b: 6,
+            sideA: 0,
+            sideB: 6,
             tileId: "06",
             isDouble: false
           },
@@ -143,8 +143,8 @@ export class TestGame {
         },
         {
           tileDetails: {
-            a: 0,
-            b: 5,
+            sideA: 0,
+            sideB: 5,
             tileId: "05",
             isDouble: false
           },
@@ -153,8 +153,8 @@ export class TestGame {
         },
         {
           tileDetails: {
-            a: 5,
-            b: 5,
+            sideA: 5,
+            sideB: 5,
             tileId: "55",
             isDouble: true
           },
@@ -163,82 +163,82 @@ export class TestGame {
         },
         {
           tileDetails: {
-            a: 3,
-            b: 5,
+            sideA: 3,
+            sideB: 5,
             tileId: "35",
             isDouble: false
           },
           position: 6,
           contactEdge: 5
         },
-        // {
-        //   tileDetails: {
-        //     a: 3,
-        //     b: 3,
-        //     tileId: "33",
-        //     isDouble: true
-        //   },
-        //   position: 7,
-        //   contactEdge: 3
-        // },
         {
           tileDetails: {
-            a: 3,
-            b: 6,
-            tileId: "36",
-            isDouble: false
+            sideA: 3,
+            sideB: 3,
+            tileId: "33",
+            isDouble: true
           },
           position: 7,
           contactEdge: 3
         },
         {
           tileDetails: {
-            a: 6,
-            b: 6,
-            tileId: "66",
-            isDouble: true
+            sideA: 3,
+            sideB: 6,
+            tileId: "36",
+            isDouble: false
           },
           position: 8,
-          contactEdge: 6
+          contactEdge: 3
         },
         {
           tileDetails: {
-            a: 5,
-            b: 6,
-            tileId: "56",
-            isDouble: false
+            sideA: 6,
+            sideB: 6,
+            tileId: "66",
+            isDouble: true
           },
           position: 9,
           contactEdge: 6
         },
         {
           tileDetails: {
-            a: 2,
-            b: 5,
-            tileId: "25",
+            sideA: 5,
+            sideB: 6,
+            tileId: "56",
             isDouble: false
           },
           position: 10,
+          contactEdge: 6
+        },
+        {
+          tileDetails: {
+            sideA: 2,
+            sideB: 5,
+            tileId: "25",
+            isDouble: false
+          },
+          position: 11,
           contactEdge: 5
         },
         {
           tileDetails: {
-            a: 2,
-            b: 2,
+            sideA: 2,
+            sideB: 2,
             tileId: "22",
             isDouble: true
           },
-          position: 11,
+          position: 12,
           contactEdge: 2
         },
         {
           tileDetails: {
-            a: 2,
-            b: 3,
+            sideA: 2,
+            sideB: 3,
             tileId: "23",
             isDouble: false
           },
-          position: 12,
+          position: 13,
           contactEdge: 2
         },
       ]
@@ -247,8 +247,8 @@ export class TestGame {
       name: "Name",
       hand: [
         {
-          a: 2,
-          b: 4,
+          sideA: 2,
+          sideB: 4,
           tileId: "24",
           isDouble: false
         }
@@ -258,14 +258,14 @@ export class TestGame {
       name: "AI",
       hand: [
         {
-          a: 1,
-          b: 5,
+          sideA: 1,
+          sideB: 5,
           tileId: "15",
           isDouble: false
         },
         {
-          a: 5,
-          b: 6,
+          sideA: 5,
+          sideB: 6,
           tileId: "56",
           isDouble: false
         }
@@ -278,8 +278,8 @@ export class TestGame {
           playerName: "Name",
           type: 1,
           tile: {
-            a: 4,
-            b: 4,
+            sideA: 4,
+            sideB: 4,
             tileId: "44",
             isDouble: true
           },
@@ -290,8 +290,8 @@ export class TestGame {
           playerName: "AI",
           type: 1,
           tile: {
-            a: 4,
-            b: 6,
+            sideA: 4,
+            sideB: 6,
             tileId: "46",
             isDouble: false
           },
@@ -302,8 +302,8 @@ export class TestGame {
           playerName: "Name",
           type: 1,
           tile: {
-            a: 2,
-            b: 6,
+            sideA: 2,
+            sideB: 6,
             tileId: "26",
             isDouble: false
           },
@@ -314,8 +314,8 @@ export class TestGame {
           playerName: "AI",
           type: 1,
           tile: {
-            a: 1,
-            b: 2,
+            sideA: 1,
+            sideB: 2,
             tileId: "12",
             isDouble: false
           },
@@ -326,8 +326,8 @@ export class TestGame {
           playerName: "Name",
           type: 1,
           tile: {
-            a: 0,
-            b: 1,
+            sideA: 0,
+            sideB: 1,
             tileId: "01",
             isDouble: false
           },
@@ -338,8 +338,8 @@ export class TestGame {
           playerName: "AI",
           type: 1,
           tile: {
-            a: 0,
-            b: 3,
+            sideA: 0,
+            sideB: 3,
             tileId: "03",
             isDouble: false
           },
@@ -350,8 +350,8 @@ export class TestGame {
           playerName: "Name",
           type: 1,
           tile: {
-            a: 3,
-            b: 3,
+            sideA: 3,
+            sideB: 3,
             tileId: "33",
             isDouble: true
           },
@@ -362,8 +362,8 @@ export class TestGame {
           playerName: "AI",
           type: 1,
           tile: {
-            a: 1,
-            b: 3,
+            sideA: 1,
+            sideB: 3,
             tileId: "13",
             isDouble: false
           },
@@ -374,8 +374,8 @@ export class TestGame {
           playerName: "Name",
           type: 1,
           tile: {
-            a: 0,
-            b: 4,
+            sideA: 0,
+            sideB: 4,
             tileId: "04",
             isDouble: false
           },
@@ -386,8 +386,8 @@ export class TestGame {
           playerName: "AI",
           type: 1,
           tile: {
-            a: 1,
-            b: 6,
+            sideA: 1,
+            sideB: 6,
             tileId: "16",
             isDouble: false
           },
@@ -398,19 +398,542 @@ export class TestGame {
           playerName: "Name",
           type: 1,
           tile: {
-            a: 0,
-            b: 6,
+            sideA: 0,
+            sideB: 6,
             tileId: "06",
             isDouble: false
           },
           nextToTile: {
-            a: 1,
-            b: 6,
+            sideA: 1,
+            sideB: 6,
             tileId: "16",
             isDouble: false
           }
         }
       ]
+    }
+  };
+  private static game2: GameState =
+  {
+    id: 638614877478557700,
+    message: "Default",
+    set: {},
+    table: {
+      tilesOnTable: [
+        {
+          tileDetails: {
+            sideA: 0,
+            sideB: 3,
+            tileId: "03",
+            isDouble: false
+          },
+          position: -10,
+          contactEdge: 0
+        },
+        {
+          tileDetails: {
+            sideA: 0,
+            sideB: 0,
+            tileId: "00",
+            isDouble: true
+          },
+          position: -9,
+          contactEdge: 0
+        },
+        {
+          tileDetails: {
+            sideA: 0,
+            sideB: 5,
+            tileId: "05",
+            isDouble: false
+          },
+          position: -8,
+          contactEdge: 5
+        },
+        {
+          tileDetails: {
+            sideA: 5,
+            sideB: 5,
+            tileId: "55",
+            isDouble: true
+          },
+          position: -7,
+          contactEdge: 5
+        },
+        {
+          tileDetails: {
+            sideA: 2,
+            sideB: 5,
+            tileId: "25",
+            isDouble: false
+          },
+          position: -6,
+          contactEdge: 2
+        },
+        {
+          tileDetails: {
+            sideA: 2,
+            sideB: 6,
+            tileId: "26",
+            isDouble: false
+          },
+          position: -5,
+          contactEdge: 6
+        },
+        {
+          tileDetails: {
+            sideA: 6,
+            sideB: 6,
+            tileId: "66",
+            isDouble: true
+          },
+          position: -4,
+          contactEdge: 6
+        },
+        {
+          tileDetails: {
+            sideA: 3,
+            sideB: 6,
+            tileId: "36",
+            isDouble: false
+          },
+          position: -3,
+          contactEdge: 3
+        },
+        {
+          tileDetails: {
+            sideA: 1,
+            sideB: 3,
+            tileId: "13",
+            isDouble: false
+          },
+          position: -2,
+          contactEdge: 1
+        },
+        {
+          tileDetails: {
+            sideA: 0,
+            sideB: 1,
+            tileId: "01",
+            isDouble: false
+          },
+          position: -1,
+          contactEdge: 0
+        },
+        {
+          tileDetails: {
+            sideA: 0,
+            sideB: 6,
+            tileId: "06",
+            isDouble: false
+          },
+          position: 0,
+          contactEdge: 0
+        },
+        {
+          tileDetails: {
+            sideA: 6,
+            sideB: 5,
+            tileId: "56",
+            isDouble: false
+          },
+          position: 1,
+          contactEdge: 6
+        },
+        {
+          tileDetails: {
+            sideA: 1,
+            sideB: 5,
+            tileId: "15",
+            isDouble: false
+          },
+          position: 2,
+          contactEdge: 5
+        },
+        {
+          tileDetails: {
+            sideA: 1,
+            sideB: 4,
+            tileId: "14",
+            isDouble: false
+          },
+          position: 3,
+          contactEdge: 1
+        },
+        {
+          tileDetails: {
+            sideA: 4,
+            sideB: 4,
+            tileId: "44",
+            isDouble: true
+          },
+          position: 4,
+          contactEdge: 4
+        },
+        {
+          tileDetails: {
+            sideA: 3,
+            sideB: 4,
+            tileId: "34",
+            isDouble: false
+          },
+          position: 5,
+          contactEdge: 4
+        },
+        {
+          tileDetails: {
+            sideA: 3,
+            sideB: 3,
+            tileId: "33",
+            isDouble: true
+          },
+          position: 6,
+          contactEdge: 3
+        },
+        {
+          tileDetails: {
+            sideA: 2,
+            sideB: 3,
+            tileId: "23",
+            isDouble: false
+          },
+          position: 7,
+          contactEdge: 3
+        },
+        {
+          tileDetails: {
+            sideA: 2,
+            sideB: 2,
+            tileId: "22",
+            isDouble: true
+          },
+          position: 8,
+          contactEdge: 2
+        },
+        {
+          tileDetails: {
+            sideA: 1,
+            sideB: 2,
+            tileId: "12",
+            isDouble: false
+          },
+          position: 9,
+          contactEdge: 2
+        },
+        {
+          tileDetails: {
+            sideA: 1,
+            sideB: 1,
+            tileId: "11",
+            isDouble: true
+          },
+          position: 10,
+          contactEdge: 1
+        },
+        {
+          tileDetails: {
+            sideA: 1,
+            sideB: 6,
+            tileId: "16",
+            isDouble: false
+          },
+          position: 11,
+          contactEdge: 1
+        },
+      ]
+    },
+    player: {
+      name: "Name",
+      hand: [
+        {
+          sideA: 3,
+          sideB: 5,
+          tileId: "35",
+          isDouble: false
+        }
+      ]
+    },
+    opponent: {
+      name: "AI",
+      hand: [
+        {
+          sideA: 1,
+          sideB: 5,
+          tileId: "15",
+          isDouble: false
+        },
+        {
+          sideA: 5,
+          sideB: 6,
+          tileId: "56",
+          isDouble: false
+        }
+      ]
+    },
+    log: {
+      events: []
+    }
+  };
+  private static game3: GameState =
+  {
+    id: 638614877478557700,
+    message: "Default",
+    set: {},
+    table: {
+      tilesOnTable: [
+        {
+          tileDetails: {
+            sideA: 0,
+            sideB: 3,
+            tileId: "03",
+            isDouble: false
+          },
+          position: 10,
+          contactEdge: 0
+        },
+        {
+          tileDetails: {
+            sideA: 0,
+            sideB: 0,
+            tileId: "00",
+            isDouble: true
+          },
+          position: 9,
+          contactEdge: 0
+        },
+        {
+          tileDetails: {
+            sideA: 0,
+            sideB: 5,
+            tileId: "05",
+            isDouble: false
+          },
+          position: 8,
+          contactEdge: 5
+        },
+        {
+          tileDetails: {
+            sideA: 5,
+            sideB: 5,
+            tileId: "55",
+            isDouble: true
+          },
+          position: 7,
+          contactEdge: 5
+        },
+        {
+          tileDetails: {
+            sideA: 2,
+            sideB: 5,
+            tileId: "25",
+            isDouble: false
+          },
+          position: 6,
+          contactEdge: 2
+        },
+        {
+          tileDetails: {
+            sideA: 2,
+            sideB: 6,
+            tileId: "26",
+            isDouble: false
+          },
+          position: 5,
+          contactEdge: 6
+        },
+        
+        {
+          tileDetails: {
+            sideA: 3,
+            sideB: 6,
+            tileId: "36",
+            isDouble: false
+          },
+          position: 4,
+          contactEdge: 3
+        },
+        {
+          tileDetails: {
+            sideA: 1,
+            sideB: 3,
+            tileId: "13",
+            isDouble: false
+          },
+          position: 3,
+          contactEdge: 1
+        },
+        {
+          tileDetails: {
+            sideA: 0,
+            sideB: 1,
+            tileId: "01",
+            isDouble: false
+          },
+          position: 2,
+          contactEdge: 0
+        },
+        {
+          tileDetails: {
+            sideA: 6,
+            sideB: 6,
+            tileId: "66",
+            isDouble: true
+          },
+          position: 0,
+          contactEdge: 6
+        },
+        {
+          tileDetails: {
+            sideA: 0,
+            sideB: 6,
+            tileId: "06",
+            isDouble: false
+          },
+          position: 1,
+          contactEdge: 0
+        },
+        {
+          tileDetails: {
+            sideA: 6,
+            sideB: 5,
+            tileId: "56",
+            isDouble: false
+          },
+          position: -1,
+          contactEdge: 6
+        },
+        {
+          tileDetails: {
+            sideA: 1,
+            sideB: 5,
+            tileId: "15",
+            isDouble: false
+          },
+          position: -2,
+          contactEdge: 5
+        },
+        {
+          tileDetails: {
+            sideA: 1,
+            sideB: 4,
+            tileId: "14",
+            isDouble: false
+          },
+          position: -3,
+          contactEdge: 1
+        },
+        {
+          tileDetails: {
+            sideA: 4,
+            sideB: 4,
+            tileId: "44",
+            isDouble: true
+          },
+          position: -4,
+          contactEdge: 4
+        },
+        {
+          tileDetails: {
+            sideA: 3,
+            sideB: 4,
+            tileId: "34",
+            isDouble: false
+          },
+          position: -5,
+          contactEdge: 4
+        },
+        {
+          tileDetails: {
+            sideA: 3,
+            sideB: 3,
+            tileId: "33",
+            isDouble: true
+          },
+          position: -6,
+          contactEdge: 3
+        },
+        {
+          tileDetails: {
+            sideA: 2,
+            sideB: 3,
+            tileId: "23",
+            isDouble: false
+          },
+          position: -7,
+          contactEdge: 3
+        },
+        {
+          tileDetails: {
+            sideA: 2,
+            sideB: 2,
+            tileId: "22",
+            isDouble: true
+          },
+          position: -8,
+          contactEdge: 2
+        },
+        {
+          tileDetails: {
+            sideA: 1,
+            sideB: 2,
+            tileId: "12",
+            isDouble: false
+          },
+          position: -9,
+          contactEdge: 2
+        },
+        {
+          tileDetails: {
+            sideA: 1,
+            sideB: 1,
+            tileId: "11",
+            isDouble: true
+          },
+          position: -10,
+          contactEdge: 1
+        },
+        {
+          tileDetails: {
+            sideA: 1,
+            sideB: 6,
+            tileId: "16",
+            isDouble: false
+          },
+          position: -11,
+          contactEdge: 1
+        },
+      ]
+    },
+    player: {
+      name: "Name",
+      hand: [
+        {
+          sideA: 3,
+          sideB: 5,
+          tileId: "35",
+          isDouble: false
+        }
+      ]
+    },
+    opponent: {
+      name: "AI",
+      hand: [
+        {
+          sideA: 1,
+          sideB: 5,
+          tileId: "15",
+          isDouble: false
+        },
+        {
+          sideA: 5,
+          sideB: 6,
+          tileId: "56",
+          isDouble: false
+        }
+      ]
+    },
+    log: {
+      events: []
     }
   };
 }
