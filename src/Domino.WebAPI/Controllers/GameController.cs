@@ -14,9 +14,9 @@ public class GameController(IGameService gameService) : ControllerBase
         return _gameService.StartGame(playerName, opponentName);
     }
     [HttpGet("play")]
-    public ActionResult<Game> PlayTile(string tileId, string? nextTo = null)
+    public ActionResult<Game> PlayTile(string tileId, int contactEdge, bool? isLeft = null)
     {
-        return _gameService.PlayTile(tileId, nextTo);
+        return _gameService.PlayTile(tileId, contactEdge, isLeft);
     }
     [HttpGet("grab")]
     public ActionResult<Game> GrabTile()

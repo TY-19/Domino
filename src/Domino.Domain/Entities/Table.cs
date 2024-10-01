@@ -2,41 +2,99 @@ namespace Domino.Domain.Entities;
 
 public class Table
 {
-    private int _leftEnd = -1;
-    private int _rightEnd = -1;
-    private LinkedListNode<DominoTile>? startNode;
-    private LinkedList<DominoTile> _row = new();
-    public LinkedList<DominoTile> TilesOnTable { get => _row; }
-    public void PlaceTile(DominoTile toPlace, DominoTile? nextTo = null)
+    public LinkedList<DominoTile> TilesOnTable { get; } = new();
+    public DominoTile PlaceTile(TileDetails tileDetails, int contactEdge, bool? isLeftEdge)
     {
-        if (nextTo == null && startNode == null)
+        int position = TryGetPosition(tileDetails, contactEdge, isLeftEdge)
+            ?? throw new ArgumentException("Invalid tile to place");
+        if(position == 0 && TilesOnTable.Count != 0)
         {
-            startNode = _row.AddFirst(toPlace);
-            _leftEnd = toPlace.A;
-            _rightEnd = toPlace.B;
+            throw new ArgumentException("Starting tile is already in place.");
+        }
+        var tile = new DominoTile()
+        {
+            TileDetails = tileDetails,
+            ContactEdge = contactEdge,
+            Position = position,
+        };
+        if(tile.Position <= 0)
+        {
+            TilesOnTable.AddFirst(tile);
         }
         else
         {
-            if (toPlace.IsMatch(_rightEnd, out int freeEnd))
+            TilesOnTable.AddLast(tile);
+        }
+        return tile;
+    }
+    public (DominoTile? left, DominoTile? right) GetFreeEnds()
+    {
+        return (TilesOnTable.First?.Value, TilesOnTable.Last?.Value);
+    }
+    public List<(TileDetails tileDetails, int edge)> GetPossibleMoves(List<TileDetails> hand)
+    {
+        List<(TileDetails tileDetails, int edge)> possibleMoves = [];
+        if(TilesOnTable.Count == 0)
+        {
+            var doubles = hand.Where(d => d.IsDouble);
+            if(!doubles.Any())
             {
-                _row.AddLast(toPlace);
-                _rightEnd = freeEnd;
+                doubles = hand;
             }
-            else if (toPlace.IsMatch(_leftEnd, out freeEnd))
+            foreach(var tile in doubles)
             {
-                _row.AddFirst(toPlace);
-                _leftEnd = freeEnd;
+                possibleMoves.Add((tile, tile.SideA));
             }
         }
+        var (left, right) = GetFreeEnds();
+        foreach(var tile in hand)
+        {
+            if(tile.SideA == left?.FreeEnd)
+            {
+                possibleMoves.Add((tile, tile.SideA));
+            }
+            if(tile.SideA != tile.SideB && tile.SideB == left?.FreeEnd)
+            {
+                possibleMoves.Add((tile, tile.SideB));
+            }
+            if(left?.FreeEnd != right?.FreeEnd)
+            {
+                if(tile.SideA == right?.FreeEnd)
+                {
+                    possibleMoves.Add((tile, tile.SideA));
+                }
+                if(tile.SideA != tile.SideB && tile.SideB == right?.FreeEnd)
+                {
+                    possibleMoves.Add((tile, tile.SideB));
+                }   
+            }
+        }
+        return possibleMoves;
     }
-    public (int left, int right) GetFreeEnds()
+    private int? TryGetPosition(TileDetails tileDetails, int contactEdge, bool? isLeft)
     {
-        return (_leftEnd, _rightEnd);
-    }
-    public bool CanBePlayed(DominoTile tile)
-    {
-        return tile.A == _leftEnd || tile.A == _rightEnd
-            || tile.B == _leftEnd || tile.B == _rightEnd
-            || (_leftEnd == -1 && _rightEnd == -1);
+
+        if(tileDetails.SideA != contactEdge && tileDetails.SideB != contactEdge)
+        {
+            return null;
+        }
+        var (left, right) = GetFreeEnds();
+        if(left == null && right == null)
+        {
+            return 0;
+        }
+        if(contactEdge != left?.FreeEnd && contactEdge != right?.FreeEnd)
+        {
+            return null;
+        }
+        if((!isLeft.HasValue || isLeft.Value) && contactEdge == left?.FreeEnd)
+        {
+            return left.Position - 1;
+        }
+        if((!isLeft.HasValue || !isLeft.Value) && contactEdge == right?.FreeEnd)
+        {
+            return right.Position + 1;
+        }
+        return null;
     }
 }

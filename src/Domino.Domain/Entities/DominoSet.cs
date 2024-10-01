@@ -2,8 +2,9 @@ namespace Domino.Domain.Entities;
 
 public class DominoSet
 {
-    private readonly List<DominoTile> Tiles;
+    private readonly List<TileDetails> Tiles;
     private readonly Random rnd;
+    public int TilesCount { get => Tiles.Count; }
     public DominoSet()
     {
         Tiles = [];
@@ -16,18 +17,18 @@ public class DominoSet
         {
             for (int j = i; j <= 6; j++)
             {
-                Tiles.Add(new DominoTile(i, j));
+                Tiles.Add(new TileDetails(i, j));
             }
         }
     }
-    public DominoTile? ServeTile()
+    public TileDetails? ServeTile()
     {
         if (Tiles.Count < 2)
         {
             return null;
         }
         int index = rnd.Next(Tiles.Count - 1);
-        DominoTile toReturn = Tiles[index];
+        TileDetails toReturn = Tiles[index];
         Tiles.RemoveAt(index);
         return toReturn;
     }

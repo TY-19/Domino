@@ -3,8 +3,8 @@ namespace Domino.Domain.Entities;
 public class Player
 {
     public string Name { get; }
-    private protected List<DominoTile> _hand = [];
-    public List<DominoTile> Hand { get => _hand; }
+    private protected List<TileDetails> _hand = [];
+    public List<TileDetails> Hand { get => _hand; }
     public Player()
     {
         Name = "test";
@@ -13,19 +13,19 @@ public class Player
     {
         Name = name;
     }
-    public void GrabTile(DominoTile? tile)
+    public void GrabTile(TileDetails? tileDetails)
     {
-        if(tile == null)
+        if(tileDetails == null)
         {
             return;
         }
-        _hand.Add(tile);
+        _hand.Add(tileDetails);
     }
-    public DominoTile? GetTileFromHand(string tileId)
+    public TileDetails? GetTileFromHand(string tileId)
     {
         return _hand.FirstOrDefault(t => t.TileId == tileId);
     }
-    public void PlayTile(DominoTile tile)
+    public void PlayTile(TileDetails tile)
     {
         if(tile == null)
         {
