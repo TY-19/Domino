@@ -18,6 +18,12 @@
     border-top: none;
     border-right: none;
     border-left: none;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
+    padding: 2px 10px 2px 20px;
+    justify-content: center;
 }
 .game-table {
     grid-column-start: 1;
@@ -52,6 +58,7 @@
     flex-wrap: wrap;
     gap: 10px;
     padding: 2px 10px 2px 20px;
+    justify-content: center;
 }
 .play-button {
     grid-column-start: 11;

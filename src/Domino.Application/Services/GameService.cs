@@ -50,9 +50,11 @@ public class GameService : IGameService
     {
         var game = GetGame();
         var tileDetails = game.Player.GetTileFromHand(tileId)
-            ?? throw new ArgumentException("No tile with such an id in the hand");
+            ?? throw new ArgumentException("No tile with such an id in the hand.");
+        int position = game.Table.TryGetPosition(tileDetails, contactEdge, isLeft)
+            ?? throw new ArgumentException("The tile can't be played on the table.");
         game.Player.PlayTile(tileDetails);
-        var tile = game.Table.PlaceTile(tileDetails, contactEdge, isLeft);
+        var tile = game.Table.PlaceTile(tileDetails, contactEdge, position);
         game.Log.AddEntry(new GameLogEntry()
         {
             PlayerName = game.Player.Name,
@@ -60,6 +62,7 @@ public class GameService : IGameService
             Tile = tile,
         });
         WaitOpponentTurn();
+        TrySetGameResult(game);
         return game;
     }
     public Game GrabTile()
@@ -88,8 +91,10 @@ public class GameService : IGameService
         switch (move)
         {
             case PlayTileMove ptm:
+                int position = game.Table.TryGetPosition(ptm.Tile, ptm.ContactEdge, null)
+                    ?? throw new ArgumentException("The tile can't be played on the table.");
                 game.Opponent.PlayTile(ptm.Tile);
-                var tile = game.Table.PlaceTile(ptm.Tile, ptm.ContactEdge, null);
+                var tile = game.Table.PlaceTile(ptm.Tile, ptm.ContactEdge, position);
                 game.Log.AddEntry(new GameLogEntry()
                 {
                     PlayerName = game.Opponent.Name,
@@ -126,7 +131,9 @@ public class GameService : IGameService
 
     private Game GetGame()
     {
-        return _game ?? StartGame("Player", "AI");
+        var game = _game ?? StartGame("Player", "AI");
+        ThrowIfGameEnded(game);
+        return game;
     }
     public bool CanGrabAnotherTile(string playerName)
     {
@@ -163,5 +170,92 @@ public class GameService : IGameService
             }
         }
         return true;
+    }
+    private static void TrySetGameResult(Game game)
+    {
+        if(game.Player.Hand.Count == 0)
+        {
+            SetGameStatus(game, game.Player.Name);
+        }
+        else if (game.Opponent.Hand.Count == 0)
+        {
+            SetGameStatus(game, game.Opponent.Name);
+        }
+        else if(game.Set.TilesCount <= game.GameRules.MinLeftInMarket
+            && game.Table.GetPossibleMoves(game.Player.Hand).Count == 0
+            && game.Table.GetPossibleMoves(game.Opponent.Hand).Count == 0)
+        {
+            game.GameStatus.IsEnded = true;
+            game.GameStatus.LoserPointsCount[0] = (game.Player.Name, CountPoints(game.Player.Hand));
+            game.GameStatus.LoserPointsCount[1] = (game.Opponent.Name, CountPoints(game.Opponent.Hand));
+            game.GameStatus.Result = "The game ended up in a draw.\nPoints count is:\n"
+                + $"{game.Player.Name} - {game.GameStatus.LoserPointsCount[0]}"
+                + $"{game.Opponent.Name} - {game.GameStatus.LoserPointsCount[1]}";
+        }
+    }
+    private static void SetGameStatus(Game game, string playerName)
+    {
+        game.GameStatus.IsEnded = true;
+        game.GameStatus.Result = $"{game.Player.Name} win!";
+        if(playerName == game.Player.Name)
+        {
+            game.GameStatus.Winner = game.Player.Name;
+            game.GameStatus.Loser = game.Opponent.Name;
+        }
+        else
+        {
+            game.GameStatus.Winner = game.Opponent.Name;
+            game.GameStatus.Loser = game.Player.Name;
+        }
+        var lastTile = game.Log.Events
+            .Where(e => e.PlayerName == playerName)
+            .MaxBy(e => e.MoveNumber);
+        
+        if(game.GameStatus.HuntPlayers.Contains(game.GameStatus.Loser))
+        {
+            if(lastTile?.Tile?.TileDetails.TileId == "0-0")
+            {
+                game.GameStatus.VictoryType = "General";
+            }
+            else
+            {
+                game.GameStatus.VictoryType = "Goat";
+            }
+        }
+        else if(lastTile?.Tile?.TileDetails.TileId == "0-0")
+        {
+            game.GameStatus.VictoryType = "Officer";
+        }
+        else if(game.GameStatus.HuntPlayers.Contains(game.GameStatus.Winner))
+        {
+            game.GameStatus.VictoryType = "Cleared points";
+        }
+        else
+        {
+            game.GameStatus.VictoryType = "Normal Victory";
+            var loserHand = playerName == game.Player.Name
+                ? game.Player.Hand
+                : game.Opponent.Hand;
+            game.GameStatus.LoserPointsCount[0] = (game.GameStatus.Loser, CountPoints(loserHand));
+            game.GameStatus.Result ??= "";
+            game.GameStatus.Result += $"\n{game.GameStatus.Loser} is left with {game.GameStatus.LoserPointsCount} points.";
+        }
+    }
+    private static int CountPoints(List<TileDetails> tileDetails)
+    {
+        int count = 0;
+        foreach(var tileDetail in tileDetails)
+        {
+            count += tileDetail.SideA + tileDetail.SideB;
+        }
+        return count;
+    }
+
+    private static void ThrowIfGameEnded(Game game)
+    {
+        if(game.GameStatus.IsEnded)
+        {
+            throw new ArgumentException("Game is ended.");
+        }
     }
 }

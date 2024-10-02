@@ -3,10 +3,8 @@ namespace Domino.Domain.Entities;
 public class Table
 {
     public LinkedList<DominoTile> TilesOnTable { get; } = new();
-    public DominoTile PlaceTile(TileDetails tileDetails, int contactEdge, bool? isLeftEdge)
+    public DominoTile PlaceTile(TileDetails tileDetails, int contactEdge, int position)
     {
-        int position = TryGetPosition(tileDetails, contactEdge, isLeftEdge)
-            ?? throw new ArgumentException("Invalid tile to place");
         if(position == 0 && TilesOnTable.Count != 0)
         {
             throw new ArgumentException("Starting tile is already in place.");
@@ -71,9 +69,8 @@ public class Table
         }
         return possibleMoves;
     }
-    private int? TryGetPosition(TileDetails tileDetails, int contactEdge, bool? isLeft)
+    public int? TryGetPosition(TileDetails tileDetails, int contactEdge, bool? isLeft)
     {
-
         if(tileDetails.SideA != contactEdge && tileDetails.SideB != contactEdge)
         {
             return null;

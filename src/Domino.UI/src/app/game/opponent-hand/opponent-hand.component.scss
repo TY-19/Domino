@@ -1,0 +1,24 @@
+.domino-tile {
+    display: flex;
+    position: relative;
+    border: 2px solid black;
+    &-vertical {
+        flex-direction: column;
+        height: 12vh;
+        width: 6vh;
+    }
+    &-horizontal {
+        flex-direction: row;
+        height: 6vh;
+        width: 12vh;
+    }
+}
+$wave-color: var(--wave-color, violet);
+.back-wave {
+    background:
+      radial-gradient(circle at 3vh 3vh, transparent 3vh, $wave-color 4.2vh, $wave-color 0vh, transparent 3.75vh),
+      radial-gradient(circle at 3vh 0.75vh, transparent 3vh, $wave-color 3.15vh, $wave-color 3.3vh, transparent 3.45vh)
+      rgb(255, 150, 0);
+    background-size: 6vh 6vh;
+    background-position: -3vh -2vh;
+}

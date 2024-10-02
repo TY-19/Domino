@@ -11,6 +11,7 @@ public static class MappingExtensions
             Table = game.Table,
             MyHand = playerName == game.Player.Name ? game.Player.Hand : game.Opponent.Hand,
             Log = game.Log,
+            GameStatus = game.GameStatus
         };
     }
 }

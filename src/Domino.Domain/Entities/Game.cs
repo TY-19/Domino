@@ -10,6 +10,7 @@ public class Game
     public Player Opponent { get; }
     public GameLog Log { get; }
     public GameRules GameRules { get; }
+    public GameStatus GameStatus { get; }
     public Game(long id, string playerName = "Player", string opponentName = "AI")
     {
         Id = id;
@@ -19,5 +20,6 @@ public class Game
         Player = new HumanPlayer(playerName);
         Opponent = new AiPlayer(opponentName);
         GameRules = new(new GameRulesPrototype());
+        GameStatus = new();
     }
 }

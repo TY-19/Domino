@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+    --domino-tile-color: orange;
+    --domino-tile-dot-color: green;
+    --domino-tile-line-color: blue;
+}

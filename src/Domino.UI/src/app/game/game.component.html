@@ -1,6 +1,6 @@
 <div class="grid-container">
-  <div class="grid-item opponent-hand">Opponent hand</div>
-  @if(game.table.tilesOnTable) {
+  <Dom-opponent-hand class="grid-item opponent-hand"></Dom-opponent-hand>
+  @if(game) {
     <Dom-game-table [tiles]="game.table.tilesOnTable" class="grid-item game-table"></Dom-game-table>
   }
   <div class="grid-item market">Market</div>

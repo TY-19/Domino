@@ -34,7 +34,7 @@ export class TileComponent implements AfterViewInit {
   @ViewChild('squareOne') squareOne!: ElementRef<HTMLDivElement>;
   @ViewChild('squareTwo') squareTwo!: ElementRef<HTMLDivElement>;
 
-  constructor(private el: ElementRef, private renderer: Renderer2) {
+  constructor(private renderer: Renderer2) {
   }
   
   ngOnChanges(changes: SimpleChanges): void {
