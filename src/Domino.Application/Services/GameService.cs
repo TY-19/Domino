@@ -3,6 +3,7 @@ using Domino.Application.Interfaces;
 using Domino.Domain.Entities;
 using Domino.Domain.Enums;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
 namespace Domino.Application.Services;
 
@@ -12,12 +13,15 @@ public class GameService : IGameService
     private readonly IMemoryCache _cache;
     private ICurrentUserService _currentUserService;
     private IAiPlayerService? _aiPlayerService;
+    private ILogger<GameService> _logger;
     public GameService(
         IMemoryCache memoryCache,
-        ICurrentUserService currentUserService)
+        ICurrentUserService currentUserService,
+        ILogger<GameService> logger)
     {
         _currentUserService = currentUserService;
         _cache = memoryCache;
+        _logger = logger;
         long? gameId = _currentUserService.GetCurrentGameId();
         if(gameId != null &&
             _cache.TryGetValue(gameId, out Game? game) && game != null)
@@ -48,21 +52,29 @@ public class GameService : IGameService
     }
     public Game PlayTile(string tileId, int contactEdge, bool? isLeft)
     {
+        _logger.LogInformation("PlayTile {tileId} to edge {edge}, {isLeft}", tileId, contactEdge, isLeft);
         var game = GetGame();
+        _logger.LogInformation("Current game: {@game}", game);
         var tileDetails = game.Player.GetTileFromHand(tileId)
             ?? throw new ArgumentException("No tile with such an id in the hand.");
         int position = game.Table.TryGetPosition(tileDetails, contactEdge, isLeft)
             ?? throw new ArgumentException("The tile can't be played on the table.");
+        _logger.LogInformation("Player plays {@details}", tileDetails);
         game.Player.PlayTile(tileDetails);
+        _logger.LogInformation("Tile is placing on table");
         var tile = game.Table.PlaceTile(tileDetails, contactEdge, position);
+        _logger.LogInformation("Writing log");
         game.Log.AddEntry(new GameLogEntry()
         {
             PlayerName = game.Player.Name,
             Type = MoveType.PlayTile,
             Tile = tile,
         });
+        _logger.LogInformation("Waiting for opponent");
         WaitOpponentTurn();
+        _logger.LogInformation("Check for endgame conditions");
         TrySetGameResult(game);
+        _logger.LogInformation("Returning result");
         return game;
     }
     public Game GrabTile()

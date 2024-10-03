@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, HostListener, Input, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, Output, Renderer2, SimpleChanges, ViewChild } from '@angular/core';
 import { TileDetails } from '../_models/tileDetails';
 
 @Component({
@@ -31,6 +31,7 @@ export class TileComponent implements AfterViewInit {
 
   @Input() tile: TileDetails = null!;
   @Input() isHorizontal: boolean = false;
+  @Output() tileEmitter: EventEmitter<TileDetails> = new EventEmitter<TileDetails>();
   @ViewChild('squareOne') squareOne!: ElementRef<HTMLDivElement>;
   @ViewChild('squareTwo') squareTwo!: ElementRef<HTMLDivElement>;
 
@@ -47,6 +48,10 @@ export class TileComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     this.buildTile();
     this.isViewInitialized = true;
+  }
+  onDoubleClick()
+  {
+    this.tileEmitter.emit(this.tile);
   }
   
   private buildTile() {

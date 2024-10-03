@@ -38,14 +38,17 @@ export class GameTableComponent {
     }
     return style;
   }
-  onResize() {
-    this.columnsNumber = this.calculateColumnsNumber();
-    this.displayTiles();
-  }
   displayTiles(): void {
     this.columnsNumber = this.calculateColumnsNumber();
     this.populateTileDisplays();
   }
+  updateDisplayingTiles(tiles: DominoTile[]): void {
+    this.tiles = tiles;
+    if(tiles.length > 0) {
+      this.displayTiles();
+    }
+  }
+  
   private calculateColumnsNumber(): number {
     const columnWidth: number = 3 * window.innerHeight / 100;
     const gameTableWidth: number = window.innerWidth * 10 / 12 - 20;

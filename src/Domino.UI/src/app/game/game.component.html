@@ -1,3 +1,4 @@
+<div [hidden]="!showMessage" class="message">Test message</div>
 <div class="grid-container">
   <Dom-opponent-hand class="grid-item opponent-hand"></Dom-opponent-hand>
   @if(game) {
@@ -8,7 +9,7 @@
     @if(game) {
       @for(tile of this.game.player.hand; track tile.tileId)
       {
-        <Dom-tile [tile]="tile" [isHorizontal]="false"></Dom-tile>
+        <Dom-tile [tile]="tile" [isHorizontal]="false" (tileEmitter)="playTile($event)"></Dom-tile>
       }
     }
   </div>
