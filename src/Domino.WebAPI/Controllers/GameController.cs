@@ -1,22 +1,24 @@
 using Domino.Application.Interfaces;
+using Domino.Application.Models;
 using Domino.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Domino.WebAPI.Controllers;
 
 [Route("api/[controller]")]
+[ApiController]
 public class GameController(IGameService gameService) : ControllerBase
 {
     IGameService _gameService = gameService;
     [HttpGet("start")]
-    public ActionResult<Game> StartGame(string playerName, string opponentName = "AI")
+    public ActionResult<Game> StartGame(string playerName = "Test", string opponentName = "AI")
     {
         return _gameService.StartGame(playerName, opponentName);
     }
-    [HttpGet("play")]
-    public ActionResult<Game> PlayTile(string tileId, int contactEdge, bool? isLeft = null)
+    [HttpPost("play")]
+    public ActionResult<Game> PlayTile(PlayTileDto playTileDto)
     {
-        return _gameService.PlayTile(tileId, contactEdge, isLeft);
+        return _gameService.PlayTile(playTileDto.TileId, playTileDto.ContactEdge, playTileDto.IsLeft);
     }
     [HttpGet("grab")]
     public ActionResult<Game> GrabTile()
