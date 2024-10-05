@@ -1,7 +1,7 @@
 import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
 import { TileComponent } from "../tile/tile.component";
 import { GameService } from './game.service';
-import { GameState } from '../_models/gameState';
+import { GameView } from '../_models/gameView';
 import { TestGame } from './testGame';
 import { TileDisplay } from '../_models/tileDisplay';
 import { GameTableComponent } from "./game-table/game-table.component";
@@ -22,10 +22,12 @@ import { TileDetails } from '../_models/tileDetails';
 })
 export class GameComponent implements OnInit {
   @ViewChild(GameTableComponent) gameTable: GameTableComponent = null!;
-  game: GameState = null!;
+  game: GameView = null!;
   // game: GameState = TestGame.getGame();
   // tileDisplays: Map<number, TileDisplay> = new Map<number, TileDisplay>();
   showMessage: boolean = false;
+  opponentTiles: number[] = [0, 1, 2, 3, 4, 5, 6];
+  activeTile: TileDetails | null = null;
 
   constructor(private gameService: GameService) {
   }
@@ -45,72 +47,71 @@ export class GameComponent implements OnInit {
       this.gameTable.tileDisplays = new Map<number, TileDisplay>();
     }
   }
-  playTile(tileDetails: TileDetails) {
-    let ends = this.getEnds();
-    let position: number = -1;
-    let contactEdge = -1;
-    if(ends.length === 0) {
-      position = 0;
-      contactEdge = tileDetails.sideA;
-    } else {
-      let leftFreeEnd = this.getFreeEnds(ends[0]);
-      let rightFreeEnd = this.getFreeEnds(ends[1]);
-      console.log("left: " + leftFreeEnd);
-      console.log("right: " + rightFreeEnd);
-      if(tileDetails.sideA == leftFreeEnd) {
-        contactEdge = tileDetails.sideA;
-        position = ends[0].tile.position - 1;
-      } else if(tileDetails.sideB == leftFreeEnd) {
-        contactEdge = tileDetails.sideB;
-        position = ends[0].tile.position - 1;
-      } else if(tileDetails.sideA == rightFreeEnd) {
-        contactEdge = tileDetails.sideA;
-        position = ends[1].tile.position + 1;
-      } else if(tileDetails.sideB == rightFreeEnd) {
-        contactEdge = tileDetails.sideB;
-        position = ends[1].tile.position + 1;
+  slectTile(tileDetails: TileDetails) {
+    this.activeTile = tileDetails;
+    console.log("active tile: " + tileDetails.tileId);
+  }
+  playToSide(isLeft: boolean) {
+    if(this.activeTile) {
+      let contactEdge = isLeft ? this.game.table.leftFreeEnd : this.game.table.rightFreeEnd;
+      if(contactEdge === null) {
+        contactEdge = this.activeTile.sideA;
       }
+      this.playTile(this.activeTile, contactEdge, isLeft);
+      this.activeTile = null;
     }
+  }
+  playTile(tileDetails: TileDetails, contactEdge: number, placeLeft?: boolean): void {
+    let position: number = -1;
+    if(contactEdge !== null && contactEdge !== tileDetails.sideA && contactEdge !== tileDetails.sideB) {
+      return;
+    }
+    if(this.game.table.leftFreeEnd === null && this.game.table.rightFreeEnd === null) {
+      position = 0;
+    } else if(contactEdge === this.game.table.leftFreeEnd && contactEdge === this.game.table.rightFreeEnd) {
+      position = placeLeft === null || placeLeft === true
+        ? this.game.table.leftPosition! - 1
+        : this.game.table.rightPosition! + 1;
+    } else if(contactEdge === this.game.table.leftFreeEnd) {
+      position = this.game.table.leftPosition! - 1;
+    } else if(contactEdge === this.game.table.rightFreeEnd) {
+      position = this.game.table.rightPosition! + 1;
+    } else {
+      console.error(`Cannot play tile to edge ${contactEdge}. Tile details:`);
+      console.error(tileDetails);
+    }
+    
     const tile: DominoTile = {
       tileDetails: tileDetails,
       position: position,
-      contactEdge: contactEdge,
-      freeEnd: contactEdge === tileDetails.sideA ? tileDetails.sideB : tileDetails.sideA
+      contactEdge: contactEdge
     };
+    console.log("playing tile");
     console.log(tile);
     this.gameService.playTile(tile)
       .subscribe(gs => {
         this.game = gs;
-        this.gameTable.updateDisplayingTiles(gs.table.tilesOnTable);
+        this.updateChildren();
+        console.log(this.game);
     });
   }
   grabTile() {
     this.gameService.grabTile()
       .subscribe(gs => {
         this.game = gs;
+        this.updateChildren();
       });
   }
   @HostListener('window:resize')
   onResize() {
     this.gameTable.displayTiles();
   }
-
-  private getEnds(): TileDisplay[] {
-    console.log("tileDisplays");
-    console.log(this.gameTable.tileDisplays);
-    if(this.gameTable.tileDisplays.size === 0) {
-      return [];
+  private updateChildren()
+  {
+    this.gameTable.updateDisplayingTiles(this.game.table.tilesOnTable);
+    this.opponentTiles = [];
+    for(let i = 0; i < this.game.opponentTilesCount; i++) {
+      this.opponentTiles.push(i);
     }
-    let left = this.gameTable.tileDisplays.get(Math.min(...this.gameTable.tileDisplays.keys()));
-    let right = this.gameTable.tileDisplays.get(Math.max(...this.gameTable.tileDisplays.keys()));
-    return [left!, right!];
-  }
-  private getFreeEnds(tileDisplay: TileDisplay): number {
-    if(tileDisplay.tile.tileDetails.sideA === tileDisplay.tile.tileDetails.sideB) {
-      return tileDisplay.tile.tileDetails.sideA;
-    } 
-    return tileDisplay.tile.contactEdge === tileDisplay.tile.tileDetails.sideA
-      ? tileDisplay.tile.tileDetails.sideB
-      : tileDisplay.tile.tileDetails.sideA;
   }
 }

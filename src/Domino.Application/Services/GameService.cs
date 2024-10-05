@@ -1,5 +1,6 @@
 using Domino.Application.Extensions;
 using Domino.Application.Interfaces;
+using Domino.Application.Models;
 using Domino.Domain.Entities;
 using Domino.Domain.Enums;
 using Microsoft.Extensions.Caching.Memory;
@@ -30,8 +31,12 @@ public class GameService : IGameService
             _aiPlayerService = new AiPlayerService(_game.Opponent);
         }
     }
-    
-    public Game StartGame(string playerName, string opponentName)
+    public GameView StartGame(string playerName, string opponentName)
+    {
+        var game = StartGameInner(playerName, opponentName);
+        return game.ToGameView(game.Player.Name);
+    }
+    private Game StartGameInner(string playerName, string opponentName)
     {
         long id = DateTime.UtcNow.Ticks;
         _game = new Game(id, playerName, opponentName);
@@ -41,28 +46,19 @@ public class GameService : IGameService
         _currentUserService.SetCurrentGameId(id);
         return _game;
     }
-    public List<TileDetails> GetHand()
+    public GameView PlayTile(string tileId, bool? isLeft)
     {
-        return GetGame().Player.Hand;
-    }
-    
-    public LinkedList<DominoTile> GetTable()
-    {
-        return GetGame().Table.TilesOnTable;
-    }
-    public Game PlayTile(string tileId, int contactEdge, bool? isLeft)
-    {
-        _logger.LogInformation("PlayTile {tileId} to edge {edge}, {isLeft}", tileId, contactEdge, isLeft);
+        _logger.LogInformation("PlayTile {tileId} to edge, {isLeft}", tileId, isLeft);
         var game = GetGame();
         _logger.LogInformation("Current game: {@game}", game);
         var tileDetails = game.Player.GetTileFromHand(tileId)
             ?? throw new ArgumentException("No tile with such an id in the hand.");
-        int position = game.Table.TryGetPosition(tileDetails, contactEdge, isLeft)
+        int position = game.Table.TryGetPosition(tileDetails, isLeft)
             ?? throw new ArgumentException("The tile can't be played on the table.");
         _logger.LogInformation("Player plays {@details}", tileDetails);
         game.Player.PlayTile(tileDetails);
         _logger.LogInformation("Tile is placing on table");
-        var tile = game.Table.PlaceTile(tileDetails, contactEdge, position);
+        var tile = game.Table.PlaceTile(tileDetails, position);
         _logger.LogInformation("Writing log");
         game.Log.AddEntry(new GameLogEntry()
         {
@@ -75,9 +71,9 @@ public class GameService : IGameService
         _logger.LogInformation("Check for endgame conditions");
         TrySetGameResult(game);
         _logger.LogInformation("Returning result");
-        return game;
+        return game.ToGameView(game.Player.Name);
     }
-    public Game GrabTile()
+    public GameView GrabTile()
     {
         var game = GetGame();
         if(CanGrabAnotherTile(game.Player.Name))
@@ -90,12 +86,12 @@ public class GameService : IGameService
                 Type = MoveType.GrabTile
             });
         }
-        return game;
+        return game.ToGameView(game.Player.Name);
     }
-    public Game WaitOpponentTurn()
+    public GameView WaitOpponentTurn()
     {
         var game = GetGame();
-        return WaitOpponentTurn(game);
+        return WaitOpponentTurn(game).ToGameView(game.Player.Name);
     }
     public Game WaitOpponentTurn(Game game)
     {
@@ -103,10 +99,11 @@ public class GameService : IGameService
         switch (move)
         {
             case PlayTileMove ptm:
-                int position = game.Table.TryGetPosition(ptm.Tile, ptm.ContactEdge, null)
+                bool isLeft = ptm.ContactEdge == game.Table.LeftFreeEnd;
+                int position = game.Table.TryGetPosition(ptm.Tile, true)
                     ?? throw new ArgumentException("The tile can't be played on the table.");
                 game.Opponent.PlayTile(ptm.Tile);
-                var tile = game.Table.PlaceTile(ptm.Tile, ptm.ContactEdge, position);
+                var tile = game.Table.PlaceTile(ptm.Tile, position);
                 game.Log.AddEntry(new GameLogEntry()
                 {
                     PlayerName = game.Opponent.Name,
@@ -143,7 +140,7 @@ public class GameService : IGameService
 
     private Game GetGame()
     {
-        var game = _game ?? StartGame("Player", "AI");
+        var game = _game ?? StartGameInner("Player", "AI");
         ThrowIfGameEnded(game);
         return game;
     }

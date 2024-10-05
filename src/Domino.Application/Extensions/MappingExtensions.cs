@@ -1,3 +1,4 @@
+using Domino.Application.Models;
 using Domino.Domain.Entities;
 
 namespace Domino.Application.Extensions;
@@ -8,8 +9,13 @@ public static class MappingExtensions
     {
         return new GameView()
         {
+            Id = game.Id,
             Table = game.Table,
-            MyHand = playerName == game.Player.Name ? game.Player.Hand : game.Opponent.Hand,
+            PlayerName = playerName,
+            PlayerHand = playerName == game.Player.Name ? game.Player.Hand : game.Opponent.Hand,
+            OpponentName = playerName == game.Player.Name ? game.Opponent.Name : game.Player.Name,
+            OpponentTilesCount = playerName == game.Player.Name ? game.Opponent.Hand.Count : game.Player.Hand.Count,
+            MarketTilesCount = game.Set.TilesCount,
             Log = game.Log,
             GameStatus = game.GameStatus
         };

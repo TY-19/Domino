@@ -3,11 +3,48 @@ namespace Domino.Domain.Entities;
 public class Table
 {
     public LinkedList<DominoTile> TilesOnTable { get; } = new();
-    public DominoTile PlaceTile(TileDetails tileDetails, int contactEdge, int position)
+    public int? LeftPosition
+    {
+        get
+        {
+            return TilesOnTable.First?.Value.Position; 
+        }
+    }
+    public int? LeftFreeEnd { get => GetFreeEnd(true); }
+    public int? RightPosition
+    {
+        get
+        {
+            return TilesOnTable.Last?.Value.Position; 
+        }
+    }
+    public int? RightFreeEnd { get => GetFreeEnd(false); }
+    private int? GetFreeEnd(bool isLeft)
+    {
+        if(TilesOnTable.Count == 0)
+        {
+            return null;
+        }
+        if(isLeft && LeftPosition == 0)
+        {
+            return TilesOnTable.First?.Value.TileDetails.SideA;
+        }
+        if(!isLeft && RightPosition == 0)
+        {
+            return TilesOnTable.First?.Value.TileDetails.SideB; 
+        }
+        return isLeft ? TilesOnTable.First?.Value.FreeEnd : TilesOnTable.Last?.Value.FreeEnd;
+    }
+    public DominoTile PlaceTile(TileDetails tileDetails, int position)
     {
         if(position == 0 && TilesOnTable.Count != 0)
         {
             throw new ArgumentException("Starting tile is already in place.");
+        }
+        int contactEdge = -1;
+        if(position != 0)
+        {
+            contactEdge = position < 0 ? LeftFreeEnd!.Value : RightFreeEnd!.Value;
         }
         var tile = new DominoTile()
         {
@@ -69,29 +106,21 @@ public class Table
         }
         return possibleMoves;
     }
-    public int? TryGetPosition(TileDetails tileDetails, int contactEdge, bool? isLeft)
+    public int? TryGetPosition(TileDetails tileDetails, bool? isLeft)
     {
+        if(LeftFreeEnd == null && RightFreeEnd == null)
+        {
+            return 0;
+        }
+        int? contactEdge = isLeft == null || isLeft == true
+            ? LeftFreeEnd
+            : RightFreeEnd;
         if(tileDetails.SideA != contactEdge && tileDetails.SideB != contactEdge)
         {
             return null;
         }
-        var (left, right) = GetFreeEnds();
-        if(left == null && right == null)
-        {
-            return 0;
-        }
-        if(contactEdge != left?.FreeEnd && contactEdge != right?.FreeEnd)
-        {
-            return null;
-        }
-        if((!isLeft.HasValue || isLeft.Value) && contactEdge == left?.FreeEnd)
-        {
-            return left.Position - 1;
-        }
-        if((!isLeft.HasValue || !isLeft.Value) && contactEdge == right?.FreeEnd)
-        {
-            return right.Position + 1;
-        }
-        return null;
+        return isLeft == null || isLeft == true
+            ? LeftPosition - 1
+            : RightPosition + 1;
     }
 }

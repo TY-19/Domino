@@ -1,7 +1,7 @@
-import { GameState } from "../_models/gameState";
+import { GameView } from "../_models/gameView";
 
 export class TestGame {
-  static getGame(): GameState {
+  static getGame(): GameView {
     return null!;
   }
   // private static game1: GameState =

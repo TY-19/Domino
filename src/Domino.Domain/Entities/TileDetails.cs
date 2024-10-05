@@ -8,6 +8,12 @@ public class TileDetails
     public int SideA { get => _a; }
     public int SideB { get => _b; }
     public string TileId { get => _tileId; }
+    public TileDetails()
+    {
+        _a = 1;
+        _b = 1;
+        _tileId = $"{_a}-{_b}";
+    }
     public TileDetails(int a, int b)
     {
         if(a < 0 || a > 6 || b < 0 || b > 6)

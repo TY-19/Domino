@@ -3,7 +3,6 @@ namespace Domino.Domain.Entities;
 public class Game
 {
     public long Id { get; set; }
-    public string Message { get; set; } = "Default";
     public DominoSet Set { get; }
     public Table Table { get; }
     public Player Player { get; }

@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { PositionOnTable } from '../../_models/positionOnTable';
 import { TileDisplay } from '../../_models/tileDisplay';
 import { DominoTile } from '../../_models/dominoTile';
@@ -20,10 +20,15 @@ import { TileComponent } from '../../tile/tile.component';
 export class GameTableComponent {
   private columnsNumber: number = 0;
   private rowsNumber: number = 24;
-  private leftEdgePosition: PositionOnTable = null!;
-  private rightEdgePosition: PositionOnTable = null!;
+  leftEdgePosition: PositionOnTable = null!;
+  rightEdgePosition: PositionOnTable = null!;
   @Input() tiles: DominoTile[] = [];
   tileDisplays: Map<number, TileDisplay> = new Map<number, TileDisplay>();
+  showPlaces: boolean = false;
+  @Output() playToSide: EventEmitter<boolean> = new EventEmitter<boolean>();
+  playTile(isLeft: boolean) {
+    this.playToSide.emit(isLeft);
+  }
   constructor() {
 
   }
@@ -41,6 +46,13 @@ export class GameTableComponent {
   displayTiles(): void {
     this.columnsNumber = this.calculateColumnsNumber();
     this.populateTileDisplays();
+
+    this.def = {
+      row: Math.floor(this.rowsNumber / 2),
+      column: Math.floor(this.columnsNumber / 2),
+    };
+    this.leftActive = this.leftEdgePosition ?? this.def;
+    this.rightActive = this.rightEdgePosition ?? this.def;
   }
   updateDisplayingTiles(tiles: DominoTile[]): void {
     this.tiles = tiles;
@@ -48,6 +60,12 @@ export class GameTableComponent {
       this.displayTiles();
     }
   }
+  def: PositionOnTable = {
+    row: Math.floor(this.rowsNumber / 2),
+    column: Math.floor(this.columnsNumber / 2),
+  };
+  leftActive: PositionOnTable = this.leftEdgePosition ?? this.def;
+  rightActive: PositionOnTable = this.rightEdgePosition ?? this.def;
   
   private calculateColumnsNumber(): number {
     const columnWidth: number = 3 * window.innerHeight / 100;

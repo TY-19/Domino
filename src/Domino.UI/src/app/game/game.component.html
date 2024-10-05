@@ -1,18 +1,20 @@
 <div [hidden]="!showMessage" class="message">Test message</div>
 <div class="grid-container">
-  <Dom-opponent-hand class="grid-item opponent-hand"></Dom-opponent-hand>
   @if(game) {
-    <Dom-game-table [tiles]="game.table.tilesOnTable" class="grid-item game-table"></Dom-game-table>
+    <Dom-opponent-hand [opponentTiles]="opponentTiles" class="grid-item opponent-hand">
+    </Dom-opponent-hand>
+    <Dom-game-table [tiles]="game.table.tilesOnTable"
+      (playToSide)="playToSide($event)"
+      class="grid-item game-table">
+    </Dom-game-table>
+    <div class="grid-item market">Market</div>
+    <div class="grid-item player-hand">
+        @for(tile of this.game.playerHand; track tile.tileId)
+        {
+          <Dom-tile [tile]="tile" [isHorizontal]="false" (tileEmitter)="slectTile($event)"></Dom-tile>
+        }
+    </div>
   }
-  <div class="grid-item market">Market</div>
-  <div class="grid-item player-hand">
-    @if(game) {
-      @for(tile of this.game.player.hand; track tile.tileId)
-      {
-        <Dom-tile [tile]="tile" [isHorizontal]="false" (tileEmitter)="playTile($event)"></Dom-tile>
-      }
-    }
-  </div>
   <button type="button" class="grid-item play-button" (click)="start()">Start!</button>
 </div>
 

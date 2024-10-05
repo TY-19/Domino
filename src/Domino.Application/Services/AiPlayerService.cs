@@ -1,4 +1,5 @@
 using Domino.Application.Interfaces;
+using Domino.Application.Models;
 using Domino.Application.Strategies;
 using Domino.Domain.Entities;
 
@@ -16,7 +17,7 @@ public class AiPlayerService : IAiPlayerService
     public Move MakeMove(GameView gameView)
     {
         List<(TileDetails tileDetails, int contactEdge)> possibilities = 
-            gameView.Table.GetPossibleMoves(gameView.MyHand);
+            gameView.Table.GetPossibleMoves(gameView.PlayerHand);
         if (possibilities.Count == 0)
         {
             return new GrabTileMove();

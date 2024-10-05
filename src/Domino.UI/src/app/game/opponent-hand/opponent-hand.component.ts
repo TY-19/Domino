@@ -7,15 +7,9 @@ import { Component, ElementRef, Input, OnInit } from '@angular/core';
   templateUrl: './opponent-hand.component.html',
   styleUrl: './opponent-hand.component.scss'
 })
-export class OpponentHandComponent implements OnInit {
-  @Input() tileCount: number = 7;
-  elements: number[] = [];
+export class OpponentHandComponent {
+  @Input() opponentTiles: number[] = [];
   constructor(private ref: ElementRef) {
     this.ref.nativeElement.style.setProperty('--wave-color', "green");
-  }
-  ngOnInit() {
-    for(let i = 0; i < this.tileCount; i++) {
-      this.elements.push(i);
-    }
   }
 }
