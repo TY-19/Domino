@@ -8,6 +8,7 @@ import { GameTableComponent } from "./game-table/game-table.component";
 import { OpponentHandComponent } from "./opponent-hand/opponent-hand.component";
 import { DominoTile } from '../_models/dominoTile';
 import { TileDetails } from '../_models/tileDetails';
+import { MarketComponent } from "./market/market.component";
 
 @Component({
   selector: 'Dom-game',
@@ -15,7 +16,8 @@ import { TileDetails } from '../_models/tileDetails';
   imports: [
     TileComponent,
     GameTableComponent,
-    OpponentHandComponent
+    OpponentHandComponent,
+    MarketComponent
 ],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
@@ -26,7 +28,9 @@ export class GameComponent implements OnInit {
   // game: GameState = TestGame.getGame();
   // tileDisplays: Map<number, TileDisplay> = new Map<number, TileDisplay>();
   showMessage: boolean = false;
+  message: string = "";
   opponentTiles: number[] = [0, 1, 2, 3, 4, 5, 6];
+  marketTiles: number[] = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ];
   activeTile: TileDetails | null = null;
 
   constructor(private gameService: GameService) {
@@ -45,15 +49,20 @@ export class GameComponent implements OnInit {
       });
     if(this.gameTable) {
       this.gameTable.tileDisplays = new Map<number, TileDisplay>();
+      this.gameTable.leftActive = this.gameTable.def;
+      this.gameTable.rightActive = this.gameTable.def;
     }
+    this.showMessage = false;
+    this.message = "";
+    this.opponentTiles = [0, 1, 2, 3, 4, 5, 6];
+    this.marketTiles = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ];
   }
   slectTile(tileDetails: TileDetails) {
     this.activeTile = tileDetails;
-    console.log("active tile: " + tileDetails.tileId);
   }
   playToSide(isLeft: boolean) {
     if(this.activeTile) {
-      let contactEdge = isLeft ? this.game.table.leftFreeEnd : this.game.table.rightFreeEnd;
+      let contactEdge = isLeft === true ? this.game.table.leftFreeEnd : this.game.table.rightFreeEnd;
       if(contactEdge === null) {
         contactEdge = this.activeTile.sideA;
       }
@@ -86,17 +95,25 @@ export class GameComponent implements OnInit {
       position: position,
       contactEdge: contactEdge
     };
-    console.log("playing tile");
-    console.log(tile);
     this.gameService.playTile(tile)
       .subscribe(gs => {
         this.game = gs;
         this.updateChildren();
-        console.log(this.game);
     });
+  }
+  grabFromMarket(index: number) {
+    this.marketTiles = this.marketTiles.filter(t => t !== index);
+    this.grabTile();
   }
   grabTile() {
     this.gameService.grabTile()
+      .subscribe(gs => {
+        this.game = gs;
+        this.updateChildren();
+      });
+  }
+  endTurn() {
+    this.gameService.waitForOpponent()
       .subscribe(gs => {
         this.game = gs;
         this.updateChildren();
@@ -112,6 +129,16 @@ export class GameComponent implements OnInit {
     this.opponentTiles = [];
     for(let i = 0; i < this.game.opponentTilesCount; i++) {
       this.opponentTiles.push(i);
+    }
+    if(this.game.gameStatus.isEnded) {
+      this.showMessage = true;
+        this.message = this.game.gameStatus.result;
+    }
+    if(this.game.marketTilesCount < this.marketTiles.length)
+    {
+      for(let i = 0; i < this.marketTiles.length - this.game.marketTilesCount; i++) {
+        this.marketTiles.pop();
+      }
     }
   }
 }

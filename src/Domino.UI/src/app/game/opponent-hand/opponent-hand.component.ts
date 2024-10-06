@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
 
 @Component({
   selector: 'Dom-opponent-hand',
@@ -9,7 +9,11 @@ import { Component, ElementRef, Input, OnInit } from '@angular/core';
 })
 export class OpponentHandComponent {
   @Input() opponentTiles: number[] = [];
+  @Output() endTurn: EventEmitter<void> = new EventEmitter<void>();
   constructor(private ref: ElementRef) {
     this.ref.nativeElement.style.setProperty('--wave-color', "green");
+  }
+  yourTurn() {
+    this.endTurn.emit();
   }
 }

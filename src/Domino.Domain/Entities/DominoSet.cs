@@ -23,6 +23,7 @@ public class DominoSet
     }
     public TileDetails? ServeTile()
     {
+        Console.WriteLine($"Tiles remains {Tiles.Count}");
         if (Tiles.Count < 2)
         {
             return null;

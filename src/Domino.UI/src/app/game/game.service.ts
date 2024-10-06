@@ -23,13 +23,16 @@ export class GameService {
         const isLeft: boolean | null = tile.position == 0 ? null : tile.position < 0;
         const playTileDto = {
             tileId: tile.tileDetails.tileId,
-            contactEdge: tile.contactEdge,
             isLeft: isLeft
         };
         return this.http.post<GameView>(url, playTileDto);
     }
     grabTile(): Observable<GameView> {
         const url: string = baseUrl + "/Game/grab";
+        return this.http.get<GameView>(url);
+    }
+    waitForOpponent(): Observable<GameView> {
+        const url: string = baseUrl + "/Game/endTurn";
         return this.http.get<GameView>(url);
     }
 }

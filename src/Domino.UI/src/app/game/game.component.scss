@@ -45,6 +45,11 @@
     margin-top: -1px;
     border-top-width: 2px;
     border-right: none;
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 5px 5px 5px 5px;
 }
 .player-hand {
     grid-column-start: 1;
@@ -78,6 +83,7 @@
 }
 .message {
     position: absolute;
-    top: 45%;
+    top: 40%;
     left: 40%;
+    z-index: 10;
 }

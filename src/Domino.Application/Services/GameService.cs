@@ -48,7 +48,7 @@ public class GameService : IGameService
     }
     public GameView PlayTile(string tileId, bool? isLeft)
     {
-        _logger.LogInformation("PlayTile {tileId} to edge, {isLeft}", tileId, isLeft);
+        _logger.LogInformation("PlayTile {tileId} to edge, left: {isLeft}", tileId, isLeft);
         var game = GetGame();
         _logger.LogInformation("Current game: {@game}", game);
         var tileDetails = game.Player.GetTileFromHand(tileId)
@@ -57,7 +57,7 @@ public class GameService : IGameService
             ?? throw new ArgumentException("The tile can't be played on the table.");
         _logger.LogInformation("Player plays {@details}", tileDetails);
         game.Player.PlayTile(tileDetails);
-        _logger.LogInformation("Tile is placing on table");
+        _logger.LogInformation("Tile is placing on the table.");
         var tile = game.Table.PlaceTile(tileDetails, position);
         _logger.LogInformation("Writing log");
         game.Log.AddEntry(new GameLogEntry()
@@ -67,8 +67,10 @@ public class GameService : IGameService
             Tile = tile,
         });
         _logger.LogInformation("Waiting for opponent");
-        WaitOpponentTurn();
-        _logger.LogInformation("Check for endgame conditions");
+        _logger.LogInformation("Check for endgame conditions for player");
+        TrySetGameResult(game);
+        WaitOpponentTurn(game);
+        _logger.LogInformation("Check for endgame conditions for opponent");
         TrySetGameResult(game);
         _logger.LogInformation("Returning result");
         return game.ToGameView(game.Player.Name);
@@ -95,12 +97,16 @@ public class GameService : IGameService
     }
     public Game WaitOpponentTurn(Game game)
     {
+        if(game.GameStatus.IsEnded)
+        {
+            return game;
+        }
         var move = _aiPlayerService?.MakeMove(game.ToGameView(game.Opponent.Name));
         switch (move)
         {
             case PlayTileMove ptm:
                 bool isLeft = ptm.ContactEdge == game.Table.LeftFreeEnd;
-                int position = game.Table.TryGetPosition(ptm.Tile, true)
+                int position = game.Table.TryGetPosition(ptm.Tile, isLeft)
                     ?? throw new ArgumentException("The tile can't be played on the table.");
                 game.Opponent.PlayTile(ptm.Tile);
                 var tile = game.Table.PlaceTile(ptm.Tile, position);
@@ -180,32 +186,35 @@ public class GameService : IGameService
         }
         return true;
     }
-    private static void TrySetGameResult(Game game)
+    private void TrySetGameResult(Game game)
     {
         if(game.Player.Hand.Count == 0)
         {
+            _logger.LogInformation("game.Player.Hand.Count == 0");
             SetGameStatus(game, game.Player.Name);
         }
         else if (game.Opponent.Hand.Count == 0)
         {
+            _logger.LogInformation("game.Opponent.Hand.Count == 0");
             SetGameStatus(game, game.Opponent.Name);
         }
         else if(game.Set.TilesCount <= game.GameRules.MinLeftInMarket
             && game.Table.GetPossibleMoves(game.Player.Hand).Count == 0
             && game.Table.GetPossibleMoves(game.Opponent.Hand).Count == 0)
         {
+            _logger.LogInformation("Player possible moves:\n{@moves}", game.Table.GetPossibleMoves(game.Player.Hand));
+            _logger.LogInformation("Opponent possible moves:\n{@moves}", game.Table.GetPossibleMoves(game.Opponent.Hand));
             game.GameStatus.IsEnded = true;
             game.GameStatus.LoserPointsCount[0] = (game.Player.Name, CountPoints(game.Player.Hand));
             game.GameStatus.LoserPointsCount[1] = (game.Opponent.Name, CountPoints(game.Opponent.Hand));
             game.GameStatus.Result = "The game ended up in a draw.\nPoints count is:\n"
-                + $"{game.Player.Name} - {game.GameStatus.LoserPointsCount[0]}"
-                + $"{game.Opponent.Name} - {game.GameStatus.LoserPointsCount[1]}";
+                + $"{game.Player.Name} - {game.GameStatus.LoserPointsCount[0].Item2}"
+                + $"{game.Opponent.Name} - {game.GameStatus.LoserPointsCount[1].Item2}";
         }
     }
     private static void SetGameStatus(Game game, string playerName)
     {
         game.GameStatus.IsEnded = true;
-        game.GameStatus.Result = $"{game.Player.Name} win!";
         if(playerName == game.Player.Name)
         {
             game.GameStatus.Winner = game.Player.Name;
@@ -216,6 +225,7 @@ public class GameService : IGameService
             game.GameStatus.Winner = game.Opponent.Name;
             game.GameStatus.Loser = game.Player.Name;
         }
+        game.GameStatus.Result = $"{game.GameStatus.Winner} win!";
         var lastTile = game.Log.Events
             .Where(e => e.PlayerName == playerName)
             .MaxBy(e => e.MoveNumber);
@@ -242,12 +252,12 @@ public class GameService : IGameService
         else
         {
             game.GameStatus.VictoryType = "Normal Victory";
-            var loserHand = playerName == game.Player.Name
+            var loserHand = game.GameStatus.Loser == game.Player.Name
                 ? game.Player.Hand
                 : game.Opponent.Hand;
             game.GameStatus.LoserPointsCount[0] = (game.GameStatus.Loser, CountPoints(loserHand));
             game.GameStatus.Result ??= "";
-            game.GameStatus.Result += $"\n{game.GameStatus.Loser} is left with {game.GameStatus.LoserPointsCount} points.";
+            game.GameStatus.Result += $"\n{game.GameStatus.Loser} is left with {game.GameStatus.LoserPointsCount[0].Item2} points.";
         }
     }
     private static int CountPoints(List<TileDetails> tileDetails)

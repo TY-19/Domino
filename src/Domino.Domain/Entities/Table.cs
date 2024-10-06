@@ -31,7 +31,7 @@ public class Table
         }
         if(!isLeft && RightPosition == 0)
         {
-            return TilesOnTable.First?.Value.TileDetails.SideB; 
+            return TilesOnTable.Last?.Value.TileDetails.SideB; 
         }
         return isLeft ? TilesOnTable.First?.Value.FreeEnd : TilesOnTable.Last?.Value.FreeEnd;
     }
@@ -62,10 +62,6 @@ public class Table
         }
         return tile;
     }
-    public (DominoTile? left, DominoTile? right) GetFreeEnds()
-    {
-        return (TilesOnTable.First?.Value, TilesOnTable.Last?.Value);
-    }
     public List<(TileDetails tileDetails, int edge)> GetPossibleMoves(List<TileDetails> hand)
     {
         List<(TileDetails tileDetails, int edge)> possibleMoves = [];
@@ -80,25 +76,25 @@ public class Table
             {
                 possibleMoves.Add((tile, tile.SideA));
             }
+            return possibleMoves;
         }
-        var (left, right) = GetFreeEnds();
         foreach(var tile in hand)
         {
-            if(tile.SideA == left?.FreeEnd)
+            if(tile.SideA == LeftFreeEnd)
             {
                 possibleMoves.Add((tile, tile.SideA));
             }
-            if(tile.SideA != tile.SideB && tile.SideB == left?.FreeEnd)
+            else if(tile.SideB == LeftFreeEnd)
             {
                 possibleMoves.Add((tile, tile.SideB));
             }
-            if(left?.FreeEnd != right?.FreeEnd)
+            if(LeftFreeEnd != RightFreeEnd)
             {
-                if(tile.SideA == right?.FreeEnd)
+                if(tile.SideA == RightFreeEnd)
                 {
                     possibleMoves.Add((tile, tile.SideA));
                 }
-                if(tile.SideA != tile.SideB && tile.SideB == right?.FreeEnd)
+                else if(tile.SideB == RightFreeEnd)
                 {
                     possibleMoves.Add((tile, tile.SideB));
                 }   
