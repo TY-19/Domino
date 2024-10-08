@@ -13,6 +13,15 @@
         width: 12vh;
     }
 }
+.market-display {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px;
+    min-width: 20vh;
+    justify-content: center;
+}
+
 $wave-color: var(--wave-color, green);
 .back-wave {
     background:

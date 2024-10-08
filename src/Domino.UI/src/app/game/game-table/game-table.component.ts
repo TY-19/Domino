@@ -53,6 +53,12 @@ export class GameTableComponent {
     };
     this.leftActive = this.leftEdgePosition ?? this.def;
     this.rightActive = this.rightEdgePosition ?? this.def;
+    if(this.leftEdgePosition && this.leftEdgePosition.currentDirection === Direction.Right) {
+      this.leftActive.column--;
+    }
+    if(this.rightEdgePosition && this.rightEdgePosition.currentDirection === Direction.Right) {
+      this.rightActive.column--;
+    }
   }
   updateDisplayingTiles(tiles: DominoTile[]): void {
     this.tiles = tiles;

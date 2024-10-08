@@ -25,7 +25,7 @@ import { MarketComponent } from "./market/market.component";
 export class GameComponent implements OnInit {
   @ViewChild(GameTableComponent) gameTable: GameTableComponent = null!;
   game: GameView = null!;
-  // game: GameState = TestGame.getGame();
+  // game: GameView = TestGame.getGame();
   // tileDisplays: Map<number, TileDisplay> = new Map<number, TileDisplay>();
   showMessage: boolean = false;
   message: string = "";
@@ -59,6 +59,29 @@ export class GameComponent implements OnInit {
   }
   slectTile(tileDetails: TileDetails) {
     this.activeTile = tileDetails;
+    if(this.game.table.leftFreeEnd && this.game.table.rightFreeEnd) {
+      let movesCount: number = 0;
+      let isLeft: boolean | null = null;
+      if(tileDetails.sideA === this.game.table.leftFreeEnd) {
+        movesCount++;
+        isLeft = true;
+      }
+      if(tileDetails.sideB === this.game.table.leftFreeEnd) {
+        movesCount++;
+        isLeft = true;
+      }
+      if(tileDetails.sideA === this.game.table.rightFreeEnd) {
+        movesCount++;
+        isLeft = false;
+      }
+      if(tileDetails.sideB === this.game.table.rightFreeEnd) {
+        movesCount++;
+        isLeft = false;
+      }
+      if(movesCount === 1 && isLeft !== null) {
+        this.playToSide(isLeft);
+      }
+    }
   }
   playToSide(isLeft: boolean) {
     if(this.activeTile) {
@@ -102,7 +125,7 @@ export class GameComponent implements OnInit {
     });
   }
   grabFromMarket(index: number) {
-    this.marketTiles = this.marketTiles.filter(t => t !== index);
+    // this.marketTiles = this.marketTiles.filter(t => t !== index);
     this.grabTile();
   }
   grabTile() {

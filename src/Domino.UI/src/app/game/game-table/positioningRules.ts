@@ -89,10 +89,10 @@ export class PositioningRules {
       edgeColumnShift: 3
     }],
     [(Direction.Top + MoveType.RotateCornerAfterDouble), {
-      rowShift: 2,
-      columnShift: 5,
-      reverseRowShift: 3,
-      reverseColumnShift: 1,
+      rowShift: 4,
+      columnShift: 3,
+      reverseRowShift: 1,
+      reverseColumnShift: 3,
       edgeRowShift: 4,
       edgeColumnShift: 6
     }],

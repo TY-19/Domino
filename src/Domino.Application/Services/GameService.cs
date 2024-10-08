@@ -188,6 +188,7 @@ public class GameService : IGameService
     }
     private void TrySetGameResult(Game game)
     {
+        _logger.LogInformation("Try set game result for game:\n{@game}", game);
         if(game.Player.Hand.Count == 0)
         {
             _logger.LogInformation("game.Player.Hand.Count == 0");
@@ -208,7 +209,7 @@ public class GameService : IGameService
             game.GameStatus.LoserPointsCount[0] = (game.Player.Name, CountPoints(game.Player.Hand));
             game.GameStatus.LoserPointsCount[1] = (game.Opponent.Name, CountPoints(game.Opponent.Hand));
             game.GameStatus.Result = "The game ended up in a draw.\nPoints count is:\n"
-                + $"{game.Player.Name} - {game.GameStatus.LoserPointsCount[0].Item2}"
+                + $"{game.Player.Name} - {game.GameStatus.LoserPointsCount[0].Item2}\n"
                 + $"{game.Opponent.Name} - {game.GameStatus.LoserPointsCount[1].Item2}";
         }
     }
