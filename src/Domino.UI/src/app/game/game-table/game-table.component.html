@@ -6,5 +6,6 @@
     </div>
   }
 }
-<div [hidden]="showPlaces" (click)="playTile(true)" class="active-play" [style]="buildStyle(leftActive)"></div>
-<div [hidden]="showPlaces" (click)="playTile(false)" class="active-play" [style]="buildStyle(rightActive)"></div>
+<div [hidden]="!showPlaces" (click)="playTile(true)" class="active-play" [style]="buildStyle(leftActive)"></div>
+<div [hidden]="!showPlaces" (click)="playTile(false)" class="active-play" [style]="buildStyle(rightActive)"></div>
+

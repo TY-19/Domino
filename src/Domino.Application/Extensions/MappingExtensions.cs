@@ -16,6 +16,7 @@ public static class MappingExtensions
             OpponentName = playerName == game.Player.Name ? game.Opponent.Name : game.Player.Name,
             OpponentTilesCount = playerName == game.Player.Name ? game.Opponent.Hand.Count : game.Player.Hand.Count,
             MarketTilesCount = game.Set.TilesCount,
+            GameRules = game.GameRules,
             Log = game.Log,
             GameStatus = game.GameStatus
         };

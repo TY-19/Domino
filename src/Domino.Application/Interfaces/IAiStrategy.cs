@@ -5,5 +5,5 @@ namespace Domino.Application.Interfaces;
 
 public interface IAiStrategy
 {
-    PlayTileMove SelectMove(GameView gameView);
+    Move SelectMove(GameView gameView);
 }

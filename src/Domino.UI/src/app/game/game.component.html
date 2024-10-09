@@ -1,4 +1,5 @@
-<div [hidden]="!showMessage" class="message">{{message}}</div>
+<div (click)="opponentMessage = ''" [hidden]="opponentMessage.length < 1" class="opponent-message">{{opponentMessage}}</div>
+<div (click)="showMessage = false" [hidden]="!showMessage" class="message">{{message}}</div>
 <div class="grid-container">
   @if(game) {
     <Dom-opponent-hand [opponentTiles]="opponentTiles"

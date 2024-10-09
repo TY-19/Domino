@@ -2,14 +2,15 @@ namespace Domino.Domain.Entities;
 
 public class DominoSet
 {
-    private readonly List<TileDetails> Tiles;
-    private readonly Random rnd;
-    public int TilesCount { get => Tiles.Count; }
+    private readonly List<TileDetails> _tiles;
+    private readonly Random _rnd;
+    public List<TileDetails> Tiles { get => _tiles; }
+    public int TilesCount { get => _tiles.Count; }
     public DominoSet()
     {
-        Tiles = [];
+        _tiles = [];
         PopulateTiles();
-        rnd = new Random();
+        _rnd = new Random();
     }
     private void PopulateTiles()
     {
@@ -17,19 +18,19 @@ public class DominoSet
         {
             for (int j = i; j <= 6; j++)
             {
-                Tiles.Add(new TileDetails(i, j));
+                _tiles.Add(new TileDetails(i, j));
             }
         }
     }
     public TileDetails? ServeTile()
     {
-        if (Tiles.Count < 2)
+        if (_tiles.Count < 2)
         {
             return null;
         }
-        int index = rnd.Next(Tiles.Count - 1);
-        TileDetails toReturn = Tiles[index];
-        Tiles.RemoveAt(index);
+        int index = _rnd.Next(_tiles.Count - 1);
+        TileDetails toReturn = _tiles[index];
+        _tiles.RemoveAt(index);
         return toReturn;
     }
 }

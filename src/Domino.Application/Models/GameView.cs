@@ -11,8 +11,7 @@ public class GameView
     public string OpponentName { get; set; } = null!;
     public int OpponentTilesCount { get; set; }
     public int MarketTilesCount { get; set; }
+    public GameRules GameRules { get; set; } = null!;
     public GameStatus GameStatus { get; set; } = null!;
-    public GameLog Log { get; set; } = null!;
-    public List<(TileDetails tileDetails, int contactEdge)> PossibleTilesToPlay { get; set; } = [];
-    
+    public GameLog Log { get; set; } = null!;    
 }

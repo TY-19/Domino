@@ -1,5 +1,12 @@
-@for(tile of opponentTiles; track tile)
-{
-    <div (dblclick)="yourTurn()" class="domino-tile domino-tile-vertical back-wave">
-    </div>
+@if(openHand) {
+    @for(tile of this.opponentHand; track tile.tileId)
+    {
+        <Dom-tile [tile]="tile" [isHorizontal]="false"></Dom-tile>
+    }
+} @else {
+    @for(tile of opponentTiles; track tile)
+    {
+        <div (dblclick)="yourTurn()" class="domino-tile domino-tile-vertical back-wave">
+        </div>
+    }
 }

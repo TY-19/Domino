@@ -186,28 +186,26 @@ public class GameService : IGameService
         }
         return true;
     }
-    private void TrySetGameResult(Game game)
+    private static void TrySetGameResult(Game game)
     {
-        _logger.LogInformation("Try set game result for game:\n{@game}", game);
         if(game.Player.Hand.Count == 0)
         {
-            _logger.LogInformation("game.Player.Hand.Count == 0");
             SetGameStatus(game, game.Player.Name);
         }
         else if (game.Opponent.Hand.Count == 0)
         {
-            _logger.LogInformation("game.Opponent.Hand.Count == 0");
             SetGameStatus(game, game.Opponent.Name);
         }
-        else if(game.Set.TilesCount <= game.GameRules.MinLeftInMarket
+        else if((game.Set.TilesCount <= game.GameRules.MinLeftInMarket
+            || game.Table.GetPossibleMoves(game.Set.Tiles).Count == 0)
             && game.Table.GetPossibleMoves(game.Player.Hand).Count == 0
             && game.Table.GetPossibleMoves(game.Opponent.Hand).Count == 0)
         {
-            _logger.LogInformation("Player possible moves:\n{@moves}", game.Table.GetPossibleMoves(game.Player.Hand));
-            _logger.LogInformation("Opponent possible moves:\n{@moves}", game.Table.GetPossibleMoves(game.Opponent.Hand));
             game.GameStatus.IsEnded = true;
             game.GameStatus.LoserPointsCount[0] = (game.Player.Name, CountPoints(game.Player.Hand));
             game.GameStatus.LoserPointsCount[1] = (game.Opponent.Name, CountPoints(game.Opponent.Hand));
+            game.GameStatus.EndHands[game.Player.Name] = game.Player.Hand;
+            game.GameStatus.EndHands[game.Opponent.Name] = game.Opponent.Hand;
             game.GameStatus.Result = "The game ended up in a draw.\nPoints count is:\n"
                 + $"{game.Player.Name} - {game.GameStatus.LoserPointsCount[0].Item2}\n"
                 + $"{game.Opponent.Name} - {game.GameStatus.LoserPointsCount[1].Item2}";
@@ -256,6 +254,7 @@ public class GameService : IGameService
             var loserHand = game.GameStatus.Loser == game.Player.Name
                 ? game.Player.Hand
                 : game.Opponent.Hand;
+            game.GameStatus.EndHands[game.GameStatus.Loser] = loserHand;
             game.GameStatus.LoserPointsCount[0] = (game.GameStatus.Loser, CountPoints(loserHand));
             game.GameStatus.Result ??= "";
             game.GameStatus.Result += $"\n{game.GameStatus.Loser} is left with {game.GameStatus.LoserPointsCount[0].Item2} points.";

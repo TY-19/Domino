@@ -9,6 +9,7 @@ import { OpponentHandComponent } from "./opponent-hand/opponent-hand.component";
 import { DominoTile } from '../_models/dominoTile';
 import { TileDetails } from '../_models/tileDetails';
 import { MarketComponent } from "./market/market.component";
+import { LogEvent } from '../_models/logEvent';
 
 @Component({
   selector: 'Dom-game',
@@ -24,6 +25,7 @@ import { MarketComponent } from "./market/market.component";
 })
 export class GameComponent implements OnInit {
   @ViewChild(GameTableComponent) gameTable: GameTableComponent = null!;
+  @ViewChild(OpponentHandComponent) opponentHand: OpponentHandComponent = null!;
   game: GameView = null!;
   // game: GameView = TestGame.getGame();
   // tileDisplays: Map<number, TileDisplay> = new Map<number, TileDisplay>();
@@ -32,6 +34,9 @@ export class GameComponent implements OnInit {
   opponentTiles: number[] = [0, 1, 2, 3, 4, 5, 6];
   marketTiles: number[] = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ];
   activeTile: TileDetails | null = null;
+  
+  currentTurn: number = 0;
+  opponentMessage: string = "";
 
   constructor(private gameService: GameService) {
   }
@@ -52,35 +57,41 @@ export class GameComponent implements OnInit {
       this.gameTable.leftActive = this.gameTable.def;
       this.gameTable.rightActive = this.gameTable.def;
     }
+    if(this.opponentHand) {
+      this.opponentHand.openHand = false;
+      this.opponentHand.opponentHand = [];
+    }
     this.showMessage = false;
     this.message = "";
+    this.currentTurn = 0;
+    this.opponentMessage = "";
     this.opponentTiles = [0, 1, 2, 3, 4, 5, 6];
     this.marketTiles = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ];
   }
   slectTile(tileDetails: TileDetails) {
     this.activeTile = tileDetails;
-    if(this.game.table.leftFreeEnd && this.game.table.rightFreeEnd) {
+    if(this.game.table.leftFreeEnd !== null
+      && this.game.table.rightFreeEnd !== null) {
       let movesCount: number = 0;
       let isLeft: boolean | null = null;
-      if(tileDetails.sideA === this.game.table.leftFreeEnd) {
+      if(tileDetails.sideA === this.game.table.leftFreeEnd
+        || tileDetails.sideB === this.game.table.leftFreeEnd) {
         movesCount++;
         isLeft = true;
       }
-      if(tileDetails.sideB === this.game.table.leftFreeEnd) {
-        movesCount++;
-        isLeft = true;
-      }
-      if(tileDetails.sideA === this.game.table.rightFreeEnd) {
-        movesCount++;
-        isLeft = false;
-      }
-      if(tileDetails.sideB === this.game.table.rightFreeEnd) {
+      if(tileDetails.sideA === this.game.table.rightFreeEnd
+        || tileDetails.sideB === this.game.table.rightFreeEnd) {
         movesCount++;
         isLeft = false;
       }
       if(movesCount === 1 && isLeft !== null) {
         this.playToSide(isLeft);
+      }  else if(movesCount > 1) {
+        this.gameTable.showPlaces = true;
       }
+    }
+    else {
+      this.playToSide(true);
     }
   }
   playToSide(isLeft: boolean) {
@@ -91,6 +102,7 @@ export class GameComponent implements OnInit {
       }
       this.playTile(this.activeTile, contactEdge, isLeft);
       this.activeTile = null;
+      this.gameTable.showPlaces = false;
     }
   }
   playTile(tileDetails: TileDetails, contactEdge: number, placeLeft?: boolean): void {
@@ -125,8 +137,16 @@ export class GameComponent implements OnInit {
     });
   }
   grabFromMarket(index: number) {
-    // this.marketTiles = this.marketTiles.filter(t => t !== index);
-    this.grabTile();
+    if(this.game.playerHand.some(t =>
+      t.sideA === this.game.table.leftFreeEnd
+      || t.sideB === this.game.table.leftFreeEnd
+      || t.sideA === this.game.table.rightFreeEnd
+      || t.sideB === this.game.table.rightFreeEnd)) {
+        this.message = "You have a possible tile to play in your hand. No need to grab another one";
+        this.showMessage = true;
+    } else {  
+      this.grabTile();
+    }
   }
   grabTile() {
     this.gameService.grabTile()
@@ -155,7 +175,12 @@ export class GameComponent implements OnInit {
     }
     if(this.game.gameStatus.isEnded) {
       this.showMessage = true;
-        this.message = this.game.gameStatus.result;
+      this.message = this.game.gameStatus.result;
+      let tiles: TileDetails[] = [];
+      if (this.game.gameStatus.endHands.hasOwnProperty(this.game.opponentName)) {
+        tiles = this.game.gameStatus.endHands[this.game.opponentName];
+      }
+      this.opponentHand.showOpponentTiles(tiles);
     }
     if(this.game.marketTilesCount < this.marketTiles.length)
     {
@@ -163,5 +188,22 @@ export class GameComponent implements OnInit {
         this.marketTiles.pop();
       }
     }
+    this.buildOpponentMessage(this.game.log.events);
+  }
+  private buildOpponentMessage(events: LogEvent[]) {
+    let newEvents = events.filter(e => e.moveNumber > this.currentTurn &&
+      e.playerName === this.game.opponentName).sort((a, b ) => {
+        return a.moveNumber - b.moveNumber;
+      });
+    let message = "";
+    for(let event of newEvents) {
+      if(event.type === 1) {
+        message += "I played " + event.tile.tileDetails.tileId + ".\n";
+      } else if(event.type === 2) {
+        message += "I grabbed a tile.\n";
+      }
+      this.currentTurn = event.moveNumber;
+    }
+    this.opponentMessage = message;
   }
 }
