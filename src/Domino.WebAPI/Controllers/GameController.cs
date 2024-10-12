@@ -6,9 +6,13 @@ namespace Domino.WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class GameController(IGameService gameService) : ControllerBase
+public class GameController : ControllerBase
 {
-    IGameService _gameService = gameService;
+    private readonly IGameService _gameService;
+    public GameController(IGameService gameService)
+    {
+        _gameService = gameService;
+    }
     [HttpGet("start")]
     public ActionResult<GameView> StartGame(string playerName = "Test", string opponentName = "AI")
     {

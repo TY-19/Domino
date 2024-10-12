@@ -12,15 +12,21 @@ public class GameService : IGameService
 {
     private Game? _game;
     private readonly IMemoryCache _cache;
-    private ICurrentUserService _currentUserService;
+    private readonly IGameRepository _gameRepository;
+    private readonly ICurrentUserService _currentUserService;
+    private readonly IPlayerStatisticService _playerStatisticService;
     private IAiPlayerService? _aiPlayerService;
-    private ILogger<GameService> _logger;
+    private readonly ILogger<GameService> _logger;
     public GameService(
         IMemoryCache memoryCache,
+        IGameRepository gameRepository,
         ICurrentUserService currentUserService,
+        IPlayerStatisticService playerStatisticService,
         ILogger<GameService> logger)
     {
         _currentUserService = currentUserService;
+        _gameRepository = gameRepository;
+        _playerStatisticService = playerStatisticService;
         _cache = memoryCache;
         _logger = logger;
         long? gameId = _currentUserService.GetCurrentGameId();
@@ -50,7 +56,7 @@ public class GameService : IGameService
     {
         _logger.LogInformation("PlayTile {tileId} to edge, left: {isLeft}", tileId, isLeft);
         var game = GetGame();
-        _logger.LogInformation("Current game: {@game}", game);
+        // _logger.LogInformation("Current game: {@game}", game);
         var tileDetails = game.Player.GetTileFromHand(tileId)
             ?? throw new ArgumentException("No tile with such an id in the hand.");
         int position = game.Table.TryGetPosition(tileDetails, isLeft)
@@ -186,7 +192,7 @@ public class GameService : IGameService
         }
         return true;
     }
-    private static void TrySetGameResult(Game game)
+    private void TrySetGameResult(Game game)
     {
         if(game.Player.Hand.Count == 0)
         {
@@ -209,6 +215,11 @@ public class GameService : IGameService
             game.GameStatus.Result = "The game ended up in a draw.\nPoints count is:\n"
                 + $"{game.Player.Name} - {game.GameStatus.LoserPointsCount[0].Item2}\n"
                 + $"{game.Opponent.Name} - {game.GameStatus.LoserPointsCount[1].Item2}";
+        }
+        if(game.GameStatus.IsEnded)
+        {
+            _playerStatisticService.UpdateCreatePlayersStatistic(game.GameStatus);
+            _gameRepository.SaveGame(game);
         }
     }
     private static void SetGameStatus(Game game, string playerName)

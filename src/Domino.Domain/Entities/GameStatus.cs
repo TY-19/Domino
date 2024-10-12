@@ -13,4 +13,5 @@ public class GameStatus
     public (string, int)[] LoserPointsCount { get; set; } = new (string, int)[2];
     public Dictionary<string, List<TileDetails>> EndHands { get; set; } = new();
     public string? VictoryType { get; set; }
+    public bool IsInStatistic { get; set; }
 }

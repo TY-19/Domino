@@ -1,0 +1,9 @@
+.menu-text {
+    @apply inline-block text-xl leading-9 bg-lime-200 mr-2;
+}
+.menu-button-wide {
+    @apply inline-block text-xl text-center leading-9 border-black border-2 p-1 mr-2 bg-orange-300 cursor-pointer;
+}
+.menu-button {
+    @apply inline-block text-lg text-center leading-9 border-black border-2 p-1 bg-orange-300 cursor-pointer;
+}

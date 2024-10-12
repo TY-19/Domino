@@ -1,1 +1,16 @@
-<a [routerLink]="['game']">To game!</a>
+<div class="w-full h-[100vh] flex justify-center items-center bg-amber-100">
+    <div class="flex flex-col w-fit m-2 p-2">
+        <div [routerLink]="['game']" class="menu-button-wide">Start game!</div>
+        <div class="flex justify-between items-center m-2">
+            <div class="menu-text">Player: </div>
+            <div class="menu-button">
+                Change player
+            </div>
+        </div>
+        <div class="flex justify-between items-center m-2">
+            <div class="menu-text">Opponent: </div>
+            <div class="menu-button">Set opponent</div>
+        </div>
+        <div [routerLink]="['players-statistics']" class="menu-button-wide">Statistics</div>
+    </div>
+</div>

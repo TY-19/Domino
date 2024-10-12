@@ -1,5 +1,6 @@
 using Domino.Application.Interfaces;
 using Domino.Application.Services;
+using Domino.Infrastructure.Repositories;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
 using Microsoft.OpenApi.Models;
@@ -30,8 +31,11 @@ public class Program
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "Domino", Version = "v1" });
         });
         builder.Services.AddControllers();
+        builder.Services.AddScoped<IGameRepository, GameRepository>();
+        builder.Services.AddScoped<IPlayerStatisticRepository, PlayerStatisticRepository>();
         builder.Services.AddScoped<IGameService, GameService>();
         builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
+        builder.Services.AddScoped<IPlayerStatisticService, PlayerStatisticService>();
         builder.Services.AddSerilog(options => {
             options.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning);
             options.ReadFrom.Configuration(builder.Configuration);

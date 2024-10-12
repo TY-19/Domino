@@ -6,6 +6,9 @@
 # Local version of SonarQube
 /.sonarqube
 
+#Local Test database
+/src/Domino.WebAPI/db
+
 # User-specific files
 *.rsuser
 *.suo
