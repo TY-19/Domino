@@ -10,15 +10,20 @@ import { DominoTile } from '../_models/dominoTile';
 import { TileDetails } from '../_models/tileDetails';
 import { MarketComponent } from "./market/market.component";
 import { LogEvent } from '../_models/logEvent';
+import { LocalStorageService } from '../_shared/localstorage.service';
+import { PlayerHandComponent } from "./player-hand/player-hand.component";
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'Dom-game',
   standalone: true,
   imports: [
+    RouterLink,
     TileComponent,
     GameTableComponent,
     OpponentHandComponent,
-    MarketComponent
+    MarketComponent,
+    PlayerHandComponent
 ],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss'
@@ -31,6 +36,7 @@ export class GameComponent implements OnInit {
   // tileDisplays: Map<number, TileDisplay> = new Map<number, TileDisplay>();
   showMessage: boolean = false;
   message: string = "";
+  playerHand: TileDetails[] = [];
   opponentTiles: number[] = [0, 1, 2, 3, 4, 5, 6];
   marketTiles: number[] = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ];
   activeTile: TileDetails | null = null;
@@ -38,19 +44,23 @@ export class GameComponent implements OnInit {
   currentTurn: number = 0;
   opponentMessage: string = "";
 
-  constructor(private gameService: GameService) {
+  constructor(private gameService: GameService,
+    private localStorageService: LocalStorageService
+  ) {
   }
   
   ngOnInit(): void {
     if(this.game === null) {
       this.start();
-    }
-    
+    } 
   }
   start() {
-    this.gameService.startGame()
+    let playerName = this.localStorageService.getPlayerName();
+    let opponentName = this.localStorageService.getOpponentName();
+    this.gameService.startGame(playerName, opponentName)
       .subscribe(gs => {
         this.game = gs;
+        this.playerHand = this.game.playerHand;
       });
     if(this.gameTable) {
       this.gameTable.tileDisplays = new Map<number, TileDisplay>();
@@ -68,7 +78,7 @@ export class GameComponent implements OnInit {
     this.opponentTiles = [0, 1, 2, 3, 4, 5, 6];
     this.marketTiles = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ];
   }
-  slectTile(tileDetails: TileDetails) {
+  selectTile(tileDetails: TileDetails) {
     this.activeTile = tileDetails;
     if(this.game.table.leftFreeEnd !== null
       && this.game.table.rightFreeEnd !== null) {
@@ -169,6 +179,7 @@ export class GameComponent implements OnInit {
   private updateChildren()
   {
     this.gameTable.updateDisplayingTiles(this.game.table.tilesOnTable);
+    this.playerHand = this.game.playerHand;
     this.opponentTiles = [];
     for(let i = 0; i < this.game.opponentTilesCount; i++) {
       this.opponentTiles.push(i);

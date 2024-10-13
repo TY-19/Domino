@@ -6,14 +6,14 @@ namespace Domino.WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class PlayerController : ControllerBase
+public class PlayersController : ControllerBase
 {
     private readonly IPlayerStatisticService _playerStatisticService;
-    public PlayerController(IPlayerStatisticService playerStatisticService)
+    public PlayersController(IPlayerStatisticService playerStatisticService)
     {
         _playerStatisticService = playerStatisticService;
     }
-    [HttpGet("players")]
+    [HttpGet]
     public IEnumerable<PlayerStatistic> GetPlayersStatistics()
     {
         return _playerStatisticService.GetAllPlayersStatistics();

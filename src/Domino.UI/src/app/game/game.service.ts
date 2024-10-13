@@ -14,8 +14,14 @@ export class GameService {
     constructor(private http: HttpClient) {
 
     }
-    startGame(): Observable<GameView> {
-        const url: string = baseUrl + "/Game/start";
+    startGame(playerName: string | null, opponentName: string | null): Observable<GameView> {
+        let url: string = baseUrl + "/Game/start";
+        if(playerName) {
+            url += "?playerName=" + playerName;
+            if(opponentName) {
+                url += "&opponentName=" + opponentName;
+            }
+        }
         return this.http.get<GameView>(url);
     }
     playTile(tile: DominoTile): Observable<GameView> {

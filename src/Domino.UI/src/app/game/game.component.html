@@ -1,6 +1,12 @@
 <div (click)="opponentMessage = ''" [hidden]="opponentMessage.length < 1" class="opponent-message">{{opponentMessage}}</div>
 <div (click)="showMessage = false" [hidden]="!showMessage" class="message">{{message}}</div>
 <div class="grid-container">
+  <div [routerLink]="['']" class="grid-item menu-button">Menu</div>
+  <div class="grid-item menu-button">Colors</div>
+  <div class="grid-item menu-button">Preference</div>
+  <div class="grid-item menu-button">Button 4</div>
+  <div class="grid-item menu-button">Button 5</div>
+  <div class="grid-item menu-button">Button 6</div>
   @if(game) {
     <Dom-opponent-hand [opponentTiles]="opponentTiles"
       (endTurn)="endTurn()"
@@ -14,12 +20,10 @@
       (grabTile)="grabFromMarket($event)"
       class="grid-item market">
     </Dom-market>
-    <div class="grid-item player-hand">
-        @for(tile of this.game.playerHand; track tile.tileId)
-        {
-          <Dom-tile [tile]="tile" [isHorizontal]="false" (tileEmitter)="slectTile($event)"></Dom-tile>
-        }
-    </div>
+    <Dom-player-hand [playerHand]="playerHand"
+      (selectTile)="selectTile($event)"
+      class="grid-item player-hand">
+    </Dom-player-hand>
   }
   <button type="button" class="grid-item play-button" (click)="start()">Start!</button>
 </div>

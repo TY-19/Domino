@@ -1,15 +1,38 @@
 <div class="w-full h-[100vh] flex justify-center items-center bg-amber-100">
     <div class="flex flex-col w-fit m-2 p-2">
         <div [routerLink]="['game']" class="menu-button-wide">Start game!</div>
-        <div class="flex justify-between items-center m-2">
-            <div class="menu-text">Player: </div>
-            <div class="menu-button">
-                Change player
+        <div class="flex justify-between items-center my-2 mr-2">
+            @if(editPlayer) {
+                <div>
+                    <span class="text-sm text-gray-400">Type player name</span><br>
+                    <input [(ngModel)]="playerName"
+                        (ngModelChange)="changePlayer($event)"
+                        type="text" class="mr-2 w-24">
+                </div>
+            } @else { 
+                <div class="menu-text">{{playerName}}</div>
+            }
+            <div class="menu-button" (click)="editPlayer = !editPlayer">
+                {{ editPlayer ? "Save" : "Change player"}}
             </div>
         </div>
-        <div class="flex justify-between items-center m-2">
-            <div class="menu-text">Opponent: </div>
-            <div class="menu-button">Set opponent</div>
+        <div class="flex justify-between items-center my-2 mr-2">
+            @if(editOpponent) {
+                <div>
+                    <span class="text-sm text-gray-400">Select opponent</span><br>
+                    <select [(ngModel)]="opponentName"
+                        (ngModelChange)="changeOpponent($event)"
+                         class="mr-2 w-full">
+                        <option value="AI">AI</option>
+                        <option value="AI2">AI2</option>
+                    </select>
+                </div>
+            } @else {
+                <div class="menu-text">{{opponentName}} </div>   
+            }
+            <div class="menu-button" (click)="editOpponent = !editOpponent">
+                {{ editOpponent ? "Save" : "Set opponent"}}
+            </div>
         </div>
         <div [routerLink]="['players-statistics']" class="menu-button-wide">Statistics</div>
     </div>

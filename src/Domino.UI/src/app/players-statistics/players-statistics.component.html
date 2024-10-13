@@ -1,1 +1,56 @@
-<p>players-statistics works!</p>
+<div class="ml-5 mt-3 ">
+    <span [routerLink]="['']" class="bg-yellow-100 p-3">
+        Back
+    </span>
+</div>
+<table class="m-5">
+    <thead>
+        <tr>
+            <th rowspan="2">Player name</th>
+            <th rowspan="2">Games played</th>
+            <th colspan="5">Wins</th>
+            <th rowspan="2">Draws</th>
+            <th colspan="5">Loses</th>
+            <th rowspan="2">Hunter</th>
+            <th rowspan="2">Successful hunt</th>
+            <th rowspan="2">Hunted</th>
+            <th rowspan="2">Clear points</th>
+            <th rowspan="2">Total points left with</th>
+        </tr>
+        <tr>
+            <th>Total wins</th>
+            <th>Normal</th>
+            <th>Goat</th>
+            <th>Officer</th>
+            <th>General</th>
+            <th>Total loses</th>
+            <th>Normal</th>
+            <th>Goat</th>
+            <th>Officer</th>
+            <th>General</th>
+        </tr>
+    </thead>
+    @for(stat of playersStatistics; track stat.playerName)
+    {
+        <tr>
+            <td>{{stat.playerName}}</td>
+            <td>{{stat.gamesPlayed}}</td>
+            <td>{{stat.wins}}</td>
+            <td>{{stat.normalVictoryWins}}</td>
+            <td>{{stat.wasHunter}}</td>
+            <td>{{stat.successfulHunt}}</td>
+            <td>{{stat.goatWins}}</td>
+            <td>{{stat.officerWins}}</td>
+            <td>{{stat.generalWins}}</td>
+            <td>{{stat.clearedPoints}}</td>
+            <td>{{stat.draws}}</td>
+            <td>{{stat.loses}}</td>
+            <td>{{stat.normalVictoryLoses}}</td>
+            <td>{{stat.wasHunted}}</td>
+            <td>{{stat.goatLoses}}</td>
+            <td>{{stat.officerLoses}}</td>
+            <td>{{stat.generalLoses}}</td>
+            <td>{{stat.totalPointsLeftWith}}</td>
+        </tr>
+    }
+</table>

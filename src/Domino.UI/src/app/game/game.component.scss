@@ -25,6 +25,14 @@
     padding: 2px 10px 2px 20px;
     justify-content: center;
 }
+.menu-button {
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffff99;
+    cursor: default;
+}
 .game-table {
     grid-column-start: 1;
     grid-column-end: 11;
