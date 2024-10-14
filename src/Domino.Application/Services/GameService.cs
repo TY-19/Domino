@@ -37,6 +37,10 @@ public class GameService : IGameService
             _aiPlayerService = new AiPlayerService(_game.Opponent);
         }
     }
+    public GameView? GetCurrentGame()
+    {
+        return _game?.ToGameView(_game.Player.Name);
+    }
     public GameView StartGame(string playerName, string opponentName)
     {
         var game = StartGameInner(playerName, opponentName);

@@ -1,4 +1,4 @@
-import { Component, HostListener, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { TileComponent } from "../tile/tile.component";
 import { GameService } from './game.service';
 import { GameView } from '../_models/gameView';
@@ -13,6 +13,8 @@ import { LogEvent } from '../_models/logEvent';
 import { LocalStorageService } from '../_shared/localstorage.service';
 import { PlayerHandComponent } from "./player-hand/player-hand.component";
 import { RouterLink } from '@angular/router';
+import { DisplayOptionsService } from './display-options/display-options.service';
+import { DisplayOptionsComponent } from './display-options/display-options.component';
 
 @Component({
   selector: 'Dom-game',
@@ -23,10 +25,14 @@ import { RouterLink } from '@angular/router';
     GameTableComponent,
     OpponentHandComponent,
     MarketComponent,
-    PlayerHandComponent
+    PlayerHandComponent,
+    DisplayOptionsComponent,
 ],
   templateUrl: './game.component.html',
-  styleUrl: './game.component.scss'
+  styleUrl: './game.component.scss',
+  host: {
+    class: 'game',
+  }
 })
 export class GameComponent implements OnInit {
   @ViewChild(GameTableComponent) gameTable: GameTableComponent = null!;
@@ -34,10 +40,11 @@ export class GameComponent implements OnInit {
   game: GameView = null!;
   // game: GameView = TestGame.getGame();
   // tileDisplays: Map<number, TileDisplay> = new Map<number, TileDisplay>();
+  showOptions: boolean = false;
   showMessage: boolean = false;
   message: string = "";
   playerHand: TileDetails[] = [];
-  opponentTiles: number[] = [0, 1, 2, 3, 4, 5, 6];
+  opponentTiles: number[] = [];
   marketTiles: number[] = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ];
   activeTile: TileDetails | null = null;
   
@@ -45,16 +52,30 @@ export class GameComponent implements OnInit {
   opponentMessage: string = "";
 
   constructor(private gameService: GameService,
-    private localStorageService: LocalStorageService
+    private localStorageService: LocalStorageService,
+    private elemRef: ElementRef,
+    private displayOptionsService: DisplayOptionsService
   ) {
   }
   
   ngOnInit(): void {
-    if(this.game === null) {
-      this.start();
-    } 
+    this.displayOptionsService.setVariables(this.elemRef);
+    this.gameService.getGame()
+      .subscribe((game) => {
+        if(game === null) {
+          this.startGame();
+        } else {
+          this.game = game;
+          this.playerHand = this.game.playerHand;
+        }
+        this.prepareTable();
+    });
   }
-  start() {
+  start(): void {
+    this.startGame();
+    this.prepareTable();
+  }
+  startGame(): void {
     let playerName = this.localStorageService.getPlayerName();
     let opponentName = this.localStorageService.getOpponentName();
     this.gameService.startGame(playerName, opponentName)
@@ -62,21 +83,31 @@ export class GameComponent implements OnInit {
         this.game = gs;
         this.playerHand = this.game.playerHand;
       });
+  }
+  prepareTable(): void {
     if(this.gameTable) {
       this.gameTable.tileDisplays = new Map<number, TileDisplay>();
       this.gameTable.leftActive = this.gameTable.def;
       this.gameTable.rightActive = this.gameTable.def;
     }
     if(this.opponentHand) {
-      this.opponentHand.openHand = false;
-      this.opponentHand.opponentHand = [];
+      this.opponentHand.openHand = this.game.gameStatus.isEnded;
+      if(this.game.gameStatus.isEnded === true) {
+        this.opponentHand.showOpponentTiles(this.game.gameStatus.endHands[this.game.opponentName])
+      }
     }
     this.showMessage = false;
     this.message = "";
     this.currentTurn = 0;
     this.opponentMessage = "";
-    this.opponentTiles = [0, 1, 2, 3, 4, 5, 6];
-    this.marketTiles = [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ];
+    this.opponentTiles = [];
+    for(let i = 0; i < this.game.opponentTilesCount; i++) {
+      this.opponentTiles.push(i);
+    }
+    this.marketTiles = [];
+    for(let i = 0; i < this.game.marketTilesCount; i++) {
+      this.marketTiles.push(i);
+    }
   }
   selectTile(tileDetails: TileDetails) {
     this.activeTile = tileDetails;
@@ -216,5 +247,16 @@ export class GameComponent implements OnInit {
       this.currentTurn = event.moveNumber;
     }
     this.opponentMessage = message;
+  }
+  changeColorScheme() {
+    this.displayOptionsService.setVariables(this.elemRef);
+    this.showOptions = !this.showOptions;
+    // let current = this.showOptions;
+    // if(this.showOptions === true) {
+    //   this.displayOptionsService.setVariables(this.elemRef);
+    //   this.showOptions = false;
+    // } else {
+    //   this.showOptions = true;
+    // }
   }
 }

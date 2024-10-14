@@ -1,5 +1,4 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { DominoTile } from '../../_models/dominoTile';
 import { TileDetails } from '../../_models/tileDetails';
 import { TileComponent } from '../../tile/tile.component';
 

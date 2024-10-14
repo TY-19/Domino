@@ -1,0 +1,20 @@
+<div (mouseleave)="overColor = ''" class="flex flex-row flex-wrap gap-4 align-middle">
+  <div #SelectedElem (click)="showOptions = !showOptions" class="color-square-active mx-2"></div>
+  <div></div>
+  @if(showOptions) {
+    <div class="flex flex-row flex-wrap gap-4 align-middle">
+      @for(color of colors; track color) {
+        <div (mouseover)="overColor = color" class="color-square" [class]="color + '-500'">
+          @if(overColor === color) {
+            @for(intensity of intensities; track intensity) {
+              <div (click)="changeState($event.target, color)"
+              class="color-square z-10" [class]="color + '-' + intensity"></div>
+            }
+          }
+        </div>
+      }
+      <div (click)="changeState($event.target, 'black')" class="color-square black-100"></div>
+      <div (click)="changeState($event.target, 'white')" class="color-square white-100"></div>
+    </div>
+  }
+</div>

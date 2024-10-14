@@ -1,8 +1,21 @@
+$table-bg-color: var(--table-bg-color);
+$message-text-color: var(--message-text-color);
+$message-bg-color: var(--message-bg-color);
+$menu-text-color: var(--menu-text-color);
+$menu-bg-color: var(--menu-bg-color);
+$start-button-text-color: var(--start-button-text-color);
+$start-button-bg-color: var(--start-button-bg-color);
+
+:host.game {
+    background-color: $table-bg-color;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
 .grid-container {
     display: grid;
     grid-template-columns: repeat(12, calc(100vw/12));
     grid-template-rows: repeat(24, calc(100vh/24));
-    background-color: #ffffcc;
     gap: 0px;
 }
 .grid-item {
@@ -30,8 +43,18 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: #ffff99;
+    color: $menu-text-color;
+    background-color: $menu-bg-color;
     cursor: default;
+}
+.menu-open {
+    grid-row-start: 4;
+    grid-row-end: 22;
+    grid-column-start: 1;
+    grid-column-end: 11;
+    background-color: $menu-bg-color;
+    z-index: 2;
+    overflow: auto;
 }
 .game-table {
     grid-column-start: 1;
@@ -80,19 +103,21 @@
     justify-content: center;
     align-items: center;
     font-size: 32px;
-    background-color: lightgray;
+    color: $start-button-text-color;
+    background-color: $start-button-bg-color;
 }
 .play-button:active {
     box-shadow: inset 0px 0px 2px 2px green;
 }
 .message {
     position: absolute;
-    top: 40%;
+    top: 35%;
     left: 40%;
     z-index: 10;
     width: fit-content;
     padding: 5px;
-    background-color: rgba(255, 255, 255, 0.75);
+    color: $message-text-color;
+    background-color: $message-bg-color;
     font-size: 1.4rem;
     white-space: pre-line;
 }
@@ -103,7 +128,8 @@
     z-index: 10;
     width: fit-content;
     padding: 5px;
-    background-color: rgba(255, 255, 255, 0.75);
+    color: $message-text-color;
+    background-color: $message-bg-color;
     font-size: 1.4rem;
     white-space: pre-line;
 }

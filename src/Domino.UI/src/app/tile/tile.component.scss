@@ -1,11 +1,11 @@
-$domino-tile-color: var(--domino-tile-color, orange);
-$domino-tile-dot-color: var(--domino-tile-dot-color, green);
+$domino-tile-primary-color: var(--domino-tile-primary-color, orange);
+$domino-tile-dots-color: var(--domino-tile-dots-color, green);
 $domino-tile-line-color: var(--domino-tile-line-color, blue);
 
 .domino-tile {
     display: flex;
     position: relative;
-    background-color: $domino-tile-color;
+    background-color: $domino-tile-primary-color;
     border: 2px solid black;
     &-vertical {
         flex-direction: column;
@@ -45,7 +45,7 @@ $domino-tile-line-color: var(--domino-tile-line-color, blue);
     height: 27.5%;
     width: 27.5%;
     border-radius: 50%;
-    background-color: $domino-tile-dot-color;
+    background-color: $domino-tile-dots-color;
     position: absolute;
 }
 .center-dot {

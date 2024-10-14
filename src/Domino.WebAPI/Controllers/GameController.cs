@@ -13,6 +13,13 @@ public class GameController : ControllerBase
     {
         _gameService = gameService;
     }
+    [HttpGet("getCurrent")]
+    public ActionResult<GameView> GetCurrentGame()
+    {
+        var currentGame = _gameService.GetCurrentGame();
+        return currentGame == null ? NotFound() : Ok(currentGame);
+    }
+
     [HttpGet("start")]
     public ActionResult<GameView> StartGame(string playerName = "Test", string opponentName = "AI")
     {

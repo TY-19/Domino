@@ -2,11 +2,15 @@
 <div (click)="showMessage = false" [hidden]="!showMessage" class="message">{{message}}</div>
 <div class="grid-container">
   <div [routerLink]="['']" class="grid-item menu-button">Menu</div>
-  <div class="grid-item menu-button">Colors</div>
+  <div class="grid-item menu-button" (click)="changeColorScheme()">Colors</div>
   <div class="grid-item menu-button">Preference</div>
   <div class="grid-item menu-button">Button 4</div>
-  <div class="grid-item menu-button">Button 5</div>
-  <div class="grid-item menu-button">Button 6</div>
+  <div class="grid-item menu-button">Market</div>
+  <div class="grid-item menu-button">Log</div>
+  @if(showOptions) {
+    <Dom-display-options (closeOptions)="changeColorScheme()" class="grid-item menu-open">
+    </Dom-display-options>
+  }
   @if(game) {
     <Dom-opponent-hand [opponentTiles]="opponentTiles"
       (endTurn)="endTurn()"

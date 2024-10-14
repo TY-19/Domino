@@ -1,3 +1,6 @@
+$domino-tile-back-primary-color: var(--domino-tile-back-primary-color, orange);
+$domino-tile-back-secondary-color: var(--domino-tile-back-secondary-color, black);
+
 .domino-tile {
     display: flex;
     position: relative;
@@ -13,12 +16,11 @@
         width: 12vh;
     }
 }
-$wave-color: var(--wave-color, violet);
 .back-wave {
     background:
-      radial-gradient(circle at 3vh 3vh, transparent 3vh, $wave-color 4.2vh, $wave-color 0vh, transparent 3.75vh),
-      radial-gradient(circle at 3vh 0.75vh, transparent 3vh, $wave-color 3.15vh, $wave-color 3.3vh, transparent 3.45vh)
-      rgb(255, 150, 0);
+      radial-gradient(circle at 3vh 3vh, transparent 3vh, $domino-tile-back-secondary-color 4.2vh, $domino-tile-back-secondary-color 0vh, transparent 3.75vh),
+      radial-gradient(circle at 3vh 0.75vh, transparent 3vh, $domino-tile-back-secondary-color 3.15vh, $domino-tile-back-secondary-color 3.3vh, transparent 3.45vh)
+      $domino-tile-back-primary-color;
     background-size: 6vh 6vh;
     background-position: -3vh -2vh;
 }

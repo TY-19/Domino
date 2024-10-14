@@ -1,4 +1,5 @@
 import { Injectable } from "@angular/core";
+import { DisplayOptions } from "../_models/displayOptions";
 
 @Injectable({
     providedIn: 'root',
@@ -6,6 +7,7 @@ import { Injectable } from "@angular/core";
 export class LocalStorageService {
     playerNameKey: string = "playerName";
     opponentNameKey: string = "opponentName";
+    displayOptionsKey: string = "displayOptions";
     getPlayerName(): string | null {
         return localStorage.getItem(this.playerNameKey);
     }
@@ -17,5 +19,15 @@ export class LocalStorageService {
     }
     setOpponentName(opponentName: string): void {
         localStorage.setItem(this.opponentNameKey, opponentName);
+    }
+    getDisplayOptions(): DisplayOptions | null {
+        let options = localStorage.getItem(this.displayOptionsKey);
+        if(!options) {
+            return null;
+        }
+        return JSON.parse(options);
+    }
+    setDisplayOptions(options: DisplayOptions): void {
+        localStorage.setItem(this.displayOptionsKey, JSON.stringify(options));
     }
 }
