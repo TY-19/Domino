@@ -133,3 +133,14 @@ $start-button-bg-color: var(--start-button-bg-color);
     font-size: 1.4rem;
     white-space: pre-line;
 }
+.points {
+    font-size: larger;
+}
+.player-points {
+    grid-column-start: 10;
+    grid-row-start: 22;
+}
+.opponent-points {
+    grid-column-start: 10;
+    grid-row-start: 3;
+}

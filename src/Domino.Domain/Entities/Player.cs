@@ -3,15 +3,17 @@ namespace Domino.Domain.Entities;
 public class Player
 {
     public string Name { get; }
+    public PlayerInfo Info { get; set; }
     private protected List<TileDetails> _hand = [];
     public List<TileDetails> Hand { get => _hand; }
-    public Player()
+    public Player(): this("test")
     {
-        Name = "test";
+
     }
     public Player(string name)
     {
         Name = name;
+        Info = new() { PlayerName = name };
     }
     public void GrabTile(TileDetails? tileDetails)
     {

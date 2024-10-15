@@ -10,6 +10,18 @@ public class PlayerStatisticService : IPlayerStatisticService
     {
         _repo = repo;
     }
+    public IEnumerable<PlayerInfo> GetAllPlayersInfo()
+    {
+        return _repo.GetAllPlayersInfo();
+    }
+    public PlayerInfo GetPlayerInfo(string playerName)
+    {
+        return _repo.GetPlayerInfo(playerName);
+    }
+    public void UpdatePlayerInfo(PlayerInfo playerInfo)
+    {
+        _repo.UpdatePlayerInfo(playerInfo);
+    }
     public IEnumerable<PlayerStatistic> GetAllPlayersStatistics()
     {
         return _repo.GetAllPlayersStatistics();
@@ -41,9 +53,20 @@ public class PlayerStatisticService : IPlayerStatisticService
                 playerOneStatistic.WasHunter++;
             }
 
+            playerOneStatistic.TotalPointsLeftWith += gameStatus.LoserPointsCount.FirstOrDefault(c => c.Item1 == playerOneStatistic.PlayerName).Item2;
+            playerTwoStatistic.TotalPointsLeftWith += gameStatus.LoserPointsCount.FirstOrDefault(c => c.Item1 == playerTwoStatistic.PlayerName).Item2;
+
 
             _repo.UpdatePlayerStatistic(playerOneStatistic);
             _repo.UpdatePlayerStatistic(playerTwoStatistic);
+
+
+            var playerOneInfo = _repo.GetPlayerInfo(playerOneStatistic.PlayerName);
+            var playerTwoInfo = _repo.GetPlayerInfo(playerTwoStatistic.PlayerName);
+            playerOneInfo.CurrentPointCount += gameStatus.LoserPointsCount.FirstOrDefault(c => c.Item1 == playerOneInfo.PlayerName).Item2;
+            playerTwoInfo.CurrentPointCount += gameStatus.LoserPointsCount.FirstOrDefault(c => c.Item1 == playerTwoInfo.PlayerName).Item2;
+            _repo.UpdatePlayerInfo(playerOneInfo);
+            _repo.UpdatePlayerInfo(playerTwoInfo);
         }
         else
         {
@@ -106,9 +129,23 @@ public class PlayerStatisticService : IPlayerStatisticService
             }
             winnerStatistic.TotalPointsLeftWith += gameStatus.LoserPointsCount.FirstOrDefault(c => c.Item1 == winnerStatistic.PlayerName).Item2;
             loserStatistic.TotalPointsLeftWith += gameStatus.LoserPointsCount.FirstOrDefault(c => c.Item1 == loserStatistic.PlayerName).Item2;
-            
+
             _repo.UpdatePlayerStatistic(winnerStatistic);
             _repo.UpdatePlayerStatistic(loserStatistic);
+
+            var winnerInfo = _repo.GetPlayerInfo(winnerStatistic.PlayerName);
+            var loserInfo = _repo.GetPlayerInfo(loserStatistic.PlayerName);
+            winnerInfo.CurrentPointCount = 0;
+            if(gameStatus.VictoryType == "Normal Victory")
+            {
+                loserInfo.CurrentPointCount += gameStatus.LoserPointsCount.FirstOrDefault(c => c.Item1 == loserInfo.PlayerName).Item2;
+            } 
+            else
+            {
+                loserInfo.CurrentPointCount = 0;
+            }
+            _repo.UpdatePlayerInfo(winnerInfo);
+            _repo.UpdatePlayerInfo(loserInfo);
         }
         gameStatus.IsInStatistic = true;
     }

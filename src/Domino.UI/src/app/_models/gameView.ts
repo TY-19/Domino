@@ -5,10 +5,13 @@ import { TileDetails } from "./tileDetails";
 
 export interface GameView {
     id: number;
+    errorMessage: string | null;
     table: GameTable,
     playerName: string;
+    playerCurrentPoints: number;
     playerHand: TileDetails[];
     opponentName: string;
+    opponentCurrentPoints: number;
     opponentTilesCount: number;
     marketTilesCount: number;
     gameStatus: GameStatus;

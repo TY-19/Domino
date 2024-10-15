@@ -1,3 +1,4 @@
+using Domino.Application.Exceptions;
 using Domino.Application.Interfaces;
 using Domino.Application.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -28,16 +29,37 @@ public class GameController : ControllerBase
     [HttpPost("play")]
     public ActionResult<GameView> PlayTile(PlayTileDto playTileDto)
     {
-        return _gameService.PlayTile(playTileDto.TileId, playTileDto.IsLeft);
+        try
+        {
+            return Ok(_gameService.PlayTile(playTileDto.TileId, playTileDto.IsLeft));
+        }
+        catch(GameEndedException ex)
+        {
+            return Ok(ex.GameView);
+        }
     }
     [HttpGet("grab")]
     public ActionResult<GameView> GrabTile()
     {
-        return _gameService.GrabTile();
+        try
+        {
+            return Ok(_gameService.GrabTile());
+        }
+        catch(GameEndedException ex)
+        {
+            return Ok(ex.GameView);
+        }
     }
     [HttpGet("endTurn")]
     public ActionResult<GameView> EndTurn()
     {
-        return _gameService.WaitOpponentTurn();
+        try
+        {
+            return Ok(_gameService.WaitOpponentTurn());
+        }
+        catch(GameEndedException ex)
+        {
+            return Ok(ex.GameView);
+        }
     }
 }

@@ -12,7 +12,7 @@ export class PlayersStatisticsService {
 
     }
     getAllPlayersStatistics(): Observable<PlayerStatistic[]> {
-        const url = baseUrl + "/players";
+        const url = baseUrl + "/players/statistics";
         return this.http.get<PlayerStatistic[]>(url);
     }
 }

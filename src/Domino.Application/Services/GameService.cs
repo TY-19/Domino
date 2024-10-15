@@ -50,6 +50,8 @@ public class GameService : IGameService
     {
         long id = DateTime.UtcNow.Ticks;
         _game = new Game(id, playerName, opponentName);
+        _game.Player.Info = _playerStatisticService.GetPlayerInfo(playerName);
+        _game.Opponent.Info = _playerStatisticService.GetPlayerInfo(opponentName);
         _aiPlayerService = new AiPlayerService(_game.Opponent);
         ServeStartHands();
         _cache.Set(id, _game);
@@ -61,14 +63,20 @@ public class GameService : IGameService
         _logger.LogInformation("PlayTile {tileId} to edge, left: {isLeft}", tileId, isLeft);
         var game = GetGame();
         // _logger.LogInformation("Current game: {@game}", game);
-        var tileDetails = game.Player.GetTileFromHand(tileId)
-            ?? throw new ArgumentException("No tile with such an id in the hand.");
-        int position = game.Table.TryGetPosition(tileDetails, isLeft)
-            ?? throw new ArgumentException("The tile can't be played on the table.");
+        var tileDetails = game.Player.GetTileFromHand(tileId);
+        if(tileDetails == null) {
+            string errorMessage = "No tile with such an id in the hand.";
+            return game.ToGameView(game.Player.Name, errorMessage);
+        }   
+        int? position = game.Table.TryGetPosition(tileDetails, isLeft);
+        if(position == null) {
+            string errorMessage = "The tile can't be played on the table.";
+            return game.ToGameView(game.Player.Name, errorMessage);
+        }
         _logger.LogInformation("Player plays {@details}", tileDetails);
         game.Player.PlayTile(tileDetails);
         _logger.LogInformation("Tile is placing on the table.");
-        var tile = game.Table.PlaceTile(tileDetails, position);
+        var tile = game.Table.PlaceTile(tileDetails, position.Value);
         _logger.LogInformation("Writing log");
         game.Log.AddEntry(new GameLogEntry()
         {

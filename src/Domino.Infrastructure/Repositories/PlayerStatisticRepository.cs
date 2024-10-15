@@ -12,11 +12,29 @@ public class PlayerStatisticRepository : IPlayerStatisticRepository
     {
         _connectionString = configuration["ConnectionStrings:LiteDb"] ?? "";
     }
+    public IEnumerable<PlayerInfo> GetAllPlayersInfo()
+    {
+        using var db = new LiteDatabase(_connectionString);
+        var col = db.GetCollection<PlayerInfo>("playersInfo");
+        return col.FindAll().ToList();
+    }
+    public PlayerInfo GetPlayerInfo(string playerName)
+    {
+        using var db = new LiteDatabase(_connectionString);
+        var col = db.GetCollection<PlayerInfo>("playersInfo");
+        return col.Find(p => p.PlayerName == playerName).FirstOrDefault()
+            ?? new PlayerInfo() { PlayerName = playerName };
+    }
+    public void UpdatePlayerInfo(PlayerInfo playerInfo)
+    {
+        using var db = new LiteDatabase(_connectionString);
+        var col = db.GetCollection<PlayerInfo>("playersInfo");
+        col.Upsert(playerInfo.PlayerName, playerInfo);
+    }
     public IEnumerable<PlayerStatistic> GetAllPlayersStatistics()
     {
         using var db = new LiteDatabase(_connectionString);
         var col = db.GetCollection<PlayerStatistic>("playersStatistics");
-        Console.WriteLine(col.Count());
         return col.FindAll().ToList();
     }
     public PlayerStatistic? GetPlayerStatistic(string playerName)

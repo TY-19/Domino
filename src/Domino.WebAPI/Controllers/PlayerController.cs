@@ -14,6 +14,11 @@ public class PlayersController : ControllerBase
         _playerStatisticService = playerStatisticService;
     }
     [HttpGet]
+    public IEnumerable<PlayerInfo> GetPlayersInfo()
+    {
+        return _playerStatisticService.GetAllPlayersInfo();
+    }
+    [HttpGet("statistics")]
     public IEnumerable<PlayerStatistic> GetPlayersStatistics()
     {
         return _playerStatisticService.GetAllPlayersStatistics();

@@ -67,13 +67,10 @@ export class GameComponent implements OnInit {
         } else {
           this.game = game;
           this.playerHand = this.game.playerHand;
+          this.prepareTable();
         }
-        this.prepareTable();
+        
     });
-  }
-  start(): void {
-    this.startGame();
-    this.prepareTable();
   }
   startGame(): void {
     let playerName = this.localStorageService.getPlayerName();
@@ -82,6 +79,7 @@ export class GameComponent implements OnInit {
       .subscribe(gs => {
         this.game = gs;
         this.playerHand = this.game.playerHand;
+        this.prepareTable();
       });
   }
   prepareTable(): void {
@@ -223,6 +221,9 @@ export class GameComponent implements OnInit {
         tiles = this.game.gameStatus.endHands[this.game.opponentName];
       }
       this.opponentHand.showOpponentTiles(tiles);
+    } else if(this.game.errorMessage) {
+      this.showMessage = true;
+      this.message = this.game.errorMessage;
     }
     if(this.game.marketTilesCount < this.marketTiles.length)
     {
@@ -251,12 +252,5 @@ export class GameComponent implements OnInit {
   changeColorScheme() {
     this.displayOptionsService.setVariables(this.elemRef);
     this.showOptions = !this.showOptions;
-    // let current = this.showOptions;
-    // if(this.showOptions === true) {
-    //   this.displayOptionsService.setVariables(this.elemRef);
-    //   this.showOptions = false;
-    // } else {
-    //   this.showOptions = true;
-    // }
   }
 }
