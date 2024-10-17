@@ -41,7 +41,16 @@ export class GameComponent implements OnInit {
   // game: GameView = TestGame.getGame();
   // tileDisplays: Map<number, TileDisplay> = new Map<number, TileDisplay>();
   showOptions: boolean = false;
-  showMessage: boolean = false;
+  showMessageInner: boolean = false;
+  get showMessage(): boolean {
+    return this.showMessageInner;
+  }
+  set showMessage(show: boolean) {
+    this.showMessageInner = show;
+    if(show === true) {
+      setTimeout(() => this.showMessageInner = false, 3000);
+    }
+  }
   message: string = "";
   playerHand: TileDetails[] = [];
   opponentTiles: number[] = [];
@@ -69,7 +78,6 @@ export class GameComponent implements OnInit {
           this.playerHand = this.game.playerHand;
           this.prepareTable();
         }
-        
     });
   }
   startGame(): void {
@@ -176,22 +184,40 @@ export class GameComponent implements OnInit {
     });
   }
   grabFromMarket(index: number) {
-    if(this.game.playerHand.some(t =>
+    if(this.hasTilesToPlay()) {
+        this.message = "You have a possible tile to play in your hand. No need to grab another one";
+        this.showMessage = true;
+    } else if(this.game.playerGrabInRow >= this.game.gameRules.maxGrabsInRow) {
+      this.message = "You grab maximum allowed number of tiles in a row: " + this.game.playerGrabInRow;
+      this.showMessage = true;
+      this.endTurn();
+    } else if(this.game.marketTilesCount <= this.game.gameRules.minLeftInMarket) {
+      this.message = "You cannot grab last " + this.game.gameRules.minLeftInMarket + " tile(s) from the market.";
+      this.showMessage = true;
+      this.endTurn();
+    } else {
+      this.grabTile();
+    }
+  }
+  private hasTilesToPlay(): boolean {
+    return this.game.playerHand.some(t =>
       t.sideA === this.game.table.leftFreeEnd
       || t.sideB === this.game.table.leftFreeEnd
       || t.sideA === this.game.table.rightFreeEnd
-      || t.sideB === this.game.table.rightFreeEnd)) {
-        this.message = "You have a possible tile to play in your hand. No need to grab another one";
-        this.showMessage = true;
-    } else {  
-      this.grabTile();
-    }
+      || t.sideB === this.game.table.rightFreeEnd);
+  }
+  private canGrabAnotherTile(): boolean {
+    return this.game.playerGrabInRow < this.game.gameRules.maxGrabsInRow
+      && this.game.marketTilesCount > this.game.gameRules.minLeftInMarket;
   }
   grabTile() {
     this.gameService.grabTile()
       .subscribe(gs => {
         this.game = gs;
         this.updateChildren();
+        if(!this.hasTilesToPlay() && !this.canGrabAnotherTile()) {
+          this.endTurn();
+        }
       });
   }
   endTurn() {
@@ -199,6 +225,9 @@ export class GameComponent implements OnInit {
       .subscribe(gs => {
         this.game = gs;
         this.updateChildren();
+        if(!this.hasTilesToPlay() && !this.canGrabAnotherTile()) {
+          this.endTurn();
+        }
       });
   }
   @HostListener('window:resize')

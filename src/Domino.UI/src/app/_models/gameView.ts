@@ -1,3 +1,4 @@
+import { GameRules } from "./gameRules";
 import { GameStatus } from "./gameStatus";
 import { GameTable } from "./gameTable";
 import { LogEvent } from "./logEvent"
@@ -10,11 +11,14 @@ export interface GameView {
     playerName: string;
     playerCurrentPoints: number;
     playerHand: TileDetails[];
+    playerGrabInRow: number;
     opponentName: string;
     opponentCurrentPoints: number;
     opponentTilesCount: number;
+    OpponentGrabInRow: number;
     marketTilesCount: number;
     gameStatus: GameStatus;
+    gameRules: GameRules;
     log: {
         events: LogEvent[]
     };

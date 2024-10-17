@@ -13,14 +13,10 @@ import { TileComponent } from '../../tile/tile.component';
 })
 export class OpponentHandComponent {
   @Input() opponentTiles: number[] = [];
-  @Output() endTurn: EventEmitter<void> = new EventEmitter<void>();
   opponentHand: TileDetails[] = [];
   openHand: boolean = false;
   constructor(private ref: ElementRef) {
     this.ref.nativeElement.style.setProperty('--wave-color', "green");
-  }
-  yourTurn() {
-    this.endTurn.emit();
   }
   showOpponentTiles(tiles: TileDetails[]) {
     this.opponentHand = tiles;

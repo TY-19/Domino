@@ -67,15 +67,30 @@ public class Table
         List<(TileDetails tileDetails, int edge)> possibleMoves = [];
         if(TilesOnTable.Count == 0)
         {
-            var doubles = hand.Where(d => d.IsDouble);
-            if(!doubles.Any())
+            var doubles = hand.Where(d => d.IsDouble && d.TileId != "00");
+            if(doubles.Any())
+            {
+                var precedence = new string[] {"11", "22", "33", "44", "55", "66"};
+                TileDetails? starter;
+                foreach(var adouble in precedence)
+                {
+                    starter = doubles.FirstOrDefault(d => d.TileId == adouble);
+                    if(starter != null)
+                    {
+                        possibleMoves.Add((starter, starter.SideA));
+                        return possibleMoves;
+                    }
+                }
+            }
+            else
             {
                 doubles = hand;
+                foreach(var tile in doubles)
+                {
+                    possibleMoves.Add((tile, tile.SideA));
+                }
             }
-            foreach(var tile in doubles)
-            {
-                possibleMoves.Add((tile, tile.SideA));
-            }
+            
             return possibleMoves;
         }
         foreach(var tile in hand)

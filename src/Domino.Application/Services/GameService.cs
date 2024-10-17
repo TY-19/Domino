@@ -44,6 +44,7 @@ public class GameService : IGameService
     public GameView StartGame(string playerName, string opponentName)
     {
         var game = StartGameInner(playerName, opponentName);
+        game = ChoosePlayerToStart(game);
         return game.ToGameView(game.Player.Name);
     }
     private Game StartGameInner(string playerName, string opponentName)
@@ -57,6 +58,29 @@ public class GameService : IGameService
         _cache.Set(id, _game);
         _currentUserService.SetCurrentGameId(id);
         return _game;
+    }
+    private Game ChoosePlayerToStart(Game game)
+    {
+        if(game.Player.Hand.Any(t => t.IsDouble) || game.Opponent.Hand.Any(t => t.IsDouble))
+        {
+            var doubles = new string[] {"11", "22", "33", "44", "55", "66"};
+            foreach(var adouble in doubles)
+            {
+                if(game.Player.Hand.Find(d => d.TileId == adouble) != null)
+                {
+                    return game;
+                }
+                else if(game.Opponent.Hand.Find(d => d.TileId == adouble) != null)
+                {
+                    return WaitOpponentTurn(game);
+                }
+            }
+        }
+        else
+        {
+            
+        }
+        return game;
     }
     public GameView PlayTile(string tileId, bool? isLeft)
     {
@@ -85,11 +109,7 @@ public class GameService : IGameService
             Tile = tile,
         });
         _logger.LogInformation("Waiting for opponent");
-        _logger.LogInformation("Check for endgame conditions for player");
-        TrySetGameResult(game);
         WaitOpponentTurn(game);
-        _logger.LogInformation("Check for endgame conditions for opponent");
-        TrySetGameResult(game);
         _logger.LogInformation("Returning result");
         return game.ToGameView(game.Player.Name);
     }
@@ -115,6 +135,8 @@ public class GameService : IGameService
     }
     public Game WaitOpponentTurn(Game game)
     {
+        _logger.LogInformation("Check for endgame conditions for player");
+        TrySetGameResult(game);
         if(game.GameStatus.IsEnded)
         {
             return game;
@@ -151,21 +173,28 @@ public class GameService : IGameService
             default:
                 break;
         }
+        _logger.LogInformation("Check for endgame conditions for opponent");
+        TrySetGameResult(game);
         return game;
     }
     private void ServeStartHands()
     {
+        var game = GetGame();
+        if(game.GameStatus.IsEnded)
+        {
+            return;
+        }
         for (int i = 0; i < 7; i++)
         {
-            GetGame().Player.GrabTile(GetGame().Set.ServeTile());
-            GetGame().Opponent.GrabTile(GetGame().Set.ServeTile());
+            game.Player.GrabTile(GetGame().Set.ServeTile());
+            game.Opponent.GrabTile(GetGame().Set.ServeTile());
         }
     }
 
     private Game GetGame()
     {
         var game = _game ?? StartGameInner("Player", "AI");
-        ThrowIfGameEnded(game);
+        // ThrowIfGameEnded(game);
         return game;
     }
     public bool CanGrabAnotherTile(string playerName)

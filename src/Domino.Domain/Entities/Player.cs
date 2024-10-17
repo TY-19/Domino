@@ -6,6 +6,7 @@ public class Player
     public PlayerInfo Info { get; set; }
     private protected List<TileDetails> _hand = [];
     public List<TileDetails> Hand { get => _hand; }
+    public int GrabInRow { get; private set; }
     public Player(): this("test")
     {
 
@@ -21,6 +22,7 @@ public class Player
         {
             return;
         }
+        GrabInRow++;
         _hand.Add(tileDetails);
     }
     public TileDetails? GetTileFromHand(string tileId)
@@ -33,6 +35,7 @@ public class Player
         {
             return;
         }
+        GrabInRow = 0;
         _hand.Remove(tile);
     }
 }

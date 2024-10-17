@@ -13,7 +13,6 @@
   }
   @if(game) {
     <Dom-opponent-hand [opponentTiles]="opponentTiles"
-      (endTurn)="endTurn()"
       class="grid-item opponent-hand">
     </Dom-opponent-hand>
     <Dom-game-table [tiles]="game.table.tilesOnTable"
