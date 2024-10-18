@@ -8,19 +8,19 @@ namespace Domino.WebAPI.Controllers;
 [ApiController]
 public class PlayersController : ControllerBase
 {
-    private readonly IPlayerStatisticService _playerStatisticService;
-    public PlayersController(IPlayerStatisticService playerStatisticService)
+    private readonly IPlayerService _playerStatisticService;
+    public PlayersController(IPlayerService playerStatisticService)
     {
         _playerStatisticService = playerStatisticService;
     }
     [HttpGet]
-    public IEnumerable<PlayerInfo> GetPlayersInfo()
+    public async Task<ActionResult<IEnumerable<PlayerInfo>>> GetPlayersInfo()
     {
-        return _playerStatisticService.GetAllPlayersInfo();
+        return Ok(await _playerStatisticService.GetAllPlayersInfoAsync());
     }
     [HttpGet("statistics")]
-    public IEnumerable<PlayerStatistic> GetPlayersStatistics()
+    public async Task<ActionResult<IEnumerable<PlayerStatistic>>> GetPlayersStatistics()
     {
-        return _playerStatisticService.GetAllPlayersStatistics();
+        return Ok(await _playerStatisticService.GetAllPlayersStatisticsAsync());
     }
 }

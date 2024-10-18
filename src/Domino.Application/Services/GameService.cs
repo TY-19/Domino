@@ -1,332 +1,99 @@
+using Domino.Application.Commands.Games.GrabTile;
+using Domino.Application.Commands.Games.MakeOpponentMove;
+using Domino.Application.Commands.Games.PlayTile;
+using Domino.Application.Commands.Games.SaveGame;
+using Domino.Application.Commands.Games.SelectOpponentMove;
+using Domino.Application.Commands.Games.SetGameStatus;
+using Domino.Application.Commands.Games.StartGame;
+using Domino.Application.Commands.Players.UpdatePlayersStatistic;
 using Domino.Application.Extensions;
 using Domino.Application.Interfaces;
 using Domino.Application.Models;
+using Domino.Application.Queries.Games.GetCurrentGame;
 using Domino.Domain.Entities;
-using Domino.Domain.Enums;
-using Microsoft.Extensions.Caching.Memory;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace Domino.Application.Services;
 
 public class GameService : IGameService
 {
-    private Game? _game;
-    private readonly IMemoryCache _cache;
-    private readonly IGameRepository _gameRepository;
-    private readonly ICurrentUserService _currentUserService;
-    private readonly IPlayerStatisticService _playerStatisticService;
-    private IAiPlayerService? _aiPlayerService;
+    private readonly IMediator _mediator;
     private readonly ILogger<GameService> _logger;
     public GameService(
-        IMemoryCache memoryCache,
-        IGameRepository gameRepository,
-        ICurrentUserService currentUserService,
-        IPlayerStatisticService playerStatisticService,
+        IMediator mediator,
         ILogger<GameService> logger)
     {
-        _currentUserService = currentUserService;
-        _gameRepository = gameRepository;
-        _playerStatisticService = playerStatisticService;
-        _cache = memoryCache;
+        _mediator = mediator;
         _logger = logger;
-        long? gameId = _currentUserService.GetCurrentGameId();
-        if(gameId != null &&
-            _cache.TryGetValue(gameId, out Game? game) && game != null)
+    }
+    public async Task<GameView?> GetCurrentGameAsync(string playerName)
+    {
+        var game = await _mediator.Send(new GetCurrentGameRequest() {
+            PlayerName = playerName
+        });
+        return game?.ToGameView(game.Player.Name);
+    }
+    public async Task<GameView> StartGameAsync(string playerName, string opponentName)
+    {
+        var command = new StartGameCommand()
         {
-            _game = game;
-            _aiPlayerService = new AiPlayerService(_game.Opponent);
+            PlayerName = playerName,
+            OpponentName = opponentName
+        };
+        var game = await _mediator.Send(command);
+        if(game.IsOpponentTurn)
+        {
+            await WaitOpponentTurnAsync(playerName);
         }
-    }
-    public GameView? GetCurrentGame()
-    {
-        return _game?.ToGameView(_game.Player.Name);
-    }
-    public GameView StartGame(string playerName, string opponentName)
-    {
-        var game = StartGameInner(playerName, opponentName);
-        game = ChoosePlayerToStart(game);
         return game.ToGameView(game.Player.Name);
     }
-    private Game StartGameInner(string playerName, string opponentName)
+    
+    public async Task<GameView> PlayTileAsync(string playerName, PlayTileDto playTileDto)
     {
-        long id = DateTime.UtcNow.Ticks;
-        _game = new Game(id, playerName, opponentName);
-        _game.Player.Info = _playerStatisticService.GetPlayerInfo(playerName);
-        _game.Opponent.Info = _playerStatisticService.GetPlayerInfo(opponentName);
-        _aiPlayerService = new AiPlayerService(_game.Opponent);
-        ServeStartHands();
-        _cache.Set(id, _game);
-        _currentUserService.SetCurrentGameId(id);
-        return _game;
-    }
-    private Game ChoosePlayerToStart(Game game)
-    {
-        if(game.Player.Hand.Any(t => t.IsDouble) || game.Opponent.Hand.Any(t => t.IsDouble))
-        {
-            var doubles = new string[] {"11", "22", "33", "44", "55", "66"};
-            foreach(var adouble in doubles)
-            {
-                if(game.Player.Hand.Find(d => d.TileId == adouble) != null)
-                {
-                    return game;
-                }
-                else if(game.Opponent.Hand.Find(d => d.TileId == adouble) != null)
-                {
-                    return WaitOpponentTurn(game);
-                }
-            }
-        }
-        else
-        {
-            
-        }
-        return game;
-    }
-    public GameView PlayTile(string tileId, bool? isLeft)
-    {
-        _logger.LogInformation("PlayTile {tileId} to edge, left: {isLeft}", tileId, isLeft);
-        var game = GetGame();
+        _logger.LogInformation("PlayTile {tileId} to edge, left: {isLeft}", playTileDto.TileId, playTileDto.IsLeft);
+        Game game = await GetGameAsync(playerName);
         // _logger.LogInformation("Current game: {@game}", game);
-        var tileDetails = game.Player.GetTileFromHand(tileId);
-        if(tileDetails == null) {
-            string errorMessage = "No tile with such an id in the hand.";
-            return game.ToGameView(game.Player.Name, errorMessage);
-        }   
-        int? position = game.Table.TryGetPosition(tileDetails, isLeft);
-        if(position == null) {
-            string errorMessage = "The tile can't be played on the table.";
-            return game.ToGameView(game.Player.Name, errorMessage);
-        }
-        _logger.LogInformation("Player plays {@details}", tileDetails);
-        game.Player.PlayTile(tileDetails);
-        _logger.LogInformation("Tile is placing on the table.");
-        var tile = game.Table.PlaceTile(tileDetails, position.Value);
-        _logger.LogInformation("Writing log");
-        game.Log.AddEntry(new GameLogEntry()
-        {
-            PlayerName = game.Player.Name,
-            Type = MoveType.PlayTile,
-            Tile = tile,
-        });
+        game = await _mediator.Send(new PlayTileCommand() { Game = game, PlayTileDto = playTileDto });
         _logger.LogInformation("Waiting for opponent");
-        WaitOpponentTurn(game);
+        await WaitOpponentTurnAsync(playerName);
         _logger.LogInformation("Returning result");
         return game.ToGameView(game.Player.Name);
     }
-    public GameView GrabTile()
+    public async Task<GameView> GrabTileAsync(string playerName)
     {
-        var game = GetGame();
-        if(CanGrabAnotherTile(game.Player.Name))
+        var game = await GetGameAsync(playerName);
+        game = await _mediator.Send(new GrabTileCommand() { Game = game });
+        return game.ToGameView(game.Player.Name);
+    }
+    public async Task<GameView> WaitOpponentTurnAsync(string playerName)
+    {
+        var game = await GetGameAsync(playerName);
+        _logger.LogInformation("Check for endgame conditions for player");
+        game = await _mediator.Send(new SetGameStatusCommand() { Game = game });
+        if(game.GameStatus.IsEnded || !game.IsOpponentTurn)
         {
-            var tile = game.Set.ServeTile();
-            game.Player.GrabTile(tile);
-            game.Log.AddEntry(new GameLogEntry()
-            {
-                PlayerName = game.Player.Name,
-                Type = MoveType.GrabTile
-            });
+            game.IsOpponentTurn = false;
+            return game.ToGameView(playerName);
+        }
+        while(game.IsOpponentTurn)
+        {
+            var move = await _mediator.Send(new SelectOpponentMoveCommand() { Game = game });
+            game = await _mediator.Send(new MakeOpponentMoveCommand() { Game = game, Move = move });
+        }
+        _logger.LogInformation("Check for endgame conditions for opponent");
+        game = await _mediator.Send(new SetGameStatusCommand() { Game = game });
+        if(game.GameStatus.IsEnded)
+        {
+            await _mediator.Send(new UpdatePlayersStatisticCommand() { GameStatus = game.GameStatus });
+            await _mediator.Send(new SaveGameCommand() { Game = game });
         }
         return game.ToGameView(game.Player.Name);
     }
-    public GameView WaitOpponentTurn()
-    {
-        var game = GetGame();
-        return WaitOpponentTurn(game).ToGameView(game.Player.Name);
-    }
-    public Game WaitOpponentTurn(Game game)
-    {
-        _logger.LogInformation("Check for endgame conditions for player");
-        TrySetGameResult(game);
-        if(game.GameStatus.IsEnded)
-        {
-            return game;
-        }
-        var move = _aiPlayerService?.MakeMove(game.ToGameView(game.Opponent.Name));
-        switch (move)
-        {
-            case PlayTileMove ptm:
-                bool isLeft = ptm.ContactEdge == game.Table.LeftFreeEnd;
-                int position = game.Table.TryGetPosition(ptm.Tile, isLeft)
-                    ?? throw new ArgumentException("The tile can't be played on the table.");
-                game.Opponent.PlayTile(ptm.Tile);
-                var tile = game.Table.PlaceTile(ptm.Tile, position);
-                game.Log.AddEntry(new GameLogEntry()
-                {
-                    PlayerName = game.Opponent.Name,
-                    Type = MoveType.PlayTile,
-                    Tile = tile
-                });
-                break;
-            case GrabTileMove:
-                if(CanGrabAnotherTile(game.Opponent.Name))
-                {
-                    var tileDetails = game.Set.ServeTile();
-                    game.Opponent.GrabTile(tileDetails);
-                    game.Log.AddEntry(new GameLogEntry()
-                    {
-                        PlayerName = game.Opponent.Name,
-                        Type = MoveType.GrabTile
-                    });
-                    WaitOpponentTurn();
-                }
-                break;
-            default:
-                break;
-        }
-        _logger.LogInformation("Check for endgame conditions for opponent");
-        TrySetGameResult(game);
-        return game;
-    }
-    private void ServeStartHands()
-    {
-        var game = GetGame();
-        if(game.GameStatus.IsEnded)
-        {
-            return;
-        }
-        for (int i = 0; i < 7; i++)
-        {
-            game.Player.GrabTile(GetGame().Set.ServeTile());
-            game.Opponent.GrabTile(GetGame().Set.ServeTile());
-        }
-    }
 
-    private Game GetGame()
+    private async Task<Game> GetGameAsync(string playerName)
     {
-        var game = _game ?? StartGameInner("Player", "AI");
-        // ThrowIfGameEnded(game);
-        return game;
-    }
-    public bool CanGrabAnotherTile(string playerName)
-    {
-        var game = GetGame();
-        if(game.Set.TilesCount <= game.GameRules.MinLeftInMarket)
-        {
-            return false;
-        }
-        var log = game.Log;
-        if(log.Events.Count == 0)
-        {
-            return true;
-        }
-        var previous = log.Events.DefaultIfEmpty().MaxBy(e => e?.MoveNumber);
-        if(previous?.PlayerName != playerName)
-        {
-            return true;
-        }
-        int grabbed = 1;
-        for(int i = previous.MoveNumber - 1; i >= 0; i--)
-        {
-            var logEvent = log.Events.Find(e => e.MoveNumber == i);
-            if(logEvent?.PlayerName != playerName || logEvent.Type != MoveType.GrabTile)
-            {
-                return true;
-            }
-            else
-            {
-                grabbed++;
-                if(grabbed >= game.GameRules.MaxGrabsInRow)
-                {
-                    return false;
-                }
-            }
-        }
-        return true;
-    }
-    private void TrySetGameResult(Game game)
-    {
-        if(game.Player.Hand.Count == 0)
-        {
-            SetGameStatus(game, game.Player.Name);
-        }
-        else if (game.Opponent.Hand.Count == 0)
-        {
-            SetGameStatus(game, game.Opponent.Name);
-        }
-        else if((game.Set.TilesCount <= game.GameRules.MinLeftInMarket
-            || game.Table.GetPossibleMoves(game.Set.Tiles).Count == 0)
-            && game.Table.GetPossibleMoves(game.Player.Hand).Count == 0
-            && game.Table.GetPossibleMoves(game.Opponent.Hand).Count == 0)
-        {
-            game.GameStatus.IsEnded = true;
-            game.GameStatus.LoserPointsCount[0] = (game.Player.Name, CountPoints(game.Player.Hand));
-            game.GameStatus.LoserPointsCount[1] = (game.Opponent.Name, CountPoints(game.Opponent.Hand));
-            game.GameStatus.EndHands[game.Player.Name] = game.Player.Hand;
-            game.GameStatus.EndHands[game.Opponent.Name] = game.Opponent.Hand;
-            game.GameStatus.Result = "The game ended up in a draw.\nPoints count is:\n"
-                + $"{game.Player.Name} - {game.GameStatus.LoserPointsCount[0].Item2}\n"
-                + $"{game.Opponent.Name} - {game.GameStatus.LoserPointsCount[1].Item2}";
-        }
-        if(game.GameStatus.IsEnded)
-        {
-            _playerStatisticService.UpdateCreatePlayersStatistic(game.GameStatus);
-            _gameRepository.SaveGame(game);
-        }
-    }
-    private static void SetGameStatus(Game game, string playerName)
-    {
-        game.GameStatus.IsEnded = true;
-        if(playerName == game.Player.Name)
-        {
-            game.GameStatus.Winner = game.Player.Name;
-            game.GameStatus.Loser = game.Opponent.Name;
-        }
-        else
-        {
-            game.GameStatus.Winner = game.Opponent.Name;
-            game.GameStatus.Loser = game.Player.Name;
-        }
-        game.GameStatus.Result = $"{game.GameStatus.Winner} win!";
-        var lastTile = game.Log.Events
-            .Where(e => e.PlayerName == playerName)
-            .MaxBy(e => e.MoveNumber);
-        
-        if(game.GameStatus.HuntPlayers.Contains(game.GameStatus.Loser))
-        {
-            if(lastTile?.Tile?.TileDetails.TileId == "0-0")
-            {
-                game.GameStatus.VictoryType = "General";
-            }
-            else
-            {
-                game.GameStatus.VictoryType = "Goat";
-            }
-        }
-        else if(lastTile?.Tile?.TileDetails.TileId == "0-0")
-        {
-            game.GameStatus.VictoryType = "Officer";
-        }
-        else if(game.GameStatus.HuntPlayers.Contains(game.GameStatus.Winner))
-        {
-            game.GameStatus.VictoryType = "Cleared points";
-        }
-        else
-        {
-            game.GameStatus.VictoryType = "Normal Victory";
-            var loserHand = game.GameStatus.Loser == game.Player.Name
-                ? game.Player.Hand
-                : game.Opponent.Hand;
-            game.GameStatus.EndHands[game.GameStatus.Loser] = loserHand;
-            game.GameStatus.LoserPointsCount[0] = (game.GameStatus.Loser, CountPoints(loserHand));
-            game.GameStatus.Result ??= "";
-            game.GameStatus.Result += $"\n{game.GameStatus.Loser} is left with {game.GameStatus.LoserPointsCount[0].Item2} points.";
-        }
-    }
-    private static int CountPoints(List<TileDetails> tileDetails)
-    {
-        int count = 0;
-        foreach(var tileDetail in tileDetails)
-        {
-            count += tileDetail.SideA + tileDetail.SideB;
-        }
-        return count;
-    }
-
-    private static void ThrowIfGameEnded(Game game)
-    {
-        if(game.GameStatus.IsEnded)
-        {
-            throw new ArgumentException("Game is ended.");
-        }
+        return await _mediator.Send(new GetCurrentGameRequest() { PlayerName = playerName })
+            ?? await _mediator.Send(new StartGameCommand() { PlayerName = playerName, OpponentName = "AI" });
     }
 }

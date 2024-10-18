@@ -9,5 +9,9 @@ public class AiPlayer : Player
     public AiPlayer(string name) : base(name)
     {
         
-    }    
+    }
+    public AiPlayer(PlayerInfo player) : base(player)
+    {
+        
+    }
 }

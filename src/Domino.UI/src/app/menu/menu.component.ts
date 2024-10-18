@@ -37,9 +37,9 @@ export class MenuComponent implements OnInit {
     
   }
   changePlayer(newName: string) {
-    localStorage.setItem("playerName", newName);
+    this.localStorageService.setPlayerName(newName);
   }
   changeOpponent(newName: string) {
-    localStorage.setItem("opponentName", newName);
+    this.localStorageService.setOpponentName(newName);
   }
 }

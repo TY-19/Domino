@@ -10,4 +10,8 @@ public class HumanPlayer : Player
     {
         
     }
+    public HumanPlayer(PlayerInfo player) : base(player)
+    {
+        
+    }
 }

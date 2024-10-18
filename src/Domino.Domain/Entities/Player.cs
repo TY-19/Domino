@@ -14,7 +14,12 @@ public class Player
     public Player(string name)
     {
         Name = name;
-        Info = new() { PlayerName = name };
+        Info = new();
+    }
+    public Player(PlayerInfo playerInfo)
+    {
+        Name = playerInfo.PlayerName;
+        Info = playerInfo;
     }
     public void GrabTile(TileDetails? tileDetails)
     {

@@ -12,16 +12,17 @@ public class GameRepository : IGameRepository
     {
         _connectionString = configuration["ConnectionStrings:LiteDb"] ?? "";
     }
-    public Game? GetGame(long gameId)
+    public Task<Game?> GetGameAsync(long gameId)
     {
         using var db = new LiteDatabase(_connectionString);
         var col = db.GetCollection<Game>("games");
-        return col.Find(g => g.Id == gameId).FirstOrDefault();
+        return Task.FromResult(col.Find(g => g.Id == gameId).FirstOrDefault());
     }
-    public void SaveGame(Game game)
+    public Task SaveGameAsync(Game game)
     {
         using var db = new LiteDatabase(_connectionString);
         var col = db.GetCollection<Game>("games");
         col.Upsert(game.Id, game);
+        return Task.CompletedTask;
     }
 }

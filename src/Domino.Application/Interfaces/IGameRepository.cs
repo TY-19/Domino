@@ -4,6 +4,6 @@ namespace Domino.Application.Interfaces;
 
 public interface IGameRepository
 {
-    Game? GetGame(long gameId);
-    void SaveGame(Game game);
+    Task<Game?> GetGameAsync(long gameId);
+    Task SaveGameAsync(Game game);
 }

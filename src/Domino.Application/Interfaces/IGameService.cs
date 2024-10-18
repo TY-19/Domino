@@ -5,9 +5,9 @@ namespace Domino.Application.Interfaces;
 
 public interface IGameService
 {
-    GameView? GetCurrentGame();
-    GameView StartGame(string playerName, string opponentName);
-    GameView PlayTile(string tileId, bool? isLeft);
-    GameView GrabTile();
-    GameView WaitOpponentTurn();
+    Task<GameView?> GetCurrentGameAsync(string playerName);
+    Task<GameView> StartGameAsync(string playerName, string opponentName);
+    Task<GameView> PlayTileAsync(string playerName, PlayTileDto playTileDto);
+    Task<GameView> GrabTileAsync(string playerName);
+    Task<GameView> WaitOpponentTurnAsync(string playerName);
 }

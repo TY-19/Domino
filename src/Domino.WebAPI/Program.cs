@@ -1,5 +1,7 @@
+using Domino.Application;
 using Domino.Application.Interfaces;
 using Domino.Application.Services;
+using Domino.Application.Strategies;
 using Domino.Infrastructure.Repositories;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
@@ -32,15 +34,17 @@ public class Program
         });
         builder.Services.AddControllers();
         builder.Services.AddScoped<IGameRepository, GameRepository>();
-        builder.Services.AddScoped<IPlayerStatisticRepository, PlayerStatisticRepository>();
+        builder.Services.AddScoped<IPlayerRepository, PlayerStatisticRepository>();
         builder.Services.AddScoped<IGameService, GameService>();
-        builder.Services.AddScoped<ICurrentUserService, CurrentUserService>();
-        builder.Services.AddScoped<IPlayerStatisticService, PlayerStatisticService>();
+        builder.Services.AddScoped<IPlayerService, PlayerService>();
+        builder.Services.AddScoped<IStrategyFactory, StrategyFactory>();
         builder.Services.AddSerilog(options => {
             options.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning);
             options.ReadFrom.Configuration(builder.Configuration);
             options.WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug);
         });
+
+        builder.Services.AddApplicationServices();
 
         var app = builder.Build();
 

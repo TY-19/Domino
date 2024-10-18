@@ -22,13 +22,8 @@ public static class MappingExtensions
             MarketTilesCount = game.Set.TilesCount,
             GameRules = game.GameRules,
             Log = game.Log,
-            GameStatus = game.GameStatus
+            GameStatus = game.GameStatus,
+            ErrorMessage = game.GameError?.ErrorMessage
         };
-    }
-    public static GameView ToGameView(this Game game, string playerName, string errorMessage)
-    {
-        var gameView = game.ToGameView(playerName);
-        gameView.ErrorMessage = errorMessage;
-        return gameView;
     }
 }

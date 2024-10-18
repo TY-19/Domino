@@ -1,6 +1,6 @@
-using Domino.Application.Exceptions;
 using Domino.Application.Interfaces;
 using Domino.Application.Models;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Domino.WebAPI.Controllers;
@@ -9,57 +9,38 @@ namespace Domino.WebAPI.Controllers;
 [ApiController]
 public class GameController : ControllerBase
 {
+    private readonly IMediator _mediator;
     private readonly IGameService _gameService;
-    public GameController(IGameService gameService)
+    public GameController(IMediator mediator, IGameService gameService)
     {
+        _mediator = mediator;
         _gameService = gameService;
     }
-    [HttpGet("getCurrent")]
-    public ActionResult<GameView> GetCurrentGame()
+    [HttpGet("current")]
+    public async Task<ActionResult<GameView>> GetCurrentGame(string playerName)
     {
-        var currentGame = _gameService.GetCurrentGame();
+        var currentGame = await _gameService.GetCurrentGameAsync(playerName);
         return currentGame == null ? NotFound() : Ok(currentGame);
     }
 
     [HttpGet("start")]
-    public ActionResult<GameView> StartGame(string playerName = "Test", string opponentName = "AI")
+    public async Task<ActionResult<GameView>> StartGame(string playerName = "Test", string opponentName = "AI")
     {
-        return _gameService.StartGame(playerName, opponentName);
+        return Ok(await _gameService.StartGameAsync(playerName, opponentName));
     }
     [HttpPost("play")]
-    public ActionResult<GameView> PlayTile(PlayTileDto playTileDto)
+    public async Task<ActionResult<GameView>> PlayTile(string playerName, PlayTileDto playTileDto)
     {
-        try
-        {
-            return Ok(_gameService.PlayTile(playTileDto.TileId, playTileDto.IsLeft));
-        }
-        catch(GameEndedException ex)
-        {
-            return Ok(ex.GameView);
-        }
+        return Ok(await _gameService.PlayTileAsync(playerName, playTileDto));
     }
     [HttpGet("grab")]
-    public ActionResult<GameView> GrabTile()
+    public async Task<ActionResult<GameView>> GrabTile(string playerName)
     {
-        try
-        {
-            return Ok(_gameService.GrabTile());
-        }
-        catch(GameEndedException ex)
-        {
-            return Ok(ex.GameView);
-        }
+        return Ok(await _gameService.GrabTileAsync(playerName));
     }
     [HttpGet("endTurn")]
-    public ActionResult<GameView> EndTurn()
+    public async Task<ActionResult<GameView>> EndTurn(string playerName)
     {
-        try
-        {
-            return Ok(_gameService.WaitOpponentTurn());
-        }
-        catch(GameEndedException ex)
-        {
-            return Ok(ex.GameView);
-        }
+        return Ok(await _gameService.WaitOpponentTurnAsync(playerName));
     }
 }

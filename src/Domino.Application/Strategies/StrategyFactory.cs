@@ -1,10 +1,11 @@
 using Domino.Application.Interfaces;
+using Domino.Domain.Entities;
 
 namespace Domino.Application.Strategies;
 
-public class StrategyFactory
+public class StrategyFactory : IStrategyFactory
 {
-    public IAiStrategy SelectStrategy()
+    public IAiStrategy SelectStrategy(Player player)
     {
         return new RandomStrategy();
     }

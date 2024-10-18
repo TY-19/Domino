@@ -69,7 +69,7 @@ export class GameComponent implements OnInit {
   
   ngOnInit(): void {
     this.displayOptionsService.setVariables(this.elemRef);
-    this.gameService.getGame()
+    this.gameService.getCurrentGame()
       .subscribe((game) => {
         if(game === null) {
           this.startGame();
@@ -81,9 +81,7 @@ export class GameComponent implements OnInit {
     });
   }
   startGame(): void {
-    let playerName = this.localStorageService.getPlayerName();
-    let opponentName = this.localStorageService.getOpponentName();
-    this.gameService.startGame(playerName, opponentName)
+    this.gameService.startGame()
       .subscribe(gs => {
         this.game = gs;
         this.playerHand = this.game.playerHand;
