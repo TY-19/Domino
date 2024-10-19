@@ -4,7 +4,7 @@
         <Dom-tile [tile]="tile" [isHorizontal]="false"></Dom-tile>
     }
 } @else {
-    @for(tile of opponentTiles; track tile)
+    @for(tile of closedTiles; track tile)
     {
         <div class="domino-tile domino-tile-vertical back-wave">
         </div>

@@ -1,3 +1,5 @@
+using Domino.Domain.Enums;
+
 namespace Domino.Domain.Entities;
 
 public class GameStatus
@@ -12,6 +14,6 @@ public class GameStatus
     public string? Loser { get; set; }
     public (string, int)[] LoserPointsCount { get; set; } = new (string, int)[2];
     public Dictionary<string, List<TileDetails>> EndHands { get; set; } = new();
-    public string? VictoryType { get; set; }
+    public VictoryType? VictoryType { get; set; }
     public bool IsInStatistic { get; set; }
 }

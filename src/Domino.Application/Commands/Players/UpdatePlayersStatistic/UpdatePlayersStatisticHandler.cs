@@ -1,5 +1,6 @@
 using Domino.Application.Interfaces;
 using Domino.Domain.Entities;
+using Domino.Domain.Enums;
 using MediatR;
 
 namespace Domino.Application.Commands.Players.UpdatePlayersStatistic;
@@ -19,7 +20,14 @@ public class UpdatePlayersStatisticHandler : IRequestHandler<UpdatePlayersStatis
             return;
         }
         await UpdateAsync(gameStatus.LoserPointsCount[0].Item1, gameStatus.LoserPointsCount[0].Item2, gameStatus);
-        await UpdateAsync(gameStatus.LoserPointsCount[1].Item1, gameStatus.LoserPointsCount[1].Item2, gameStatus);
+        if(gameStatus.Winner != null)
+        {
+            await UpdateAsync(gameStatus.Winner, 0, gameStatus);
+        }
+        else
+        {
+            await UpdateAsync(gameStatus.LoserPointsCount[1].Item1, gameStatus.LoserPointsCount[1].Item2, gameStatus);
+        }
         gameStatus.IsInStatistic = true;
     }
     private async Task UpdateAsync(string playerName, int pointsCount, GameStatus gameStatus)
@@ -45,33 +53,33 @@ public class UpdatePlayersStatisticHandler : IRequestHandler<UpdatePlayersStatis
         {
             playerStatistic.Wins++;
             playerInfo.CurrentPointCount = 0;
-            Action<PlayerStatistic, GameStatus> updateFunction = _updateRules[(gameStatus.VictoryType!, true)];
+            Action<PlayerStatistic, GameStatus> updateFunction = _updateRules[(gameStatus.VictoryType!.Value, true)];
             updateFunction(playerStatistic, gameStatus);
         }
         else
         {
             playerStatistic.Loses++;
             playerStatistic.TotalPointsLeftWith += pointsCount;
-            playerInfo.CurrentPointCount = gameStatus.VictoryType == "Normal Victory"
+            playerInfo.CurrentPointCount = gameStatus.VictoryType == VictoryType.Normal
                 ? playerInfo.CurrentPointCount + pointsCount : 0;
-            Action<PlayerStatistic, GameStatus> updateFunction = _updateRules[(gameStatus.VictoryType!, false)];
+            Action<PlayerStatistic, GameStatus> updateFunction = _updateRules[(gameStatus.VictoryType!.Value, false)];
             updateFunction(playerStatistic, gameStatus);
         }
         await _playerRepository.UpdatePlayerStatisticAsync(playerStatistic);
         await _playerRepository.UpdatePlayerInfoAsync(playerInfo);
     }
-    private static readonly Dictionary<(string, bool) , Action<PlayerStatistic, GameStatus>> _updateRules = new()
+    private static readonly Dictionary<(VictoryType, bool) , Action<PlayerStatistic, GameStatus>> _updateRules = new()
     {
-        { ("Cleared points", true),  HandleClearPoints },
-        { ("Cleared points", false),  (_, _) => {} },
-        { ("Normal Victory", true), (ps, _) => ps.NormalVictoryWins++ },
-        { ("Normal Victory", false), (ps, _) => ps.NormalVictoryLoses++ },
-        { ("Goat", true), (ps, _) => ps.GoatWins++ },
-        { ("Goat", false), (ps, _) => ps.GoatLoses++ },
-        { ("Officer", true), (ps, _) => ps.OfficerWins++ },
-        { ("Officer", false), (ps, _) => ps.OfficerLoses++ },
-        { ("General", true), (ps, _) => ps.GeneralWins++ },
-        { ("General", false), (ps, _) => ps.GeneralLoses++ },
+        { (VictoryType.ClearedPoints, true),  HandleClearPoints },
+        { (VictoryType.ClearedPoints, false),  (_, _) => {} },
+        { (VictoryType.Normal, true), (ps, _) => ps.NormalVictoryWins++ },
+        { (VictoryType.Normal, false), (ps, _) => ps.NormalVictoryLoses++ },
+        { (VictoryType.Goat, true), (ps, _) => ps.GoatWins++ },
+        { (VictoryType.Goat, false), (ps, _) => ps.GoatLoses++ },
+        { (VictoryType.Officer, true), (ps, _) => ps.OfficerWins++ },
+        { (VictoryType.Officer, false), (ps, _) => ps.OfficerLoses++ },
+        { (VictoryType.General, true), (ps, _) => ps.GeneralWins++ },
+        { (VictoryType.General, false), (ps, _) => ps.GeneralLoses++ },
     };
     private static void HandleClearPoints(PlayerStatistic ps, GameStatus gs)
     {

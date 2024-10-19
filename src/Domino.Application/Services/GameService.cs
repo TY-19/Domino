@@ -44,7 +44,7 @@ public class GameService : IGameService
         var game = await _mediator.Send(command);
         if(game.IsOpponentTurn)
         {
-            await WaitOpponentTurnAsync(playerName);
+            await WaitOpponentTurnAsync(game);
         }
         return game.ToGameView(game.Player.Name);
     }
@@ -56,7 +56,7 @@ public class GameService : IGameService
         // _logger.LogInformation("Current game: {@game}", game);
         game = await _mediator.Send(new PlayTileCommand() { Game = game, PlayTileDto = playTileDto });
         _logger.LogInformation("Waiting for opponent");
-        await WaitOpponentTurnAsync(playerName);
+        await WaitOpponentTurnAsync(game);
         _logger.LogInformation("Returning result");
         return game.ToGameView(game.Player.Name);
     }
@@ -69,12 +69,28 @@ public class GameService : IGameService
     public async Task<GameView> WaitOpponentTurnAsync(string playerName)
     {
         var game = await GetGameAsync(playerName);
+        if(!game.IsOpponentTurn)
+        {
+            game = await _mediator.Send(new GrabTileCommand() { Game = game });
+            if(!game.IsOpponentTurn)
+            {
+                return game.ToGameView(playerName);
+            }
+        }
+        return await WaitOpponentTurnAsync(game);
+    }
+    private async Task<GameView> WaitOpponentTurnAsync(Game game)
+    {
         _logger.LogInformation("Check for endgame conditions for player");
         game = await _mediator.Send(new SetGameStatusCommand() { Game = game });
-        if(game.GameStatus.IsEnded || !game.IsOpponentTurn)
+        if(game.GameStatus.IsEnded)
         {
             game.IsOpponentTurn = false;
-            return game.ToGameView(playerName);
+            await HandleGameEndAsync(game);
+        }
+        if(!game.IsOpponentTurn)
+        {
+            return game.ToGameView(game.Player.Name);
         }
         while(game.IsOpponentTurn)
         {
@@ -85,10 +101,14 @@ public class GameService : IGameService
         game = await _mediator.Send(new SetGameStatusCommand() { Game = game });
         if(game.GameStatus.IsEnded)
         {
-            await _mediator.Send(new UpdatePlayersStatisticCommand() { GameStatus = game.GameStatus });
-            await _mediator.Send(new SaveGameCommand() { Game = game });
+            await HandleGameEndAsync(game);
         }
         return game.ToGameView(game.Player.Name);
+    }
+    private async Task HandleGameEndAsync(Game game)
+    {
+        await _mediator.Send(new UpdatePlayersStatisticCommand() { GameStatus = game.GameStatus });
+        await _mediator.Send(new SaveGameCommand() { Game = game });
     }
 
     private async Task<Game> GetGameAsync(string playerName)

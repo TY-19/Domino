@@ -33,7 +33,12 @@ export class GameTableComponent {
 
   }
   ngOnInit(): void {
-    this.displayTiles();
+    this.prepareTable();
+  }
+  prepareTable() {
+    this.tileDisplays = new Map<number, TileDisplay>();
+    this.leftActive = this.def;
+    this.rightActive = this.def;
   }
   buildStyle(position: PositionOnTable): string {
     let style: string = "grid-row-start: " + position.row + ";"

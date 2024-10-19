@@ -1,5 +1,6 @@
 using Domino.Application.Interfaces;
 using Domino.Domain.Entities;
+using Domino.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -7,16 +8,6 @@ namespace Domino.Application.Commands.Games.SetGameStatus;
 
 public class SetGameStatusCommandHandler : IRequestHandler<SetGameStatusCommand, Game>
 {
-    private readonly IStrategyFactory _strategyFactory;
-    private readonly ILogger<SetGameStatusCommandHandler> _logger;
-    public SetGameStatusCommandHandler(
-        IStrategyFactory strategyFactory,
-        ILogger<SetGameStatusCommandHandler> logger
-        )
-    {
-        _strategyFactory = strategyFactory;
-        _logger = logger;
-    }
     public Task<Game> Handle(SetGameStatusCommand command, CancellationToken cancellationToken)
     {
         var game = command.Game;
@@ -66,24 +57,24 @@ public class SetGameStatusCommandHandler : IRequestHandler<SetGameStatusCommand,
         {
             if(lastTile?.Tile?.TileDetails.TileId == "0-0")
             {
-                game.GameStatus.VictoryType = "General";
+                game.GameStatus.VictoryType = VictoryType.General;
             }
             else
             {
-                game.GameStatus.VictoryType = "Goat";
+                game.GameStatus.VictoryType = VictoryType.Goat;
             }
         }
         else if(lastTile?.Tile?.TileDetails.TileId == "0-0")
         {
-            game.GameStatus.VictoryType = "Officer";
+            game.GameStatus.VictoryType = VictoryType.Officer;
         }
         else if(game.GameStatus.HuntPlayers.Contains(game.GameStatus.Winner))
         {
-            game.GameStatus.VictoryType = "Cleared points";
+            game.GameStatus.VictoryType = VictoryType.ClearedPoints;
         }
         else
         {
-            game.GameStatus.VictoryType = "Normal Victory";
+            game.GameStatus.VictoryType = VictoryType.Normal;
             var loserHand = game.GameStatus.Loser == game.Player.Name
                 ? game.Player.Hand
                 : game.Opponent.Hand;

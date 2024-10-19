@@ -70,7 +70,7 @@ public class Table
             var doubles = hand.Where(d => d.IsDouble && d.TileId != "00");
             if(doubles.Any())
             {
-                var precedence = new string[] {"11", "22", "33", "44", "55", "66"};
+                var precedence = new string[] {"1-1", "2-2", "3-3", "4-4", "5-5", "6-6"};
                 TileDetails? starter;
                 foreach(var adouble in precedence)
                 {

@@ -13,4 +13,13 @@ export class MarketComponent {
   onDoubleClick(tile: number) {
     this.grabTile.emit(tile);
   }
+  displayMarketTiles(count: number): void {
+    if(count === this.marketTiles.length) {
+      return;
+    }
+    this.marketTiles = [];
+    for(let i = 0; i < count; i++) {
+      this.marketTiles.push(i);
+    }
+  }
 }

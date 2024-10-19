@@ -42,8 +42,8 @@ public class GrabTileCommandHandler : IRequestHandler<GrabTileCommand, Game>
         {
             return true;
         }
-        int grabbed = 1;
-        for(int i = previous.MoveNumber - 1; i >= 0; i--)
+        int grabbed = 0;
+        for(int i = previous.MoveNumber; i >= 0; i--)
         {
             var logEvent = log.Events.Find(e => e.MoveNumber == i);
             if(logEvent?.PlayerName != playerName || logEvent.Type != MoveType.GrabTile)

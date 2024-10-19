@@ -1,6 +1,7 @@
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { TileDetails } from '../../_models/tileDetails';
 import { TileComponent } from '../../tile/tile.component';
+import { GameView } from '../../_models/gameView';
 
 @Component({
   selector: 'Dom-opponent-hand',
@@ -12,14 +13,22 @@ import { TileComponent } from '../../tile/tile.component';
   styleUrl: './opponent-hand.component.scss'
 })
 export class OpponentHandComponent {
-  @Input() opponentTiles: number[] = [];
+  closedTiles: number[] = [];
   opponentHand: TileDetails[] = [];
   openHand: boolean = false;
   constructor(private ref: ElementRef) {
     this.ref.nativeElement.style.setProperty('--wave-color', "green");
   }
-  showOpponentTiles(tiles: TileDetails[]) {
-    this.opponentHand = tiles;
-    this.openHand = true;
+  showOpponentTiles(game: GameView) {
+    this.openHand = game.gameStatus.isEnded;
+    if(game.gameStatus.isEnded === true) {
+      this.opponentHand = game.gameStatus.endHands[game.opponentName];
+    }
+  }
+  displayClosedTiles(count: number) {
+    this.closedTiles = [];
+    for(let i = 0; i < count; i++) {
+      this.closedTiles.push(i);
+    }
   }
 }

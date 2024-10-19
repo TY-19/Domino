@@ -11,13 +11,6 @@ import { CommonModule } from '@angular/common';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
-  constructor(private http: HttpClient) {
-    
-  }
-  testResult: object = { default: "No response" };
-  ngOnInit(): void {
-    this.http.get(baseUrl + "/test")
-      .subscribe(response => this.testResult = response);
-  }
+export class AppComponent {
+  
 }

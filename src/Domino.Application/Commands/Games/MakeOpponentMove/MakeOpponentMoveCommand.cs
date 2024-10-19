@@ -6,5 +6,5 @@ namespace Domino.Application.Commands.Games.MakeOpponentMove;
 public class MakeOpponentMoveCommand : IRequest<Game>
 {
     public Game Game { get; set; } = null!;
-    public Move? Move { get; set; }
+    public Move Move { get; set; } = null!;
 }

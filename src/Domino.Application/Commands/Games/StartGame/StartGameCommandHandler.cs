@@ -22,8 +22,8 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, Game>
         PlayerInfo player = await _playerRepository.GetPlayerInfoAsync(command.PlayerName);
         PlayerInfo opponent = await _playerRepository.GetPlayerInfoAsync(command.OpponentName);
         var game = new Game(id, player, opponent);
-        game.IsOpponentTurn = !IsPlayerFirst(game);
         ServeStartHands(game);
+        game.IsOpponentTurn = !IsPlayerFirst(game);
         _cache.Set(player.PlayerName, game);
         return game;
     }
@@ -37,7 +37,7 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, Game>
     }
     private static bool IsPlayerFirst(Game game)
     {
-        var starters = new string[] {"11", "22", "33", "44", "55", "66"};
+        var starters = new string[] {"1-1", "2-2", "3-3", "4-4", "5-5", "6-6"};
         foreach(var starter in starters)
         {
             if(game.Player.Hand.Find(d => d.TileId == starter) != null)
