@@ -2,6 +2,7 @@ namespace Domino.Domain.Entities;
 
 public class Table
 {
+    private readonly string[] _starters;
     public LinkedList<DominoTile> TilesOnTable { get; } = new();
     public int? LeftPosition
     {
@@ -35,6 +36,10 @@ public class Table
         }
         return isLeft ? TilesOnTable.First?.Value.FreeEnd : TilesOnTable.Last?.Value.FreeEnd;
     }
+    public Table(GameRules gameRules)
+    {
+        _starters = gameRules.StarterTiles;
+    }
     public DominoTile PlaceTile(TileDetails tileDetails, int position)
     {
         if(position == 0 && TilesOnTable.Count != 0)
@@ -67,30 +72,16 @@ public class Table
         List<(TileDetails tileDetails, int edge)> possibleMoves = [];
         if(TilesOnTable.Count == 0)
         {
-            var doubles = hand.Where(d => d.IsDouble && d.TileId != "00");
-            if(doubles.Any())
+            TileDetails? starter;
+            foreach(var starterId in _starters)
             {
-                var precedence = new string[] {"1-1", "2-2", "3-3", "4-4", "5-5", "6-6"};
-                TileDetails? starter;
-                foreach(var adouble in precedence)
+                starter = hand.FirstOrDefault(d => d.TileId == starterId);
+                if(starter != null)
                 {
-                    starter = doubles.FirstOrDefault(d => d.TileId == adouble);
-                    if(starter != null)
-                    {
-                        possibleMoves.Add((starter, starter.SideA));
-                        return possibleMoves;
-                    }
+                    possibleMoves.Add((starter, starter.SideA));
+                    return possibleMoves;
                 }
-            }
-            else
-            {
-                doubles = hand;
-                foreach(var tile in doubles)
-                {
-                    possibleMoves.Add((tile, tile.SideA));
-                }
-            }
-            
+            }            
             return possibleMoves;
         }
         foreach(var tile in hand)

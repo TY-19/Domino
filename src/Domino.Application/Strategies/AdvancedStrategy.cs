@@ -14,7 +14,7 @@ public class AdvancedStrategy : StrategyBase
     {
         var set = new DominoSet();
         HiddenTiles = set.Tiles;
-        foreach(var tile in gameView.PlayerHand)
+        foreach(var tile in gameView.Player.Hand)
         {
             var toRemove = HiddenTiles.Find(t => t.TileId == tile.TileId);
             if(toRemove != null)
@@ -33,7 +33,7 @@ public class AdvancedStrategy : StrategyBase
         var myTilesTypes = new Dictionary<int, int>() {
             { 0, 0 }, { 1, 0 }, { 2, 0 }, { 3, 0 }, { 4, 0 }, { 5, 0 }, { 6, 0 }
         };
-        foreach(var tile in gameView.PlayerHand)
+        foreach(var tile in gameView.Player.Hand)
         {
             myTilesTypes[tile.SideA]++;
             if(tile.SideA != tile.SideB)

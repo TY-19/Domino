@@ -22,6 +22,7 @@ public class MakeOpponentMoveCommandHandler : IRequestHandler<MakeOpponentMoveCo
                 bool isLeft = ptm.ContactEdge == game.Table.LeftFreeEnd;
                 var playTileDto = new PlayTileDto() { TileId = ptm.Tile.TileId, IsLeft = isLeft };
                 game = await _mediator.Send(new PlayTileCommand() { Game = game, PlayTileDto = playTileDto });
+                game.IsOpponentTurn = false;
                 break;
             case GrabTileMove:
                 game = await _mediator.Send(new GrabTileCommand() { Game = game });

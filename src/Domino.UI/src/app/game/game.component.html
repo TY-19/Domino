@@ -27,12 +27,12 @@
     <Dom-market (grabTile)="grabTile($event)"
       class="grid-item market">
     </Dom-market>
-    <Dom-player-hand [playerHand]="this.game.playerHand"
+    <Dom-player-hand [playerHand]="game.player.hand"
       (selectTile)="selectTile($event)"
       class="grid-item player-hand">
     </Dom-player-hand>
-    <div class="points player-points">{{game.playerCurrentPoints}}</div>
-    <div class="points opponent-points">{{game.opponentCurrentPoints}}</div>
+    <div class="points player-points">{{game.player.currentPoints}}</div>
+    <div class="points opponent-points">{{game.opponent.currentPoints}}</div>
   }
   <button type="button" class="grid-item play-button" (click)="startGame()">Start!</button>
 </div>

@@ -18,20 +18,13 @@ public class PlayTileCommandHandler : IRequestHandler<PlayTileCommand, Game>
         var game = command.Game;
         Player currentPlayer = game.IsOpponentTurn ? game.Opponent : game.Player;
         TileDetails? tileDetails = currentPlayer.GetTileFromHand(command.PlayTileDto.TileId);
-        if(tileDetails == null) {
-            string errorMessage = "No tile with such an id in the hand.";
-            game.GameError = new() { ErrorMessage = errorMessage };
-            return Task.FromResult(game);
-        }   
-        int? position = game.Table.TryGetPosition(tileDetails, command.PlayTileDto.IsLeft);
-        if(position == null) {
-            string errorMessage = "The tile can't be played on the table.";
-            game.GameError = new() { ErrorMessage = errorMessage };
+        if(!TryGetPosition(tileDetails, command.PlayTileDto.IsLeft, game, out int? position)
+            || tileDetails == null)
+        {
             return Task.FromResult(game);
         }
-        _logger.LogInformation("Player plays {@details}", tileDetails);
         currentPlayer.PlayTile(tileDetails);
-        var tile = game.Table.PlaceTile(tileDetails, position.Value);
+        var tile = game.Table.PlaceTile(tileDetails, position!.Value);
         _logger.LogInformation("Writing log");
         game.Log.AddEntry(new GameLogEntry()
         {
@@ -41,5 +34,34 @@ public class PlayTileCommandHandler : IRequestHandler<PlayTileCommand, Game>
         });
         game.IsOpponentTurn = !game.IsOpponentTurn;
         return Task.FromResult(game);
+    }
+    private bool TryGetPosition(TileDetails? tileDetails, bool? isLeft, Game game, out int? position)
+    {
+        position = null;
+        if(tileDetails == null) {
+            string errorMessage = "No tile with such an id in the hand.";
+            game.GameError = new() { ErrorMessage = errorMessage };
+            return false;
+        }   
+        position = game.Table.TryGetPosition(tileDetails, isLeft);
+        if(position == null) {
+            string errorMessage = "The tile can't be played on the table.";
+            game.GameError = new() { ErrorMessage = errorMessage };
+            return false;
+        }
+        if(position == 0)
+        {
+            var hand = game.IsOpponentTurn ? game.Opponent.Hand : game.Player.Hand;
+            var starters = game.Table.GetPossibleMoves(hand);
+            if(starters.FirstOrDefault(s => s.tileDetails.TileId == tileDetails.TileId).tileDetails == null)
+            {
+                string errorMessage = $"The tile {tileDetails.TileId} cannot start the game.\n"
+                    + "Current rules define starter tiles in such and order:\n"
+                    + game.GameRules.StarterTiles.Aggregate((t1, t2) => t1 + ", " + t2);
+                game.GameError = new() { ErrorMessage = errorMessage };
+                return false;
+            }
+        }
+        return true;
     }
 }

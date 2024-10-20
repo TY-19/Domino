@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectorRef, Component, EventEmitter, Input, Output } from '@angular/core';
 import { PositionOnTable } from '../../_models/positionOnTable';
 import { TileDisplay } from '../../_models/tileDisplay';
 import { DominoTile } from '../../_models/dominoTile';
@@ -29,7 +29,7 @@ export class GameTableComponent {
   playTile(isLeft: boolean) {
     this.playToSide.emit(isLeft);
   }
-  constructor() {
+  constructor(private cdr: ChangeDetectorRef) {
 
   }
   ngOnInit(): void {
@@ -39,6 +39,8 @@ export class GameTableComponent {
     this.tileDisplays = new Map<number, TileDisplay>();
     this.leftActive = this.def;
     this.rightActive = this.def;
+    this.cdr.detectChanges();
+    this.displayTiles();
   }
   buildStyle(position: PositionOnTable): string {
     let style: string = "grid-row-start: " + position.row + ";"

@@ -9,7 +9,8 @@ public abstract class StrategyBase : IAiStrategy
     protected List<(TileDetails tileDetails, int contactEdge)> _possibilities = [];
     public virtual Move SelectMove(GameView gameView)
     {
-        _possibilities = gameView.Table.GetPossibleMoves(gameView.PlayerHand);
+
+        _possibilities = gameView.Table.GetPossibleMoves(gameView.Player.Hand);
         if (_possibilities.Count == 0)
         {
             return new GrabTileMove();

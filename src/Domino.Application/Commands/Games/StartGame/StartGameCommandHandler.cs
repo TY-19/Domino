@@ -37,7 +37,7 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, Game>
     }
     private static bool IsPlayerFirst(Game game)
     {
-        var starters = new string[] {"1-1", "2-2", "3-3", "4-4", "5-5", "6-6"};
+        var starters = game.GameRules.StarterTiles;
         foreach(var starter in starters)
         {
             if(game.Player.Hand.Find(d => d.TileId == starter) != null)

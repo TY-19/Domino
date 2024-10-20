@@ -3,7 +3,6 @@ using Domino.Application.Commands.Games.MakeOpponentMove;
 using Domino.Application.Commands.Games.PlayTile;
 using Domino.Application.Commands.Games.SaveGame;
 using Domino.Application.Commands.Games.SelectOpponentMove;
-using Domino.Application.Commands.Games.SetGameStatus;
 using Domino.Application.Commands.Games.StartGame;
 using Domino.Application.Commands.Players.UpdatePlayersStatistic;
 using Domino.Application.Extensions;
@@ -82,8 +81,8 @@ public class GameService : IGameService
     private async Task<GameView> WaitOpponentTurnAsync(Game game)
     {
         _logger.LogInformation("Check for endgame conditions for player");
-        game = await _mediator.Send(new SetGameStatusCommand() { Game = game });
-        if(game.GameStatus.IsEnded)
+        game.TrySetResult();
+        if(game.GameResult?.IsEnded == true)
         {
             game.IsOpponentTurn = false;
             await HandleGameEndAsync(game);
@@ -98,8 +97,8 @@ public class GameService : IGameService
             game = await _mediator.Send(new MakeOpponentMoveCommand() { Game = game, Move = move });
         }
         _logger.LogInformation("Check for endgame conditions for opponent");
-        game = await _mediator.Send(new SetGameStatusCommand() { Game = game });
-        if(game.GameStatus.IsEnded)
+        game.TrySetResult();
+        if(game.GameResult?.IsEnded == true)
         {
             await HandleGameEndAsync(game);
         }
@@ -107,7 +106,7 @@ public class GameService : IGameService
     }
     private async Task HandleGameEndAsync(Game game)
     {
-        await _mediator.Send(new UpdatePlayersStatisticCommand() { GameStatus = game.GameStatus });
+        await _mediator.Send(new UpdatePlayersStatisticCommand() { Game = game });
         await _mediator.Send(new SaveGameCommand() { Game = game });
     }
 

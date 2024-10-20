@@ -20,9 +20,10 @@ export class OpponentHandComponent {
     this.ref.nativeElement.style.setProperty('--wave-color', "green");
   }
   showOpponentTiles(game: GameView) {
-    this.openHand = game.gameStatus.isEnded;
-    if(game.gameStatus.isEnded === true) {
-      this.opponentHand = game.gameStatus.endHands[game.opponentName];
+    this.openHand = game.gameResult?.isEnded ?? false;
+    if(game.gameResult && game.gameResult.isEnded === true) {
+      this.opponentHand = game.gameResult.playerResultRecords?.find(r => 
+        r.playerName == game.opponent.name)?.endHand ?? [];
     }
   }
   displayClosedTiles(count: number) {

@@ -1,15 +1,7 @@
-import { TileDetails } from "./tileDetails";
+import { GameType } from "../_enums/gameType";
 
 export interface GameStatus {
-    gameType: string;
-    huntPlayers: string[];
-    status: string;
-    isEnded: boolean;
-    isDraw: boolean;
-    result: string;
-    winner: string;
-    loser: string;
-    endHands: Record<string, TileDetails[]>;
-    loserPointsCount: [string, number];
-    victoryType: string;
+    gameType: GameType;
+    hunters: string[];
+    hunted: string[];
 }

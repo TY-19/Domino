@@ -77,17 +77,17 @@ export class GameComponent implements OnInit {
       .subscribe(gs => {
         this.game = gs;
         this.cdr.detectChanges();
-        this.prepareGame();
+        this.prepareGame(true);
       });
   }
-  private prepareGame(): void {
-    if(this.game.table.tilesOnTable.length > 0) {
-      this.gameTable.displayTiles();
-    } else {
+  private prepareGame(clear?: boolean): void {
+    if(clear || this.game.table.tilesOnTable.length <= 0) {
       this.gameTable.prepareTable();
+    } else {
+      this.gameTable.displayTiles();
     }
     this.opponentHand.showOpponentTiles(this.game);
-    this.opponentHand.displayClosedTiles(this.game.opponentTilesCount);
+    this.opponentHand.displayClosedTiles(this.game.opponent.tilesCount);
     this.market.displayMarketTiles(this.game.marketTilesCount);
     this.message.hideMessage();
     this.opponentMessage.hideMessage();
@@ -162,16 +162,16 @@ export class GameComponent implements OnInit {
   private updateGameState()
   {
     this.gameTable.updateDisplayingTiles(this.game.table.tilesOnTable);
-    this.opponentHand.displayClosedTiles(this.game.opponentTilesCount);
-    if(this.game.gameStatus.isEnded) {
-      this.message.displayMessage(this.game.gameStatus.result);
+    this.opponentHand.displayClosedTiles(this.game.opponent.tilesCount);
+    if(this.game.gameResult && this.game.gameResult.isEnded) {
+      this.message.displayMessage(this.game.gameResult.result);
       this.opponentHand.showOpponentTiles(this.game);
     } else if(this.game.errorMessage) {
       this.message.displayMessage(this.game.errorMessage);
     }
     this.market.displayMarketTiles(this.game.marketTilesCount);
     let [message, newCurrentTurn] = this.gameplayService
-      .buildOpponentMessage(this.game.log.events, this.currentTurn, this.game.opponentName);
+      .buildOpponentMessage(this.game.log.events, this.currentTurn, this.game.opponent.name);
     this.opponentMessage.displayMessage(message);
     this.currentTurn = newCurrentTurn;
   }

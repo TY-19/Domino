@@ -15,8 +15,8 @@ export class GameplayService {
   canGrab(game: GameView): [canGrab: boolean, reason: string] {
     if(this.hasTilesToPlay(game)) {
       return [false, "You have a possible tile to play in your hand.\nNo need to grab another one"];
-    } else if(game.playerGrabInRow >= game.gameRules.maxGrabsInRow) {
-      return [false, "You grab maximum allowed number of tiles in a row: " + game.playerGrabInRow];
+    } else if(game.player.grabInRow >= game.gameRules.maxGrabsInRow) {
+      return [false, "You grab maximum allowed number of tiles in a row: " + game.player.grabInRow];
     } else if(game.marketTilesCount <= game.gameRules.minLeftInMarket) {
       return [false, "You cannot grab last " + game.gameRules.minLeftInMarket + " tile(s) from the market."];
     } else {
@@ -98,14 +98,14 @@ export class GameplayService {
     return [message, turn];
   }
   private hasTilesToPlay(game: GameView): boolean {
-    return game.playerHand.some(t =>
+    return game.player.hand!.some(t =>
       t.sideA === game.table.leftFreeEnd
       || t.sideB === game.table.leftFreeEnd
       || t.sideA === game.table.rightFreeEnd
       || t.sideB === game.table.rightFreeEnd);
   }
   private canGrabAnotherTile(game: GameView): boolean {
-    return game.playerGrabInRow < game.gameRules.maxGrabsInRow
+    return game.player.grabInRow < game.gameRules.maxGrabsInRow
       && game.marketTilesCount > game.gameRules.minLeftInMarket;
   }
 }

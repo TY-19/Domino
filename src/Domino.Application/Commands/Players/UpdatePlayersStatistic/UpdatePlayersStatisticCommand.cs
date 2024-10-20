@@ -5,5 +5,5 @@ namespace Domino.Application.Commands.Players.UpdatePlayersStatistic;
 
 public class UpdatePlayersStatisticCommand : IRequest
 {
-    public GameStatus GameStatus { get; set; } = null!;
+    public Game Game { get; set; } = null!;
 }

@@ -1,7 +1,4 @@
-namespace Domino.Domain.Enums;
-
-public enum VictoryType
-{
+export enum VictoryType {
     Normal,
     ClearedPoints,
     Goat,
