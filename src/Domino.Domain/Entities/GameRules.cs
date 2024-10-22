@@ -5,17 +5,26 @@ public class GameRules
     public int MaxGrabsInRow { get; }
     public int MinLeftInMarket { get; }
     public string[] StarterTiles { get; }
+    public int PointsToStartHunt { get; }
+    public bool WorkGoat { get; }
+    public int TotalPointsToLoseWithGoat { get; }
     public GameRules(GameRulesPrototype prototype)
     {
         MaxGrabsInRow = prototype.MaxGrabsInRow;
         MinLeftInMarket = prototype.MinLeftInMarket;
         StarterTiles = prototype.StarterTiles;
+        PointsToStartHunt = prototype.PointsToStartHunt;
+        WorkGoat = prototype.WorkGoat;
+        TotalPointsToLoseWithGoat = prototype.TotalPointsToLoseWithGoat;
     }   
 }
 public class GameRulesPrototype
 {
     private int _maxGrabsInRow = 3;
     private int _minLeftInMarket = 1;
+    private int _pointsToStartHunt = 25;
+    private bool _workGoat = true;
+    private int _totalPointsToLoseWithGoat = 125;
     private string[] _starterTiles = ["1-1", "2-2", "3-3", "4-4", "5-5", "6-6"];
     public int MaxGrabsInRow
     {
@@ -63,4 +72,23 @@ public class GameRulesPrototype
             }
         }
     }
+    public int PointsToStartHunt
+    {
+        get => _pointsToStartHunt;
+        set
+        {
+            if(_pointsToStartHunt > 0 || _pointsToStartHunt <= 168)
+                _pointsToStartHunt = value;
+        }
+    }
+    public int TotalPointsToLoseWithGoat
+    {
+        get => _totalPointsToLoseWithGoat;
+        set
+        {
+            if(_pointsToStartHunt > 0)
+                _pointsToStartHunt = value;
+        }
+    }
+    public bool WorkGoat { get => _workGoat; set => _workGoat = value; }
 }

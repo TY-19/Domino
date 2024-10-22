@@ -22,7 +22,6 @@ public class UpdatePlayersStatisticCommandHandler : IRequestHandler<UpdatePlayer
         }
         foreach(var record in gameResult.PlayerResultRecords)
         {
-            Console.WriteLine(record.PlayerName + "\t" + record.PlayerResult + "\t" + record.PointsLeft);
             await UpdateAsync(record, gameStatus, gameResult);
         }
         gameResult.IsInStatistic = true;
@@ -32,7 +31,6 @@ public class UpdatePlayersStatisticCommandHandler : IRequestHandler<UpdatePlayer
         var playerStatistic = await _playerRepository.GetPlayerStatisticAsync(playerRecord.PlayerName)
             ?? new PlayerStatistic(playerRecord.PlayerName);
         var playerInfo = await _playerRepository.GetPlayerInfoAsync(playerRecord.PlayerName);
-        Console.WriteLine(playerInfo.PlayerName + "\t" + playerInfo.CurrentPointCount);
         playerStatistic.GamesPlayed++;
         if(gameStatus.IsHunted(playerStatistic.PlayerName))
         {
@@ -62,11 +60,10 @@ public class UpdatePlayersStatisticCommandHandler : IRequestHandler<UpdatePlayer
                 playerInfo.CurrentPointCount = gameResult?.VictoryType == VictoryType.Normal
                     ? playerInfo.CurrentPointCount + playerRecord.PointsLeft : 0;
                 Action<PlayerStatistic, GameStatus> updateLoserFunction =
-                    _updateRules[(gameResult?.VictoryType ?? VictoryType.Normal, true)];
+                    _updateRules[(gameResult?.VictoryType ?? VictoryType.Normal, false)];
                 updateLoserFunction(playerStatistic, gameStatus);
                 break;
         }
-        Console.WriteLine(playerInfo.PlayerName + "\t" + playerInfo.CurrentPointCount);
         await _playerRepository.UpdatePlayerStatisticAsync(playerStatistic);
         await _playerRepository.UpdatePlayerInfoAsync(playerInfo);
     }

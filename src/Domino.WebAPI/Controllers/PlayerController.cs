@@ -23,4 +23,10 @@ public class PlayersController : ControllerBase
     {
         return Ok(await _playerStatisticService.GetAllPlayersStatisticsAsync());
     }
+    [HttpDelete("statistics/all")]
+    public async Task<ActionResult> DeleteAllStatistics()
+    {
+        await _playerStatisticService.DeleteAllStatistic();
+        return NoContent();
+    }
 }

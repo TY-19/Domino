@@ -22,10 +22,27 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, Game>
         PlayerInfo player = await _playerRepository.GetPlayerInfoAsync(command.PlayerName);
         PlayerInfo opponent = await _playerRepository.GetPlayerInfoAsync(command.OpponentName);
         var game = new Game(id, player, opponent);
+        SetGameType(game);
         ServeStartHands(game);
         game.IsOpponentTurn = !IsPlayerFirst(game);
         _cache.Set(player.PlayerName, game);
         return game;
+    }
+    private static void SetGameType(Game game)
+    {
+        game.GameStatus.GameType = Domain.Enums.GameType.Normal;
+        if(game.Player.Info.CurrentPointCount >= game.GameRules.PointsToStartHunt)
+        {
+            game.GameStatus.GameType = Domain.Enums.GameType.Hunt;
+            game.GameStatus.Hunted.Add(game.Player.Name);
+            game.GameStatus.Hunters.Add(game.Opponent.Name);
+        }
+        if(game.Opponent.Info.CurrentPointCount >= game.GameRules.PointsToStartHunt)
+        {
+            game.GameStatus.GameType = Domain.Enums.GameType.Hunt;
+            game.GameStatus.Hunted.Add(game.Opponent.Name);
+            game.GameStatus.Hunters.Add(game.Player.Name);
+        }
     }
     private static void ServeStartHands(Game game)
     {

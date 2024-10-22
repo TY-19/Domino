@@ -8,4 +8,5 @@ public interface IPlayerService
     Task<PlayerInfo> GetPlayerInfoAsync(string playerName);
     Task UpdatePlayerInfoAsync(PlayerInfo playerInfo);
     Task<IEnumerable<PlayerStatistic>> GetAllPlayersStatisticsAsync();
+    Task DeleteAllStatistic();
 }

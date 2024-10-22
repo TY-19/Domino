@@ -26,4 +26,8 @@ public class PlayerService : IPlayerService
     {
         return await _repo.GetAllPlayersStatisticsAsync();
     }
+    public async Task DeleteAllStatistic()
+    {
+        await _repo.DeleteAllStatistic();
+    }
 }

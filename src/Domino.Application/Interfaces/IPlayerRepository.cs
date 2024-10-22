@@ -10,4 +10,5 @@ public interface IPlayerRepository
     Task<IEnumerable<PlayerStatistic>> GetAllPlayersStatisticsAsync();
     Task<PlayerStatistic?> GetPlayerStatisticAsync(string playerName);
     Task UpdatePlayerStatisticAsync(PlayerStatistic playerStatistic);
+    Task DeleteAllStatistic();
 }
