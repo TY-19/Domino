@@ -6,7 +6,7 @@ namespace Domino.Application.Strategies;
 
 public abstract class StrategyBase : IAiStrategy
 {
-    protected List<(TileDetails tileDetails, int contactEdge)> _possibilities = [];
+    protected List<PlayTileMove> _possibilities = [];
     public virtual Move SelectMove(GameView gameView)
     {
 
@@ -17,7 +17,7 @@ public abstract class StrategyBase : IAiStrategy
         }
         else if (_possibilities.Count == 1)
         {
-            return new PlayTileMove(_possibilities[0].tileDetails, _possibilities[0].contactEdge);
+            return _possibilities[0];
         }
         else
         {

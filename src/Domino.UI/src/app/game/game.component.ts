@@ -153,9 +153,10 @@ export class GameComponent implements OnInit {
       .subscribe(gs => {
         this.game = gs;
         this.updateGameState();
-        // if(this.gameplayService.checkForTurnEnd(this.game)) {
-        //   this.endTurn();
-        // }
+        if((!this.game.gameResult || !this.game.gameResult.isEnded)
+            && this.gameplayService.checkForTurnEnd(this.game)) {
+          this.endTurn();
+        }
       });
   }
   

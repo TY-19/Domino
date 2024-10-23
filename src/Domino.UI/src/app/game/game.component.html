@@ -1,9 +1,9 @@
 <Dom-message #message
-  [hidden]="!message || message.message.length < 1"
+  [hidden]="!message.showMessage || message.message.length < 1"
   class="message">
 </Dom-message>
 <Dom-message #opponentMessage
-  [hidden]="!opponentMessage || opponentMessage.message.length < 1"
+  [hidden]="!opponentMessage.showMessage || opponentMessage.message.length < 1"
   class="opponent-message">
 </Dom-message>
 <div class="grid-container">
@@ -28,6 +28,7 @@
       class="grid-item market">
     </Dom-market>
     <Dom-player-hand [playerHand]="game.player.hand"
+      [activeTileId]="activeTile?.tileId"
       (selectTile)="selectTile($event)"
       class="grid-item player-hand">
     </Dom-player-hand>

@@ -6,7 +6,7 @@ public class Player
     public PlayerInfo Info { get; set; }
     private protected List<TileDetails> _hand = [];
     public List<TileDetails> Hand { get => _hand; }
-    public int GrabInRow { get; private set; }
+    public int GrabInRow { get; set; }
     public Player(): this("test")
     {
 

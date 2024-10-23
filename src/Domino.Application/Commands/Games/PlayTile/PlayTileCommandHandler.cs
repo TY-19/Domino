@@ -52,12 +52,22 @@ public class PlayTileCommandHandler : IRequestHandler<PlayTileCommand, Game>
         if(position == 0)
         {
             var hand = game.IsOpponentTurn ? game.Opponent.Hand : game.Player.Hand;
-            var starters = game.Table.GetPossibleMoves(hand);
-            if(starters.FirstOrDefault(s => s.tileDetails.TileId == tileDetails.TileId).tileDetails == null)
+            if(game.GameStatus.GameType == GameType.Normal)
             {
-                string errorMessage = $"The tile {tileDetails.TileId} cannot start the game.\n"
-                    + "Current rules define starter tiles in such and order:\n"
-                    + game.GameRules.StarterTiles.Aggregate((t1, t2) => t1 + ", " + t2);
+                var starters = game.Table.GetPossibleMoves(hand);
+                if(starters.FirstOrDefault(s => s.Tile.TileId == tileDetails.TileId)?.Tile == null)
+                {
+                    string errorMessage = $"The tile {tileDetails.TileId} cannot start the game.\n"
+                        + "Current rules define starter tiles in such and order:\n"
+                        + game.GameRules.StarterTiles.Aggregate((t1, t2) => t1 + ", " + t2);
+                    game.GameError = new() { ErrorMessage = errorMessage };
+                    return false;
+                }
+            }
+            else if(game.GameStatus.GameType == GameType.Hunt && tileDetails.TileId != "6-6")
+            {
+                string errorMessage = $"The tile {tileDetails.TileId} cannot start the hunt.\n"
+                        + "You need to play 6-6 and if you win it will counts as Goat Victory!\n";
                 game.GameError = new() { ErrorMessage = errorMessage };
                 return false;
             }

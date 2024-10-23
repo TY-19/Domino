@@ -61,8 +61,8 @@ public class AdvancedStrategy : StrategyBase
         foreach(var possibility in _possibilities)
         {
             (int, int) potential = (left, right);
-            var tile = possibility.tileDetails;
-            if(possibility.contactEdge == left)
+            var tile = possibility.Tile;
+            if(possibility.ContactEdge == left)
             {
                 if(tile.SideA == left)
                 {
@@ -85,7 +85,7 @@ public class AdvancedStrategy : StrategyBase
                 }
             }
             int wageForme = myTilesTypes[potential.Item1] + myTilesTypes[potential.Item2];
-            wagesForMe.Add((tile, possibility.contactEdge, wageForme));
+            wagesForMe.Add((tile, possibility.ContactEdge, wageForme));
 
             int wageAgainstOpponent = -1 * (hiddenTilesTypes[potential.Item1] + hiddenTilesTypes[potential.Item2]);
         }
@@ -100,7 +100,7 @@ public class AdvancedStrategy : StrategyBase
         var toPlay = wagesResult.MaxBy(w => w.Wage);
         if(toPlay == null)
         {
-            return new PlayTileMove(_possibilities[0].tileDetails, _possibilities[0].contactEdge);
+            return _possibilities[0];
         }
         return new PlayTileMove(toPlay.Tile, toPlay.Edge);
     }

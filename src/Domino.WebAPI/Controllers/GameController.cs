@@ -31,6 +31,11 @@ public class GameController : ControllerBase
     {
         return Ok(await _gameService.PlayTileAsync(playerName, playTileDto));
     }
+    [HttpPost("doublePlay")]
+    public async Task<ActionResult<GameView>> DoublePlay(string playerName, PlayTileDto[] playTileDtos)
+    {
+        return Ok(await _gameService.DoublePlayAsync(playerName, playTileDtos));
+    }
     [HttpGet("grab")]
     public async Task<ActionResult<GameView>> GrabTile(string playerName)
     {

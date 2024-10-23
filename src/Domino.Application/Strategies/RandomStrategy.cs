@@ -10,7 +10,6 @@ public class RandomStrategy : StrategyBase
     {
         var rnd = new Random();
         int tileIndex = rnd.Next(_possibilities.Count - 1);
-        var (tileDetails, contactEdge) = _possibilities[tileIndex];
-        return new PlayTileMove(tileDetails, contactEdge);
+        return _possibilities[tileIndex];
     }
 }

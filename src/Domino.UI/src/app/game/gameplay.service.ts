@@ -29,6 +29,9 @@ export class GameplayService {
   moveSelectedTile(tileDetails: TileDetails, game: GameView): [play: boolean, isLeft: boolean] {
     if(game.table.leftFreeEnd !== null
       && game.table.rightFreeEnd !== null) {
+      if(game.table.tilesOnTable.length === 1 && game.table.tilesOnTable[0].tileDetails.isDouble) {
+        return [ true, false ];
+      }
       let movesCount: number = 0;
       let isLeft: boolean | null = null;
       if(tileDetails.sideA === game.table.leftFreeEnd

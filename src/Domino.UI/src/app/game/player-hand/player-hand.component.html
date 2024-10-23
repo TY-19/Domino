@@ -1,4 +1,6 @@
 @for(tile of playerHand; track tile.tileId)
 {
-    <Dom-tile [tile]="tile" [isHorizontal]="false" (tileEmitter)="clickOnTile($event)"></Dom-tile>
+    <Dom-tile [tile]="tile" [isHorizontal]="false" (tileEmitter)="clickOnTile($event)"
+        [class]="tile.tileId == activeTileId ? 'active-tile' : ''">
+    </Dom-tile>
 }

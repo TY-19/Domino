@@ -10,7 +10,7 @@ public class GrabTileCommandHandler : IRequestHandler<GrabTileCommand, Game>
     {
         var game = command.Game;
         Player currentPlayer = game.IsOpponentTurn ? game.Opponent : game.Player;
-        if(CanGrabAnotherTile(game, currentPlayer.Name))
+        if(CanGrabAnotherTile(game, currentPlayer))
         {
             var tile = game.Set.ServeTile();
             currentPlayer.GrabTile(tile);
@@ -26,39 +26,9 @@ public class GrabTileCommandHandler : IRequestHandler<GrabTileCommand, Game>
         }
         return Task.FromResult(game);
     }
-    public static bool CanGrabAnotherTile(Game game, string playerName)
+    public static bool CanGrabAnotherTile(Game game, Player currentPlayer)
     {
-        if(game.Set.TilesCount <= game.GameRules.MinLeftInMarket)
-        {
-            return false;
-        }
-        var log = game.Log;
-        if(log.Events.Count == 0)
-        {
-            return true;
-        }
-        var previous = log.Events.DefaultIfEmpty().MaxBy(e => e?.MoveNumber);
-        if(previous?.PlayerName != playerName)
-        {
-            return true;
-        }
-        int grabbed = 0;
-        for(int i = previous.MoveNumber; i >= 0; i--)
-        {
-            var logEvent = log.Events.Find(e => e.MoveNumber == i);
-            if(logEvent?.PlayerName != playerName || logEvent.Type != MoveType.GrabTile)
-            {
-                return true;
-            }
-            else
-            {
-                grabbed++;
-                if(grabbed >= game.GameRules.MaxGrabsInRow)
-                {
-                    return false;
-                }
-            }
-        }
-        return true;
+        return currentPlayer.GrabInRow < game.GameRules.MaxGrabsInRow
+            && game.Set.TilesCount > game.GameRules.MinLeftInMarket;
     }
 }

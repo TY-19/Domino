@@ -67,9 +67,9 @@ public class Table
         }
         return tile;
     }
-    public List<(TileDetails tileDetails, int edge)> GetPossibleMoves(List<TileDetails> hand)
+    public List<PlayTileMove> GetPossibleMoves(List<TileDetails> hand)
     {
-        List<(TileDetails tileDetails, int edge)> possibleMoves = [];
+        List<PlayTileMove> moves = [];
         if(TilesOnTable.Count == 0)
         {
             TileDetails? starter;
@@ -78,35 +78,35 @@ public class Table
                 starter = hand.FirstOrDefault(d => d.TileId == starterId);
                 if(starter != null)
                 {
-                    possibleMoves.Add((starter, starter.SideA));
-                    return possibleMoves;
+                    moves.Add(new PlayTileMove(starter, starter.SideA));
+                    return moves;
                 }
             }            
-            return possibleMoves;
+            return moves;
         }
         foreach(var tile in hand)
         {
             if(tile.SideA == LeftFreeEnd)
             {
-                possibleMoves.Add((tile, tile.SideA));
+                moves.Add(new PlayTileMove(tile, tile.SideA));
             }
             else if(tile.SideB == LeftFreeEnd)
             {
-                possibleMoves.Add((tile, tile.SideB));
+                moves.Add(new PlayTileMove(tile, tile.SideB));
             }
             if(LeftFreeEnd != RightFreeEnd)
             {
                 if(tile.SideA == RightFreeEnd)
                 {
-                    possibleMoves.Add((tile, tile.SideA));
+                    moves.Add(new PlayTileMove(tile, tile.SideA));
                 }
                 else if(tile.SideB == RightFreeEnd)
                 {
-                    possibleMoves.Add((tile, tile.SideB));
+                    moves.Add(new PlayTileMove(tile, tile.SideB));
                 }   
             }
         }
-        return possibleMoves;
+        return moves;
     }
     public int? TryGetPosition(TileDetails tileDetails, bool? isLeft)
     {

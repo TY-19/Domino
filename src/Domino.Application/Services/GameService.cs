@@ -8,6 +8,7 @@ using Domino.Application.Commands.Players.UpdatePlayersStatistic;
 using Domino.Application.Extensions;
 using Domino.Application.Interfaces;
 using Domino.Application.Models;
+using Domino.Application.Queries.Games.CheckDoublePlay;
 using Domino.Application.Queries.Games.GetCurrentGame;
 using Domino.Domain.Entities;
 using MediatR;
@@ -55,9 +56,25 @@ public class GameService : IGameService
         // _logger.LogInformation("Current game: {@game}", game);
         game = await _mediator.Send(new PlayTileCommand() { Game = game, PlayTileDto = playTileDto });
         _logger.LogInformation("Waiting for opponent");
-        await WaitOpponentTurnAsync(game);
-        _logger.LogInformation("Returning result");
-        return game.ToGameView(game.Player.Name);
+        return await WaitOpponentTurnAsync(game);
+    }
+    public async Task<GameView> DoublePlayAsync(string playerName, PlayTileDto[] playTileDtos)
+    {
+        Game game = await GetGameAsync(playerName);
+        var request = new CheckDoublePlayRequest()
+        {
+            PlayerName = playerName,
+            Game = game,
+            PlayTileDtos = playTileDtos
+        };
+        if(await _mediator.Send(request))
+        {
+            game.GameError = new GameError() { ErrorMessage = "You cannot play these tiles together."};
+            return game.ToGameView(playerName);
+        }
+        game = await _mediator.Send(new PlayTileCommand() { Game = game, PlayTileDto = playTileDtos[0] });
+        game.IsOpponentTurn = !game.IsOpponentTurn;
+        return await PlayTileAsync(playerName, playTileDtos[1]);
     }
     public async Task<GameView> GrabTileAsync(string playerName)
     {

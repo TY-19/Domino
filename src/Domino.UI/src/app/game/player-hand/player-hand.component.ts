@@ -14,6 +14,7 @@ import { TileDetails } from '../../_models/tileDetails';
 export class PlayerHandComponent {
   @Input() playerHand: TileDetails[] = [];
   @Output() selectTile: EventEmitter<TileDetails> = new EventEmitter<TileDetails>();
+  @Input() activeTileId?: string;
   clickOnTile(tileDetails: TileDetails) {
     this.selectTile.emit(tileDetails);
   }
