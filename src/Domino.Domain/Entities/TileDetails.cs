@@ -47,4 +47,20 @@ public class TileDetails
     {
         return $"{_a}-{_b}";
     }
+    public override bool Equals(object? obj)
+    {
+        return (obj as TileDetails)?.TileId == TileId;
+    }
+    public override int GetHashCode()
+    {
+        return HashCode.Combine(TileId);
+    }
+    public static bool operator ==(TileDetails left, TileDetails right)
+    {
+        return left.Equals(right);
+    }
+    public static bool operator !=(TileDetails left, TileDetails right)
+    {
+        return !left.Equals(right);
+    }
 }
