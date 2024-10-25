@@ -1,4 +1,3 @@
-using Domino.Application.Interfaces;
 using Domino.Application.Models;
 using Domino.Domain.Entities;
 
@@ -9,7 +8,7 @@ public class RandomStrategy : StrategyBase
     protected override PlayTileMove SelectPlayTileMove(GameView gameView)
     {
         var rnd = new Random();
-        int tileIndex = rnd.Next(_possibilities.Count - 1);
-        return _possibilities[tileIndex];
+        int tileIndex = rnd.Next(PossibleMoves.Count - 1);
+        return PossibleMoves[tileIndex];
     }
 }

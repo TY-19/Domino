@@ -6,27 +6,22 @@ namespace Domino.Application.Strategies;
 
 public class AdvancedStrategy : StrategyBase
 {
-    private readonly float myHandCoeff = 2;
-    private readonly float opponentHandCoeff = 1;
+    private StrategyCoefficients _strategyCoefficients = new();
     private List<TileDetails> _myTiles = [];
     private List<TileDetails> _tableTiles = [];
     private List<TileDetails> _hiddenTiles = [];
     private List<TileDetails> _opponentHand = [];
     private List<TileDetails> _marketTiles = [];
     private List<int> _myEdges = [];
-    private List<Weakness> _oppWeaknesses = [];
-    private class Weakness
-    {
-        public int MoveNumber { get; set; }
-        public int WeakSide { get; set; }
-    }
+    private List<int> _oppWeaknesses = [];
     protected override PlayTileMove SelectPlayTileMove(GameView gameView)
     {
         _myTiles = gameView.Player.Hand;
         _tableTiles = gameView.Table.TilesOnTable.Select(dt => dt.TileDetails).ToList();
         _hiddenTiles = new DominoSet().Tiles.Except(_myTiles).Except(_tableTiles).ToList();
         AnalyzeLog(gameView);
-        Dictionary<int, float> weights = GetMovesWeights(gameView);
+        Dictionary<int, double> weights = GetMovesWeights(gameView);
+        Serilog.Log.Information("Log all weights:\n{@w}", weights);
         int moveIndex = weights.MaxBy(x => x.Value).Key;
         return PossibleMoves[moveIndex];
     }
@@ -55,46 +50,30 @@ public class AdvancedStrategy : StrategyBase
                 }
                 else
                 {
-                    for(int i = _oppWeaknesses.Count; i >= 0; i--)
+                    var next = gameView.Log.Events
+                        .FirstOrDefault(e => e.MoveNumber == logEvent.MoveNumber + 1
+                            && e.PlayerName == gameView.Opponent.Name);
+                    if(next != null && next.Type == MoveType.GrabTile)
                     {
-                        var grabMoves = gameView.Log.Events.Where(e => 
-                            e.MoveNumber > _oppWeaknesses[i].MoveNumber
-                            && e.MoveNumber < logEvent.MoveNumber
-                            && logEvent.PlayerName == gameView.Opponent.Name
-                            && logEvent.Type == MoveType.GrabTile);
-                        foreach(var grabMove in grabMoves)
-                        {
-                            if(gameView.Log.Events.Any(e =>
-                                e.MoveNumber == grabMove.MoveNumber + 1
-                                && logEvent.PlayerName == gameView.Opponent.Name
-                                && logEvent.Type != MoveType.PlayTile))
-                            {
-                                _oppWeaknesses.Remove(_oppWeaknesses[i]);
-                            }
-                        }
+                        _oppWeaknesses = [];
                     }
+                    _oppWeaknesses.Add(table.LeftFreeEnd ?? -2);
+                    _oppWeaknesses.Add(table.RightFreeEnd ?? -2);
                     _marketTiles = [];
                     _marketTiles.AddRange(_hiddenTiles.Where(t => t.SideA == table.LeftFreeEnd
                         || t.SideA == table.RightFreeEnd
                         || t.SideB == table.LeftFreeEnd
                         || t.SideB == table.RightFreeEnd));
-                    _oppWeaknesses.Add(new Weakness()
-                    {
-                        MoveNumber = logEvent.MoveNumber,
-                        WeakSide = table.LeftFreeEnd ?? -2,
-                    });
-                    _oppWeaknesses.Add(new Weakness()
-                    {
-                        MoveNumber = logEvent.MoveNumber,
-                        WeakSide = table.RightFreeEnd ?? -2,
-                    });
                 }
             }
+            _marketTiles = _marketTiles.Except(_marketTiles.Where(t =>
+                _myTiles.Contains(t) || table.TilesOnTable.Select(td => td.TileDetails).Contains(t)))
+                .ToList();
         }
     }
-    private Dictionary<int, float> GetMovesWeights(GameView gameView)
+    private Dictionary<int, double> GetMovesWeights(GameView gameView)
     {
-        Dictionary<int, float> weights = [];
+        Dictionary<int, double> weights = [];
         for(int i = 0; i < PossibleMoves.Count; i++)
         {
             var tile = PossibleMoves[i].Tile;
@@ -108,22 +87,32 @@ public class AdvancedStrategy : StrategyBase
             {
                 endTwo = PossibleMoves[i].FreeEnd;
             }
-            int myHandWeight = CountMyHandWeight(tile, endOne, endTwo);
-            int opponentHandWeight = CountOpponentHandWeight(endOne, endTwo);
-            float opponentHiddenHandWeight = CountOpponentPossibleHandWeight(gameView.Opponent.TilesCount, endOne, endTwo);
-            // Keep 0-0 to end with Officer
-            // Don't keep doubles
-            // Try to cut opponent double
-            // Cut your own double not to left with 0-0 or 6-6
-            // Play safe
-            // Prevent opponent to reverse table to your weakness
-            // Not beat your edge
-            float weight = myHandWeight * myHandCoeff - opponentHandCoeff * (opponentHandWeight + opponentHiddenHandWeight);
+            bool toOne = _myTiles.Except([tile]).Any(t => t.SideA == endOne || t.SideB == endOne);
+            bool toTwo = _myTiles.Except([tile]).Any(t => t.SideA == endTwo || t.SideB == endTwo);
+            MoveWeight moveWeight = new()
+            {
+                MyHand = CountMyHandWeight(tile, endOne, endTwo),
+                OpponentHand = CountOpponentHandWeight(endOne, endTwo),
+                OpponentPossibleHand = CountOpponentPossibleHandWeight(gameView.Opponent.TilesCount, endOne, endTwo),
+                LeaveOfficer = tile.IsOfficer ? -1 : 0,
+                DontKeepDoubles = tile.IsDouble
+                    ? gameView.Table.TilesOnTable.Select(td => td.TileDetails)
+                        .Count(t => t.SideA == tile.SideA || t.SideB == tile.SideB)
+                    : 0,
+                CutOpponentDouble = CalculateCutOpponentTileWeight(gameView, i),
+                PlaySafe = toOne && toTwo ? 2 : 0,
+                ProtectWeakness = CalculateProtectWeaknessWeight(tile, endOne, endTwo),
+                NotBeatOwnEdge = _myEdges.Any(e => e == PossibleMoves[i].ContactEdge) ? -1 : 0,
+                GetRidOfPoints = tile.SideA + tile.SideB
+            };
+            var weight = moveWeight.CalculateWeight(_strategyCoefficients);
+            Serilog.Log.Information("Move {@m}", PossibleMoves[i]);
+            Serilog.Log.Information("Weight {@cw}", moveWeight.SeeWeights(_strategyCoefficients));
             weights.Add(i, weight);
         }
         return weights;
     }
-    private int CountMyHandWeight(TileDetails except, int endOne, int endTwo)
+    private double CountMyHandWeight(TileDetails except, int endOne, int endTwo)
     {
         int counter = 0;
         foreach (var tile in _myTiles)
@@ -141,9 +130,11 @@ public class AdvancedStrategy : StrategyBase
                 counter++;
             }
         }
-        return counter;
+        return _myTiles.Count == 0
+            ? 0
+            : counter / (double)_myTiles.Count;
     }
-    private int CountOpponentHandWeight(int endOne, int endTwo)
+    private double CountOpponentHandWeight(int endOne, int endTwo)
     {
         int counter = 0;
         foreach (var tile in _opponentHand)
@@ -157,11 +148,17 @@ public class AdvancedStrategy : StrategyBase
                 counter++;
             }
         }
-        return counter;
+        return (double)_opponentHand.Count == 0
+            ? 0
+            : -counter / (double)_opponentHand.Count;
     }
-    private float CountOpponentPossibleHandWeight(int totalOpponentTiles, int endOne, int endTwo)
+    private double CountOpponentPossibleHandWeight(int totalOpponentTiles, int endOne, int endTwo)
     {
         int opponentHiddenCount = totalOpponentTiles - _opponentHand.Count;
+        if(opponentHiddenCount == 0)
+        {
+            return 0;
+        }
         int hiddenPossibleToPlay = 0;
         foreach (var tile in _hiddenTiles.Except(_marketTiles))
         {
@@ -171,36 +168,65 @@ public class AdvancedStrategy : StrategyBase
                 hiddenPossibleToPlay++;
             }
         }
-        float probableOpponentPlayableHiddenTiles = 0;
+        double probableOpponentPlayableHiddenTiles = 0;
         for(int i = 1; i <= hiddenPossibleToPlay; i++)
         {
             // Ways to select opponent tiles out of all hidden tiles 
-            float totalWays = Factorial(_hiddenTiles.Count)/(Factorial(opponentHiddenCount)*Factorial(_hiddenTiles.Count-opponentHiddenCount));
+            double totalWays = Factorial(_hiddenTiles.Count)/(Factorial(opponentHiddenCount)*Factorial(_hiddenTiles.Count-opponentHiddenCount));
             // Ways to select i playable tiles out of all playable tiles
-            float playableTilesWays = Factorial(hiddenPossibleToPlay)/(Factorial(i)*Factorial(hiddenPossibleToPlay - i));
+            double playableTilesWays = Factorial(hiddenPossibleToPlay)/(Factorial(i)*Factorial(hiddenPossibleToPlay - i));
             int hiddenNotPlayable = _hiddenTiles.Count - hiddenPossibleToPlay;
             int opponentNotPlayable = opponentHiddenCount - i;
             // Ways to select (hidden opponent tiles - i) non-playable tiles out of all non-playable tiles
-            float p3 = opponentNotPlayable >= 0
+            double p3 = opponentNotPlayable >= 0
                 ? Factorial(hiddenNotPlayable)/(Factorial(opponentNotPlayable)*Factorial(hiddenNotPlayable - opponentNotPlayable))
                 : 1;
             // Probability to select i playable tiles among all tiles into the opponent hand
-            float probability = playableTilesWays * p3 / totalWays;
+            double probability = playableTilesWays * p3 / totalWays;
             probableOpponentPlayableHiddenTiles += i * probability;
         }
-        return probableOpponentPlayableHiddenTiles;
+        return -probableOpponentPlayableHiddenTiles / opponentHiddenCount;
     }
-    private static int Factorial(int number)
+    private static double Factorial(int n)
     {
-        if(number == 0)
+        if (n < 0)
+        {
+            throw new ArgumentException("Factorial is not defined for negative numbers.");
+        }
+        if (n == 0)
         {
             return 1;
         }
-        int result = 1;
-        for(int i = 1; i <= number; i++)
+        return n * Factorial(n - 1);
+    }
+    private double CalculateCutOpponentTileWeight(GameView gameView, int currentMove)
+    {
+        var leftEnd = gameView.Table.LeftFreeEnd ?? -1;
+        var rightEnd = gameView.Table.RightFreeEnd ?? -1;
+        if(leftEnd != rightEnd && _opponentHand.Any(t => t.IsDouble))
         {
-            result *= i;
+            var opTileOne = _opponentHand.FirstOrDefault(t => t.IsDouble && t.SideA == leftEnd);
+            var opTileTwo = _opponentHand.FirstOrDefault(t => t.IsDouble && t.SideA == rightEnd);
+            if(opTileOne != null && PossibleMoves[currentMove].ContactEdge == leftEnd)
+            {
+                return gameView.Table.TilesOnTable.Select(td => td.TileDetails)
+                    .Count(t => t.SideA == leftEnd || t.SideB == leftEnd);
+            }
+            else if(opTileTwo != null && PossibleMoves[currentMove].ContactEdge == rightEnd)
+            {
+                return gameView.Table.TilesOnTable.Select(td => td.TileDetails)
+                    .Count(t => t.SideA == rightEnd || t.SideB == rightEnd);
+            }
         }
-        return result;
+        return 0;
+    }
+    private double CalculateProtectWeaknessWeight(TileDetails except, int endOne, int endTwo)
+    {
+        return (!_myTiles.Except([except]).Any(t => t.SideA == endOne || t.SideB == endOne)
+                || !_myTiles.Except([except]).Any(t => t.SideA == endTwo || t.SideB == endTwo))
+            && _hiddenTiles.Any(t => t.SideA == endOne && t.SideB == endTwo
+                    || t.SideA == endTwo && t.SideB == endTwo)
+            ? 1
+            : 0;
     }
 }

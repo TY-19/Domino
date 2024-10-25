@@ -7,6 +7,11 @@ public class StrategyFactory : IStrategyFactory
 {
     public IAiStrategy SelectStrategy(Player player)
     {
-        return new RandomStrategy();
+        return player.Name switch
+        {
+            "AI" => new RandomStrategy(),
+            "AI2" => new AdvancedStrategy(),
+            _ => new RandomStrategy()
+        };
     }
 }

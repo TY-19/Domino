@@ -25,6 +25,7 @@ public class TileDetails
         _tileId = a <= b ? $"{_a}-{_b}" : $"{_b}-{_a}";
     }
     public bool IsDouble { get => _a == _b; }
+    public bool IsOfficer { get => _a == 0 && _b == 0; }
     public bool IsMatch(int toMatch, out int freeEnd)
     {
         if (SideA == toMatch)
@@ -49,18 +50,24 @@ public class TileDetails
     }
     public override bool Equals(object? obj)
     {
-        return (obj as TileDetails)?.TileId == TileId;
+        if(obj is TileDetails other)
+        {
+            return TileId == other.TileId;
+        }
+        return false;
     }
     public override int GetHashCode()
     {
-        return HashCode.Combine(TileId);
+        return TileId.GetHashCode(StringComparison.Ordinal);
     }
-    public static bool operator ==(TileDetails left, TileDetails right)
+    public static bool operator ==(TileDetails? left, TileDetails? right)
     {
+        if (ReferenceEquals(left, right)) return true;
+        if (left is null || right is null) return false;
         return left.Equals(right);
     }
-    public static bool operator !=(TileDetails left, TileDetails right)
+    public static bool operator !=(TileDetails? left, TileDetails? right)
     {
-        return !left.Equals(right);
+        return !(left == right);
     }
 }

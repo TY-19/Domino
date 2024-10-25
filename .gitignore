@@ -8,6 +8,9 @@
 
 #Local Test database
 /src/Domino.WebAPI/db
+# Rider files
+.idea/
+
 
 # User-specific files
 *.rsuser

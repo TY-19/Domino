@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using Domino.Application.Interfaces;
 using Domino.Application.Models;
 using Domino.Domain.Entities;
+using Microsoft.Extensions.Logging;
 
 namespace Domino.Application.Strategies;
 
