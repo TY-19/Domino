@@ -1,0 +1,16 @@
+{
+  "interface": {
+    "menu": {
+      "startGame": "Start game",
+      "changePlayer": "Change player",
+      "typePlayerName": "Type player name",
+      "setOpponent": "Set opponent",
+      "selectOpponent": "Select opponent",
+      "save": "Save",
+      "statistics": "Statistics"
+    },
+    "game": {
+      "start": "Start"
+    }
+  }
+}

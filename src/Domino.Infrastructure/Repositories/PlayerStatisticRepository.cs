@@ -40,7 +40,7 @@ public class PlayerStatisticRepository : IPlayerRepository
         var col = db.GetCollection<PlayerStatistic>(PlayersStatistics);
         return Task.FromResult<IEnumerable<PlayerStatistic>>(col.FindAll().ToList());
     }
-    public Task<PlayerStatistic?> GetPlayerStatisticAsync(string playerName)
+    public Task<PlayerStatistic?> GetPlayerStatisticsAsync(string playerName)
     {
         using var db = new LiteDatabase(_connectionString);
         var col = db.GetCollection<PlayerStatistic>(PlayersStatistics);

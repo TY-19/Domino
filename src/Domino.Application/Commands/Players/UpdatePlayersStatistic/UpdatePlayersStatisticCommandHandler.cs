@@ -28,7 +28,7 @@ public class UpdatePlayersStatisticCommandHandler : IRequestHandler<UpdatePlayer
     }
     private async Task UpdateAsync(PlayerResultRecord playerRecord, GameStatus gameStatus, GameResult gameResult)
     {
-        var playerStatistic = await _playerRepository.GetPlayerStatisticAsync(playerRecord.PlayerName)
+        var playerStatistic = await _playerRepository.GetPlayerStatisticsAsync(playerRecord.PlayerName)
             ?? new PlayerStatistic(playerRecord.PlayerName);
         var playerInfo = await _playerRepository.GetPlayerInfoAsync(playerRecord.PlayerName);
         playerStatistic.GamesPlayed++;

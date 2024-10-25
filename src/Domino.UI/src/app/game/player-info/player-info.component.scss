@@ -1,0 +1,17 @@
+table td {
+    text-align: center;
+}
+table td:first-child {
+    text-align: left;
+}
+.statistics {
+    position: absolute;
+    left: 80%;
+    background-color: (rgba(255, 255, 255, 0.8));
+}
+.statistics-top {
+    top: 0;
+}
+.statistics-bottom {
+    bottom: 0;
+}

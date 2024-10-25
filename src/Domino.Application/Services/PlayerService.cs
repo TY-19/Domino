@@ -26,6 +26,11 @@ public class PlayerService : IPlayerService
     {
         return await _repo.GetAllPlayersStatisticsAsync();
     }
+    public async Task<PlayerStatistic> GetPlayerStatisticsAsync(string playerName)
+    {
+        var statistics = await _repo.GetPlayerStatisticsAsync(playerName);
+        return statistics ?? new PlayerStatistic(playerName);
+    }
     public async Task DeleteAllStatistic()
     {
         await _repo.DeleteAllStatistic();

@@ -73,8 +73,8 @@ public class Program
             var browserWindow = await Electron.WindowManager
                 .CreateWindowAsync(new BrowserWindowOptions
                 {
-                    Width = 820,
-                    Height = 420,
+                    Width = 900,
+                    Height = 720,
                     Show = false
                 });
             await Task.Run(async () => await browserWindow.WebContents.Session.ClearCacheAsync());

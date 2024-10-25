@@ -14,6 +14,9 @@ import { DisplayOptionsService } from './display-options/display-options.service
 import { DisplayOptionsComponent } from './display-options/display-options.component';
 import { MessageComponent } from "./message/message.component";
 import { GameplayService } from './gameplay.service';
+import { LanguageService } from '../_shared/language.service';
+import { GameTranslation } from '../_shared/translations';
+import { PlayerInfoComponent } from './player-info/player-info.component';
 
 @Component({
   selector: 'Dom-game',
@@ -24,6 +27,7 @@ import { GameplayService } from './gameplay.service';
     GameTableComponent,
     OpponentHandComponent,
     MarketComponent,
+    PlayerInfoComponent,
     PlayerHandComponent,
     DisplayOptionsComponent,
     MessageComponent
@@ -45,17 +49,26 @@ export class GameComponent implements OnInit {
   showOptions: boolean = false;
   activeTile: TileDetails | null = null;
   currentTurn: number = 0;
+  get names(): GameTranslation | undefined {
+    return this.languageService.translation?.interface.game;
+  }
 
   constructor(private gameService: GameService,
     private gameplayService: GameplayService,
+    protected languageService: LanguageService,
     private cdr: ChangeDetectorRef,
     private elemRef: ElementRef,
     private displayOptionsService: DisplayOptionsService
   ) {
+
   }
 
-  @HostListener('window:resize')
-  onResize() {
+  @HostListener('window:resize', ['$event'])
+  onResize(event: Event) {
+    let window = event.target as Window;
+    if(window.innerWidth < window.innerHeight) {
+      
+    }
     this.gameTable.displayTiles();
   }
 

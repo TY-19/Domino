@@ -1,0 +1,8 @@
+<div (click)="showSwitch = !showSwitch" class="absolute right-4 top-0 cursor-default">
+    <span>{{currentLang}}</span>
+    <ul [hidden]="!showSwitch">
+        @for(lang of languages; track lang.code) {
+            <li (click)="selectLanguage(lang.code)">{{lang.code}}</li>
+        }
+    </ul>
+</div>

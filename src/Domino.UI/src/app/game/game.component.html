@@ -1,40 +1,51 @@
-<Dom-message #message
-  [hidden]="!message.showMessage || message.message.length < 1"
-  class="message">
-</Dom-message>
-<Dom-message #opponentMessage
-  [hidden]="!opponentMessage.showMessage || opponentMessage.message.length < 1"
-  class="opponent-message">
-</Dom-message>
-<div class="grid-container">
-  <div [routerLink]="['']" class="grid-item menu-button">Menu</div>
-  <div class="grid-item menu-button" (click)="changeColorScheme()">Colors</div>
-  <div class="grid-item menu-button">Preference</div>
-  <div class="grid-item menu-button">Button 4</div>
-  <div class="grid-item menu-button">Market</div>
-  <div class="grid-item menu-button">Log</div>
-  @if(showOptions) {
-    <Dom-display-options (closeOptions)="changeColorScheme()" class="grid-item menu-open">
-    </Dom-display-options>
-  }
-  @if(game) {
-    <Dom-opponent-hand class="grid-item opponent-hand">
-    </Dom-opponent-hand>
-    <Dom-game-table [tiles]="game.table.tilesOnTable"
-      (playToSide)="playToSide($event)"
-      class="grid-item game-table">
-    </Dom-game-table>
-    <Dom-market (grabTile)="grabTile($event)"
-      class="grid-item market">
-    </Dom-market>
-    <Dom-player-hand [playerHand]="game.player.hand"
-      [activeTileId]="activeTile?.tileId"
-      (selectTile)="selectTile($event)"
-      class="grid-item player-hand">
-    </Dom-player-hand>
-    <div class="points player-points">{{game.player.currentPoints}}</div>
-    <div class="points opponent-points">{{game.opponent.currentPoints}}</div>
-  }
-  <button type="button" class="grid-item play-button" (click)="startGame()">Start!</button>
+<div>
+  <Dom-message #message
+    [hidden]="!message.showMessage || message.message.length < 1"
+    class="message">
+  </Dom-message>
+  <Dom-message #opponentMessage
+    [hidden]="!opponentMessage.showMessage || opponentMessage.message.length < 1"
+    class="opponent-message">
+  </Dom-message>
+  <div class="grid-container">
+    <div [routerLink]="['']" class="grid-item menu-button">Menu</div>
+    <div class="grid-item menu-button" (click)="changeColorScheme()">Colors</div>
+    <div class="grid-item menu-button">Preference</div>
+    <div class="grid-item menu-button">Button 4</div>
+    <div class="grid-item menu-button">Market</div>
+    <div class="grid-item menu-button">Log</div>
+    @if(showOptions) {
+      <Dom-display-options (closeOptions)="changeColorScheme()" class="grid-item menu-open">
+      </Dom-display-options>
+    }
+    @if(game) {
+      <Dom-opponent-hand class="grid-item opponent-hand">
+      </Dom-opponent-hand>
+      <Dom-game-table [tiles]="game.table.tilesOnTable"
+        (playToSide)="playToSide($event)"
+        class="grid-item game-table">
+      </Dom-game-table>
+      <Dom-market (grabTile)="grabTile($event)"
+        class="grid-item market">
+      </Dom-market>
+      <Dom-player-hand [playerHand]="game.player.hand"
+        [activeTileId]="activeTile?.tileId"
+        (selectTile)="selectTile($event)"
+        class="grid-item player-hand">
+      </Dom-player-hand>
+      <Dom-player-info 
+        [playerName]="game.opponent.name"
+        [currentPoints]="game.opponent.currentPoints"
+        [isTop]="true"
+        class="points opponent-points">
+      </Dom-player-info>
+      <Dom-player-info 
+        [playerName]="game.player.name"
+        [currentPoints]="game.player.currentPoints"
+        [isTop]="false"
+        class="points player-points">
+      </Dom-player-info>
+    }
+    <button type="button" class="grid-item play-button" (click)="startGame()">{{names?.start ?? "Start"}}</button>
+  </div>
 </div>
-

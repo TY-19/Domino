@@ -15,4 +15,8 @@ export class PlayersStatisticsService {
         const url = baseUrl + "/players/statistics";
         return this.http.get<PlayerStatistic[]>(url);
     }
+    getPlayerStatistics(playerName: string): Observable<PlayerStatistic> {
+        const url = baseUrl + "/players/statistics/" + playerName;
+        return this.http.get<PlayerStatistic>(url);
+    }
 }

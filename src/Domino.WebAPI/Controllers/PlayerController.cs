@@ -23,6 +23,11 @@ public class PlayersController : ControllerBase
     {
         return Ok(await _playerStatisticService.GetAllPlayersStatisticsAsync());
     }
+    [HttpGet("statistics/{playerName}")]
+    public async Task<ActionResult<PlayerStatistic>> GetPlayerStatistics(string playerName)
+    {
+        return Ok(await _playerStatisticService.GetPlayerStatisticsAsync(playerName));
+    }
     [HttpDelete("statistics/all")]
     public async Task<ActionResult> DeleteAllStatistics()
     {

@@ -1,0 +1,16 @@
+{
+  "interface": {
+    "menu": {
+      "startGame": "Старт гри!",
+      "changePlayer": "Змінити гравця",
+      "typePlayerName": "Введіть ім'я гравця",
+      "setOpponent": "Обрати суперника",
+      "selectOpponent": "Оберіть суперника",
+      "save": "Зберегти",
+      "statistics": "Статистика"
+    },
+    "game": {
+      "start": "Старт"
+    }
+  }
+}
