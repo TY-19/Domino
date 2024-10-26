@@ -1,4 +1,4 @@
-<div>
+<div class="min-w-[100vh]">
   <Dom-message #message
     [hidden]="!message.showMessage || message.message.length < 1"
     class="message">
@@ -8,12 +8,12 @@
     class="opponent-message">
   </Dom-message>
   <div class="grid-container">
-    <div [routerLink]="['']" class="grid-item menu-button">Menu</div>
-    <div class="grid-item menu-button" (click)="changeColorScheme()">Colors</div>
-    <div class="grid-item menu-button">Preference</div>
+    <div [routerLink]="['']" class="grid-item menu-button">{{names?.menu}}</div>
+    <div class="grid-item menu-button" (click)="changeColorScheme()">{{names?.colors}}</div>
+    <div class="grid-item menu-button">{{names?.preference}}</div>
     <div class="grid-item menu-button">Button 4</div>
-    <div class="grid-item menu-button">Market</div>
-    <div class="grid-item menu-button">Log</div>
+    <div class="grid-item menu-button">{{names?.market}}</div>
+    <div class="grid-item menu-button">{{names?.log}}</div>
     @if(showOptions) {
       <Dom-display-options (closeOptions)="changeColorScheme()" class="grid-item menu-open">
       </Dom-display-options>
@@ -25,9 +25,11 @@
         (playToSide)="playToSide($event)"
         class="grid-item game-table">
       </Dom-game-table>
-      <Dom-market (grabTile)="grabTile($event)"
-        class="grid-item market">
-      </Dom-market>
+      <div class="grid-item market">
+        <p>{{names?.market}}</p>
+        <Dom-market (grabTile)="grabTile($event)">
+        </Dom-market>
+      </div>
       <Dom-player-hand [playerHand]="game.player.hand"
         [activeTileId]="activeTile?.tileId"
         (selectTile)="selectTile($event)"

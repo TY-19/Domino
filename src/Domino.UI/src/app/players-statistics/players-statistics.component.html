@@ -1,33 +1,33 @@
 <div class="ml-5 mt-3 ">
     <span [routerLink]="['']" class="bg-yellow-100 p-3 cursor-default hover:bg-white">
-        Back
+        {{names?.back}}
     </span>
 </div>
 <table class="m-5">
     <thead>
         <tr>
-            <th rowspan="2">Player name</th>
-            <th rowspan="2">Games played</th>
-            <th colspan="5">Wins</th>
-            <th rowspan="2">Draws</th>
-            <th colspan="5">Loses</th>
-            <th rowspan="2">Hunter</th>
-            <th rowspan="2">Successful hunt</th>
-            <th rowspan="2">Hunted</th>
-            <th rowspan="2">Clear points</th>
-            <th rowspan="2">Total points left with</th>
+            <th rowspan="2">{{names?.playerName}}</th>
+            <th rowspan="2">{{names?.totalGames}}</th>
+            <th colspan="5">{{names?.wins}}</th>
+            <th rowspan="2">{{names?.draws}}</th>
+            <th colspan="5">{{names?.loses}}</th>
+            <th rowspan="2">{{names?.hunter}}</th>
+            <th rowspan="2">{{names?.succHunt}}</th>
+            <th rowspan="2">{{names?.hunted}}</th>
+            <th rowspan="2">{{names?.clearPoints}}</th>
+            <th rowspan="2">{{names?.totalPoints}}</th>
         </tr>
         <tr>
-            <th>Total wins</th>
-            <th>Normal</th>
-            <th>Goat</th>
-            <th>Officer</th>
-            <th>General</th>
-            <th>Total loses</th>
-            <th>Normal</th>
-            <th>Goat</th>
-            <th>Officer</th>
-            <th>General</th>
+            <th>{{names?.winsTotal}}</th>
+            <th>{{names?.normal}}</th>
+            <th>{{names?.goat}}</th>
+            <th>{{names?.officer}}</th>
+            <th>{{names?.general}}</th>
+            <th>{{names?.losesTotal}}</th>
+            <th>{{names?.normal}}</th>
+            <th>{{names?.goat}}</th>
+            <th>{{names?.officer}}</th>
+            <th>{{names?.general}}</th>
         </tr>
     </thead>
     @for(stat of playersStatistics; track stat.playerName)

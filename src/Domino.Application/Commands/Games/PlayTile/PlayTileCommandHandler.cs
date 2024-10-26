@@ -1,4 +1,3 @@
-using Domino.Application.Extensions;
 using Domino.Domain.Entities;
 using Domino.Domain.Enums;
 using MediatR;
@@ -32,21 +31,21 @@ public class PlayTileCommandHandler : IRequestHandler<PlayTileCommand, Game>
             Type = MoveType.PlayTile,
             Tile = tile,
         });
+        Player nextPlayer = game.IsOpponentTurn ? game.Player : game.Opponent;
+        nextPlayer.GrabInRow = 0;
         game.IsOpponentTurn = !game.IsOpponentTurn;
         return Task.FromResult(game);
     }
-    private bool TryGetPosition(TileDetails? tileDetails, bool? isLeft, Game game, out int? position)
+    private static bool TryGetPosition(TileDetails? tileDetails, bool? isLeft, Game game, out int? position)
     {
         position = null;
         if(tileDetails == null) {
-            string errorMessage = "No tile with such an id in the hand.";
-            game.GameError = new() { ErrorMessage = errorMessage };
+            game.GameError = new(ErrorType.NoTileInHand);
             return false;
         }   
         position = game.Table.TryGetPosition(tileDetails, isLeft);
         if(position == null) {
-            string errorMessage = "The tile can't be played on the table.";
-            game.GameError = new() { ErrorMessage = errorMessage };
+            game.GameError = new(ErrorType.NoPlaceForTile);
             return false;
         }
         if(position == 0)
@@ -57,18 +56,23 @@ public class PlayTileCommandHandler : IRequestHandler<PlayTileCommand, Game>
                 var starters = game.Table.GetPossibleMoves(hand);
                 if(starters.FirstOrDefault(s => s.Tile.TileId == tileDetails.TileId)?.Tile == null)
                 {
-                    string errorMessage = $"The tile {tileDetails.TileId} cannot start the game.\n"
-                        + "Current rules define starter tiles in such and order:\n"
-                        + game.GameRules.StarterTiles.Aggregate((t1, t2) => t1 + ", " + t2);
-                    game.GameError = new() { ErrorMessage = errorMessage };
+                    Dictionary<string, string> data = new()
+                    {
+                        { "tileId", tileDetails.TileId },
+                        { "starters", game.GameRules.StarterTiles.Aggregate((t1, t2) => t1 + ", " + t2) }
+                    };
+                    game.GameError = new(ErrorType.TileCannotStartGame, data);
                     return false;
                 }
             }
             else if(game.GameStatus.GameType == GameType.Hunt && tileDetails.TileId != "6-6")
             {
-                string errorMessage = $"The tile {tileDetails.TileId} cannot start the hunt.\n"
-                        + "You need to play 6-6 and if you win it will counts as Goat Victory!\n";
-                game.GameError = new() { ErrorMessage = errorMessage };
+                Dictionary<string, string> data = new()
+                    {
+                        { "tileId", tileDetails.TileId },
+                        { "starters", "6-6" }
+                    };
+                game.GameError = new(ErrorType.TileCannotStartGame, data);
                 return false;
             }
         }

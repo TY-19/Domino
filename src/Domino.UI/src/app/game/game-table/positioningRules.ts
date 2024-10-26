@@ -46,6 +46,8 @@ export class PositioningRules {
     [(Direction.Left + MoveType.RotateCornerAfterDouble), {
       rowShift: -5,
       columnShift: 4,
+      reverseRowShift: 3,
+      reverseColumnShift: 1,
       edgeRowShift: -5,
       edgeColumnShift: 4
     }],

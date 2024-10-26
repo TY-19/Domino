@@ -21,7 +21,7 @@ import { VersionComponent } from "./version/version.component";
 })
 export class MenuComponent implements OnInit {
   get names(): MenuTranslation | undefined {
-    return this.languageService.translation?.interface.menu;
+    return this.languageService.translation?.menu;
   }
   playerName: string = "";
   opponentName: string = "";

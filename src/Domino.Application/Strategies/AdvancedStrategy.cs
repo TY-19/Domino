@@ -27,7 +27,7 @@ public class AdvancedStrategy : StrategyBase
     }
     private void AnalyzeLog(GameView gameView)
     {
-        Table table = new(gameView.GameRules);
+        Table table = new(gameView.GameRules, gameView.GameStatus.GameType);
         foreach(var logEvent in gameView.Log.Events)
         {
             if(logEvent.Type == MoveType.PlayTile)
@@ -87,8 +87,6 @@ public class AdvancedStrategy : StrategyBase
             {
                 endTwo = PossibleMoves[i].FreeEnd;
             }
-            bool toOne = _myTiles.Except([tile]).Any(t => t.SideA == endOne || t.SideB == endOne);
-            bool toTwo = _myTiles.Except([tile]).Any(t => t.SideA == endTwo || t.SideB == endTwo);
             MoveWeight moveWeight = new()
             {
                 MyHand = CountMyHandWeight(tile, endOne, endTwo),
@@ -100,7 +98,7 @@ public class AdvancedStrategy : StrategyBase
                         .Count(t => t.SideA == tile.SideA || t.SideB == tile.SideB)
                     : 0,
                 CutOpponentDouble = CalculateCutOpponentTileWeight(gameView, i),
-                PlaySafe = toOne && toTwo ? 2 : 0,
+                PlaySafe = CalculatePlaySafeWeight(gameView, tile, endOne, endTwo),
                 ProtectWeakness = CalculateProtectWeaknessWeight(tile, endOne, endTwo),
                 NotBeatOwnEdge = _myEdges.Any(e => e == PossibleMoves[i].ContactEdge) ? -1 : 0,
                 GetRidOfPoints = tile.SideA + tile.SideB
@@ -219,6 +217,38 @@ public class AdvancedStrategy : StrategyBase
             }
         }
         return 0;
+    }
+    private double CalculatePlaySafeWeight(GameView gameView, TileDetails except, int endOne, int endTwo)
+    {
+        double weight = 0.0;
+        if(_myTiles.Except([except]).Any(t => t.SideA == endOne || t.SideB == endOne))
+        {
+            weight++;
+        }
+        if(_myTiles.Except([except]).Any(t => t.SideA == endTwo || t.SideB == endTwo))
+        {
+            weight++;
+        }
+        if(gameView.Opponent.TilesCount == 1)
+        {
+            if(_hiddenTiles.Any(t => t.IsOfficer) && (endOne == 0 || endTwo == 0))
+            {
+                weight -= 100;
+            }
+            if(_hiddenTiles.Any(t => t.TileId == "6-6") && (endOne == 6 || endTwo == 6))
+            {
+                weight -= 50;
+            }
+        }
+        else if(gameView.Opponent.TilesCount == 2)
+        {
+            if(_hiddenTiles.Any(t => t.IsOfficer) && (endOne == 0 || endTwo == 0)
+                && _hiddenTiles.Any(t => t.TileId == "6-6") && (endOne == 6 || endTwo == 6))
+            {
+                weight -= 200;
+            }
+        }
+        return weight;
     }
     private double CalculateProtectWeaknessWeight(TileDetails except, int endOne, int endTwo)
     {

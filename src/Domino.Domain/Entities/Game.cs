@@ -1,3 +1,5 @@
+using Domino.Domain.Enums;
+
 namespace Domino.Domain.Entities;
 
 public class Game
@@ -18,7 +20,7 @@ public class Game
         Id = id;
         Set = new();
         GameRules = new(new GameRulesPrototype());
-        Table = new(GameRules);
+        Table = null!;
         Log = new();
         GameStatus = new();
         Player = null!;
@@ -28,11 +30,31 @@ public class Game
     {
         Player = new HumanPlayer(playerName);
         Opponent = new AiPlayer(opponentName);
+        SetGameType();
+        Table = new(GameRules, GameStatus.GameType);
     }
     public Game(long id, PlayerInfo player, PlayerInfo opponent) : this(id)
     {
         Player = new HumanPlayer(player);
         Opponent = new AiPlayer(opponent);
+        SetGameType();
+        Table = new(GameRules, GameStatus.GameType);
+    }
+    private void SetGameType()
+    {
+        GameStatus.GameType = GameType.Normal;
+        if(Player.Info.CurrentPointCount >= GameRules.PointsToStartHunt)
+        {
+            GameStatus.GameType = GameType.Hunt;
+            GameStatus.Hunted.Add(Player.Name);
+            GameStatus.Hunters.Add(Opponent.Name);
+        }
+        if(Opponent.Info.CurrentPointCount >= GameRules.PointsToStartHunt)
+        {
+            GameStatus.GameType = GameType.Hunt;
+            GameStatus.Hunted.Add(Opponent.Name);
+            GameStatus.Hunters.Add(Player.Name);
+        }
     }
     public void TrySetResult()
     {
@@ -67,5 +89,4 @@ public class Game
             && Table.GetPossibleMoves(Player.Hand).Count == 0
             && Table.GetPossibleMoves(Opponent.Hand).Count == 0;
     }
-    
 }

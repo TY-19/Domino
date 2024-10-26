@@ -50,7 +50,7 @@ export class GameComponent implements OnInit {
   activeTile: TileDetails | null = null;
   currentTurn: number = 0;
   get names(): GameTranslation | undefined {
-    return this.languageService.translation?.interface.game;
+    return this.languageService.translation?.game;
   }
 
   constructor(private gameService: GameService,
@@ -130,6 +130,7 @@ export class GameComponent implements OnInit {
     let position: number | null = this.gameplayService
       .calculatePositionToPlay(tileDetails, contactEdge, placeLeft, this.game);
     if(position === null) {
+      this.message.displayMessage(this.names?.impossibleMove ?? "");
       return;
     }
     const tile: DominoTile = {
@@ -178,10 +179,12 @@ export class GameComponent implements OnInit {
     this.gameTable.updateDisplayingTiles(this.game.table.tilesOnTable);
     this.opponentHand.displayClosedTiles(this.game.opponent.tilesCount);
     if(this.game.gameResult && this.game.gameResult.isEnded) {
-      this.message.displayMessage(this.game.gameResult.result);
+      this.message.displayMessage(this.languageService.getResultTranslation(
+        this.game.gameResult.result.victoryType, this.game.gameResult.result.data));
       this.opponentHand.showOpponentTiles(this.game);
-    } else if(this.game.errorMessage) {
-      this.message.displayMessage(this.game.errorMessage);
+    } else if(this.game.error) {
+      this.message.displayMessage(this.languageService.getErrorTranslation(
+        this.game.error.type, this.game.error.data));
     }
     this.market.displayMarketTiles(this.game.marketTilesCount);
     let [message, newCurrentTurn] = this.gameplayService

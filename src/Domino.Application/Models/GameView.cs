@@ -5,7 +5,7 @@ namespace Domino.Application.Models;
 public class GameView
 {
     public long Id { get; set; }
-    public string? ErrorMessage { get; set; }
+    public GameError? Error { get; set; }
     public Table Table { get; set; } = null!;
     public PlayerGameView Player { get; set; } = null!;
     public PlayerGameView Opponent { get; set; } = null!;

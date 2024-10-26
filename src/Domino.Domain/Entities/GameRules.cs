@@ -5,6 +5,7 @@ public class GameRules
     public int MaxGrabsInRow { get; }
     public int MinLeftInMarket { get; }
     public string[] StarterTiles { get; }
+    public string[] HuntStarterTiles { get; }
     public int PointsToStartHunt { get; }
     public bool WorkGoat { get; }
     public int TotalPointsToLoseWithGoat { get; }
@@ -13,6 +14,7 @@ public class GameRules
         MaxGrabsInRow = prototype.MaxGrabsInRow;
         MinLeftInMarket = prototype.MinLeftInMarket;
         StarterTiles = prototype.StarterTiles;
+        HuntStarterTiles = prototype.HuntStarterTiles;
         PointsToStartHunt = prototype.PointsToStartHunt;
         WorkGoat = prototype.WorkGoat;
         TotalPointsToLoseWithGoat = prototype.TotalPointsToLoseWithGoat;
@@ -26,6 +28,7 @@ public class GameRulesPrototype
     private bool _workGoat = true;
     private int _totalPointsToLoseWithGoat = 125;
     private string[] _starterTiles = ["1-1", "2-2", "3-3", "4-4", "5-5", "6-6"];
+    private string[] _huntStarterTiles = ["6-6"];
     public int MaxGrabsInRow
     {
         get => _maxGrabsInRow;
@@ -69,6 +72,30 @@ public class GameRulesPrototype
             if(newTiles.Count > 0)
             {
                 _starterTiles = [.. newTiles];
+            }
+        }
+    }
+    public string[] HuntStarterTiles
+    {
+        get => _huntStarterTiles;
+        set
+        {
+            List<string> newTiles = [];
+            foreach(var tile in value)
+            {
+                var sides = tile.Split("-");
+                if(sides.Length == 2
+                    && int.TryParse(sides[0], out int a)
+                    && int.TryParse(sides[1], out int b)
+                    && a >= 0 && a <= 6
+                    && b >= 0 && b <= 6)
+                {
+                    newTiles.Add(tile);
+                }
+            }
+            if(newTiles.Count > 0)
+            {
+                _huntStarterTiles = [.. newTiles];
             }
         }
     }

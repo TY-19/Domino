@@ -6,9 +6,8 @@ public class GameResult
 {
     public bool IsEnded { get; set; }
     public bool IsDraw { get; set; }
-    public string? Result { get; set; }
+    public GameResultDetails? Result { get; set; }
     public List<PlayerResultRecord> PlayerResultRecords { get; set; } = [];
-    public VictoryType VictoryType { get; set; }
     public bool IsInStatistic { get; set; }
     public GameResult(Player? winner, Game game)
     {
@@ -20,10 +19,14 @@ public class GameResult
             var opponentRecord = new PlayerResultRecord(game.Opponent, PlayerResultType.Draw);
             PlayerResultRecords.Add(playerRecord);
             PlayerResultRecords.Add(opponentRecord);
-            VictoryType = VictoryType.Draw;
-            Result = BuildResultMessage(VictoryType.Draw)
-                + $"{game.Player.Name} - {playerRecord.PointsLeft}\n"
-                + $"{game.Opponent.Name} - {opponentRecord.PointsLeft}";
+            Dictionary<string, string> data = new()
+            {
+                { "player", game.Player.Name },
+                { "playerPoints", playerRecord.PointsLeft.ToString() },
+                { "opponent", game.Opponent.Name },
+                { "opponentPoints", opponentRecord.PointsLeft.ToString() }
+            };
+            Result = new(VictoryType.Draw, data);
         }
         else
         {
@@ -33,12 +36,17 @@ public class GameResult
             var loserRecord = new PlayerResultRecord(loser, PlayerResultType.Lose);
             PlayerResultRecords.Add(winnerRecord);
             PlayerResultRecords.Add(loserRecord);
-            VictoryType = ChooseVictoryType(winner, loser, game);
-            Result = $"{ winner.Name } win!" + BuildResultMessage(VictoryType);
-            if(VictoryType == VictoryType.Normal)
+            var victoryType = ChooseVictoryType(winner, loser, game);
+            Dictionary<string, string> data = new()
             {
-                Result += $"\n{loser.Name} is left with {loserRecord.PointsLeft} points.";
+                { "winner", winner.Name },
+            };
+            if(victoryType == VictoryType.Normal)
+            {
+                data.Add("loser", loser.Name);
+                data.Add("pointsLeft", loserRecord.PointsLeft.ToString());
             }
+            Result = new(victoryType, data);
         }
     }
     private static VictoryType ChooseVictoryType(Player winner, Player loser, Game game)
@@ -64,18 +72,5 @@ public class GameResult
         {
             return VictoryType.Normal;
         }
-    }
-    private static string BuildResultMessage(VictoryType victoryType)
-    {
-        return victoryType switch
-        {
-            VictoryType.Draw => "The game ended up in a draw.\nPoints count is:\n",
-            VictoryType.Normal => " Normal victory.",
-            VictoryType.ClearedPoints => " Points cleared.",
-            VictoryType.Goat => " Goat!",
-            VictoryType.Officer => " Officer!!!",
-            VictoryType.General => " General!!!!!",
-            _ => "",
-        };
     }
 }

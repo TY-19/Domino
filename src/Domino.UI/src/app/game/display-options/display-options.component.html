@@ -1,87 +1,86 @@
-<div class="ml-4">
-  <div>Click on color to change:
-    <div (click)="save()" class="w-16 h-11 text-2xl/10 float-right bg-green-500">Save</div>
-  </div>
+<div class="ml-4 relative">
+  <div>{{optionsNames?.instruction}}</div>
+  <div (click)="save()" class="text-2xl/10 right-1 top-1 p-2 absolute bg-green-500">{{optionsNames?.save}}</div>
   <div>
     <div class="flex flex-row border-b-2 pb-4 mb-4">
-      <div class="mr-4">Table background:</div>
+      <div class="mr-4">{{optionsNames?.tableBg}}</div>
       <Dom-color-picker [(backgroundColor)]="selectedOptions.tableBgColor">
       </Dom-color-picker>
     </div>
   </div>
   <div>
     <div class="flex flex-row border-b-2 pb-4 mb-4">
-      <div class="mr-4">Domino tile primary color:</div>
+      <div class="mr-4">{{optionsNames?.dominoPrimary}}</div>
       <Dom-color-picker [(backgroundColor)]="selectedOptions.dominoTilePrimaryColor">
       </Dom-color-picker>
     </div>
   </div>
   <div>
     <div class="flex flex-row border-b-2 pb-4 mb-4">
-      <div class="mr-4">Domino tile dots color:</div>
+      <div class="mr-4">{{optionsNames?.dominoDots}}</div>
       <Dom-color-picker [(backgroundColor)]="selectedOptions.dominoTileDotsColor">
       </Dom-color-picker>
     </div>
   </div>
   <div>
     <div class="flex flex-row border-b-2 pb-4 mb-4">
-      <div class="mr-4">Domino tile line color:</div>
+      <div class="mr-4">{{optionsNames?.dominoLine}}</div>
       <Dom-color-picker [(backgroundColor)]="selectedOptions.dominoTileLineColor">
       </Dom-color-picker>
     </div>
   </div>
   <div>
     <div class="flex flex-row border-b-2 pb-4 mb-4">
-      <div class="mr-4">Domino tile back primary color:</div>
+      <div class="mr-4">{{optionsNames?.dominoBackPrimary}}</div>
       <Dom-color-picker [(backgroundColor)]="selectedOptions.dominoTileBackPrimaryColor">
       </Dom-color-picker>
     </div>
   </div>
   <div>
     <div class="flex flex-row border-b-2 pb-4 mb-4">
-      <div class="mr-4">Domino tile back secondary color:</div>
+      <div class="mr-4">{{optionsNames?.dominoBackSecondary}}</div>
       <Dom-color-picker [(backgroundColor)]="selectedOptions.dominoTileBackSecondaryColor">
       </Dom-color-picker>
     </div>
   </div>
   <div>
     <div class="flex flex-row border-b-2 pb-4 mb-4">
-      <div class="mr-4">Message text color:</div>
+      <div class="mr-4">{{optionsNames?.messageText}}</div>
       <Dom-color-picker [(backgroundColor)]="selectedOptions.messageTextColor">
       </Dom-color-picker>
     </div>
   </div>
   <div>
     <div class="flex flex-row border-b-2 pb-4 mb-4">
-      <div class="mr-4">Message background color:</div>
+      <div class="mr-4">{{optionsNames?.messageBg}}</div>
       <Dom-color-picker [(backgroundColor)]="selectedOptions.messageTextColor">
       </Dom-color-picker>
     </div>
   </div>
   <div>
     <div class="flex flex-row border-b-2 pb-4 mb-4">
-      <div class="mr-4">Menu text color:</div>
+      <div class="mr-4">{{optionsNames?.menuText}}</div>
       <Dom-color-picker [(backgroundColor)]="selectedOptions.menuTextColor">
       </Dom-color-picker>
     </div>
   </div>
   <div>
     <div class="flex flex-row border-b-2 pb-4 mb-4">
-      <div class="mr-4">Menu background color:</div>
+      <div class="mr-4">{{optionsNames?.menuBg}}</div>
       <Dom-color-picker [(backgroundColor)]="selectedOptions.menuBgColor">
       </Dom-color-picker>
     </div>
   </div>
   <div>
     <div class="flex flex-row border-b-2 pb-4 mb-4">
-      <div class="mr-4">Start button text color:</div>
+      <div class="mr-4">{{optionsNames?.startText}}</div>
       <Dom-color-picker [(backgroundColor)]="selectedOptions.startButtonTextColor">
       </Dom-color-picker>
     </div>
   </div>
   <div>
     <div class="flex flex-row border-b-2 pb-4 mb-4">
-      <div class="mr-4">Start button background color:</div>
+      <div class="mr-4">{{optionsNames?.startBg}}</div>
       <Dom-color-picker [(backgroundColor)]="selectedOptions.startButtonBgColor">
       </Dom-color-picker>
     </div>

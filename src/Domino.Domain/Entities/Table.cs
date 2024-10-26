@@ -1,3 +1,5 @@
+using Domino.Domain.Enums;
+
 namespace Domino.Domain.Entities;
 
 public class Table
@@ -36,9 +38,11 @@ public class Table
         }
         return isLeft ? TilesOnTable.First?.Value.FreeEnd : TilesOnTable.Last?.Value.FreeEnd;
     }
-    public Table(GameRules gameRules)
+    public Table(GameRules gameRules, GameType gameType)
     {
-        _starters = gameRules.StarterTiles;
+        _starters = gameType == GameType.Hunt
+            ? gameRules.HuntStarterTiles
+            : gameRules.StarterTiles;
     }
     public DominoTile PlaceTile(TileDetails tileDetails, int position)
     {

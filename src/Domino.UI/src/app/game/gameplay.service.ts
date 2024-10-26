@@ -3,22 +3,32 @@ import { GameService } from "./game.service";
 import { GameView } from "../_models/gameView";
 import { LogEvent } from "../_models/logEvent";
 import { TileDetails } from "../_models/tileDetails";
+import { LanguageService } from "../_shared/language.service";
+import { HintTranslation, OpponentPhrasesTranslation } from "../_shared/translations";
 
 @Injectable({
     providedIn: 'root',
 })
 
 export class GameplayService {
-  constructor(private gameService: GameService) {
+  get opponentPhrases(): OpponentPhrasesTranslation | undefined {
+    return this.languageService.translation?.opponentPhrases;
+  }
+  get hints(): HintTranslation | undefined {
+    return this.languageService.translation?.hints;
+  }
+  constructor(private gameService: GameService,
+    private languageService: LanguageService
+  ) {
 
   }
   canGrab(game: GameView): [canGrab: boolean, reason: string] {
     if(this.hasTilesToPlay(game)) {
-      return [false, "You have a possible tile to play in your hand.\nNo need to grab another one"];
+      return [false, this.hints?.noNeedToGrab ?? ""];
     } else if(game.player.grabInRow >= game.gameRules.maxGrabsInRow) {
-      return [false, "You grab maximum allowed number of tiles in a row: " + game.player.grabInRow];
+      return [false, this.hints?.noMoreGrabsInRow ?? "" + game.player.grabInRow];
     } else if(game.marketTilesCount <= game.gameRules.minLeftInMarket) {
-      return [false, "You cannot grab last " + game.gameRules.minLeftInMarket + " tile(s) from the market."];
+      return [false, this.hints?.noGrabsLastTiles.replace("{count}", game.gameRules.minLeftInMarket.toString()) ?? ""];
     } else {
       return [true, ""];
     }
@@ -92,9 +102,9 @@ export class GameplayService {
     let turn = currentTurn;
     for(let event of newEvents) {
       if(event.type === 1) {
-        message += "I played " + event.tile.tileDetails.tileId + ".\n";
+        message += this.opponentPhrases?.iPlayed + " " + event.tile.tileDetails.tileId + ".\n";
       } else if(event.type === 2) {
-        message += "I grabbed a tile.\n";
+        message += this.opponentPhrases?.iGrabbed + "\n";
       }
       turn = event.moveNumber;
     }

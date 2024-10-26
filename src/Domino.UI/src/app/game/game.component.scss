@@ -91,7 +91,6 @@ $start-button-bg-color: var(--start-button-bg-color);
     gap: 10px;
     padding: 2px 10px 2px 20px;
     justify-content: center;
-    overflow-x: auto;
 }
 .play-button {
     grid-column-start: 11;
@@ -124,7 +123,7 @@ $start-button-bg-color: var(--start-button-bg-color);
 }
 .opponent-message {
     position: absolute;
-    top: 5.5%;
+    top: 60px;
     left: 1.5%;
     z-index: 10;
     width: fit-content;

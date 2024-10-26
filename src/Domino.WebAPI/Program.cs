@@ -3,6 +3,7 @@ using Domino.Application.Interfaces;
 using Domino.Application.Services;
 using Domino.Application.Strategies;
 using Domino.Infrastructure.Repositories;
+using Domino.WebAPI.Common;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
 using Microsoft.OpenApi.Models;
@@ -45,6 +46,7 @@ public class Program
         });
 
         builder.Services.AddApplicationServices();
+        builder.Services.AddExceptionHandler<GameExceptionHandler>();
 
         var app = builder.Build();
 

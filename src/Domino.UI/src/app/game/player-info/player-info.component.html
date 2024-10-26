@@ -2,37 +2,39 @@
     (mouseleave)="showStatistic=false"
     class="relative flex flex-col justify-center items-center">
     <p>{{playerName}}</p>
-    <p>{{currentPoints}}</p>
+    @if(currentPoints > 0) {
+        <p>{{currentPoints}}</p>
+    }
     @if(showStatistic) {
         <div class="statistics" [class]="isTop ? 'statistics-top' : 'statistics-bottom'">
             <table>
                 <tr>
                     <td></td>
-                    <td class="px-2">W</td>
-                    <td class="pr-2">L</td>
+                    <td class="px-2">{{names?.winsShort}}</td>
+                    <td class="pr-2">{{names?.losesShort}}</td>
                 </tr>
                 <tr>
-                    <td>Normal</td>
+                    <td>{{names?.normal}}</td>
                     <td class="px-2">{{playerStatistic.normalVictoryWins}}</td>
                     <td>{{playerStatistic.normalVictoryLoses}}</td>
                 </tr>
                 <tr>
-                    <td>Goat</td>
+                    <td>{{names?.goat}}</td>
                     <td class="px-2">{{playerStatistic.goatWins}}</td>
                     <td>{{playerStatistic.goatLoses}}</td>
                 </tr>
                 <tr>
-                    <td>Officer</td>
+                    <td>{{names?.officer}}</td>
                     <td class="px-2">{{playerStatistic.officerWins}}</td>
                     <td>{{playerStatistic.officerLoses}}</td>
                 </tr>
                 <tr>
-                    <td>General</td>
+                    <td>{{names?.general}}</td>
                     <td class="px-2">{{playerStatistic.generalWins}}</td>
                     <td>{{playerStatistic.generalLoses}}</td>
                 </tr>
                 <tr>
-                    <td>Draws</td>
+                    <td>{{names?.draws}}</td>
                     <td colspan="2" class="px-2">{{playerStatistic.draws}}</td>
                 </tr>
             </table>

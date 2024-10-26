@@ -1,16 +1,83 @@
 {
-  "interface": {
-    "menu": {
-      "startGame": "Start game",
-      "changePlayer": "Change player",
-      "typePlayerName": "Type player name",
-      "setOpponent": "Set opponent",
-      "selectOpponent": "Select opponent",
-      "save": "Save",
-      "statistics": "Statistics"
-    },
-    "game": {
-      "start": "Start"
-    }
+  "menu": {
+    "startGame": "Start game",
+    "changePlayer": "Change player",
+    "typePlayerName": "Type player name",
+    "setOpponent": "Set opponent",
+    "selectOpponent": "Select opponent",
+    "save": "Save",
+    "statistics": "Statistics"
+  },
+  "game": {
+    "start": "Start",
+    "menu": "Menu",
+    "colors": "Colors",
+    "preference": "Preference",
+    "market": "Market",
+    "log": "Log",
+    "impossibleMove": "Impossible move"
+  },
+  "hints": {
+    "noNeedToGrab": "You have a possible tile to play in your hand.\nNo need to grab another one.",
+    "noMoreGrabsInRow": "You grab maximum allowed number of tiles in a row: ",
+    "noGrabsLastTiles": "You cannot grab last {count} tile(s) from the market."
+  },
+  "colorsOptions": {
+    "instruction": "Click on color to change:",
+    "save": "Save",
+    "tableBg": "Table background:",
+    "dominoPrimary": "Domino tile primary color:",
+    "dominoDots": "Domino tile dots color:",
+    "dominoLine": "Domino tile line color:",
+    "dominoBackPrimary": "Domino tile back primary color:",
+    "dominoBackSecondary": "Domino tile back secondary color:",
+    "messageText": "Message text color:",
+    "messageBg": "Message background color:",
+    "menuText": "Menu text color:",
+    "menuBg": "Menu background color:",
+    "startText": "Start button text color:",
+    "startBg": "Start button background color:"
+  },
+  "opponentPhrases": {
+    "iPlayed": "I played",
+    "iGrabbed": "I grabbed a tile."
+  },
+  "errors": {
+    "0": "Unknown error.",
+    "101": "Cannot play this tile.",
+    "102": "No double play is possible.",
+    "103": "No tile with such an id in the hand.",
+    "104": "The tile can't be played on the table.",
+    "105": "The tile {tileId} cannot start the game.\nCurrent rules define starter tiles in such an order:\n{starters}",
+    "106": "The tile {tileId} cannot start the hunt.\nYou need to play {starters} and if you win it will counts as Goat Victory!\n"
+  },
+  "results": {
+    "0": "{winner} win! Normal victory. \n{loser} is left with {pointsLeft} points.",
+    "1": "{winner} win! Points cleared.",
+    "2": "{winner} win! Goat!",
+    "3": "{winner} win! Officer!!!",
+    "4": "{winner} win! General!!!!!",
+    "5": "The game ended up in a draw.\nPoints count is:\n{player} - {playerPoints}\n{opponent} - {opponentPoints}"
+  },
+  "statistics": {
+    "back": "Back",
+    "playerName": "Player name",
+    "totalGames": "Games played",
+    "winsShort": "W",
+    "wins": "Wins",
+    "winsTotal": "Total wins",
+    "losesShort": "L",
+    "loses": "Loses",
+    "losesTotal": "Total loses",
+    "draws": "Draws",
+    "normal": "Normal",
+    "goat": "Goat",
+    "officer": "Officer",
+    "general": "General",
+    "hunter": "Hunter",
+    "succHunt": "Successful hunt",
+    "hunted": "Hunted",
+    "clearPoints": "Clear points",
+    "totalPoints": "Total points left with"
   }
 }

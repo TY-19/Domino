@@ -43,29 +43,48 @@ public class UpdatePlayersStatisticCommandHandler : IRequestHandler<UpdatePlayer
         switch(playerRecord.PlayerResult)
         {
             case PlayerResultType.Draw:
-                playerStatistic.Draws++;
-                playerStatistic.TotalPointsLeftWith += playerRecord.PointsLeft;
-                playerInfo.CurrentPointCount += playerRecord.PointsLeft;
+                AddDraw(playerStatistic, playerInfo, playerRecord);
                 break;
             case PlayerResultType.Win:
-                playerStatistic.Wins++;
-                playerInfo.CurrentPointCount = 0;
-                Action<PlayerStatistic, GameStatus> updateWinnerFunction =
-                    _updateRules[(gameResult?.VictoryType ?? VictoryType.Normal, true)];
-                updateWinnerFunction(playerStatistic, gameStatus);
+                AddWin(playerStatistic, playerInfo, playerRecord, gameStatus, gameResult);
                 break;
             case PlayerResultType.Lose:
-                playerStatistic.Loses++;
-                playerStatistic.TotalPointsLeftWith += playerRecord.PointsLeft;
-                playerInfo.CurrentPointCount = gameResult?.VictoryType == VictoryType.Normal
-                    ? playerInfo.CurrentPointCount + playerRecord.PointsLeft : 0;
-                Action<PlayerStatistic, GameStatus> updateLoserFunction =
-                    _updateRules[(gameResult?.VictoryType ?? VictoryType.Normal, false)];
-                updateLoserFunction(playerStatistic, gameStatus);
+                AddLose(playerStatistic, playerInfo, playerRecord, gameStatus, gameResult);
                 break;
         }
         await _playerRepository.UpdatePlayerStatisticAsync(playerStatistic);
         await _playerRepository.UpdatePlayerInfoAsync(playerInfo);
+    }
+    private static void AddDraw(PlayerStatistic playerStatistic, PlayerInfo playerInfo,
+        PlayerResultRecord playerRecord)
+    {
+        playerStatistic.Draws++;
+        playerStatistic.TotalPointsLeftWith += playerRecord.PointsLeft;
+        playerInfo.CurrentPointCount += playerRecord.PointsLeft;
+    }
+    private static void AddWin(PlayerStatistic playerStatistic, PlayerInfo playerInfo,
+        PlayerResultRecord playerRecord, GameStatus gameStatus, GameResult gameResult)
+    {
+        playerStatistic.Wins++;
+        if(gameStatus.IsHunter(playerRecord.PlayerName))
+        {
+            playerStatistic.SuccessfulHunt++;
+        }
+        playerInfo.CurrentPointCount = 0;
+        Action<PlayerStatistic, GameStatus> updateWinnerFunction =
+            _updateRules[(gameResult?.Result?.VictoryType ?? VictoryType.Normal, true)];
+        updateWinnerFunction(playerStatistic, gameStatus);
+    }
+    private static void AddLose(PlayerStatistic playerStatistic, PlayerInfo playerInfo,
+        PlayerResultRecord playerRecord, GameStatus gameStatus, GameResult gameResult)
+    {
+        playerStatistic.Loses++;
+        playerStatistic.TotalPointsLeftWith += playerRecord.PointsLeft;
+        playerInfo.CurrentPointCount = gameResult?.Result?.VictoryType == VictoryType.Normal
+            ? playerInfo.CurrentPointCount + playerRecord.PointsLeft : 0;
+        Action<PlayerStatistic, GameStatus> updateLoserFunction =
+            _updateRules[(gameResult?.Result?.VictoryType ?? VictoryType.Normal, false)];
+        updateLoserFunction(playerStatistic, gameStatus);
     }
     private static readonly Dictionary<(VictoryType, bool) , Action<PlayerStatistic, GameStatus>> _updateRules = new()
     {

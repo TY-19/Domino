@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using Domino.Application.Models;
 using Domino.Domain.Entities;
 
@@ -10,10 +9,9 @@ public static class MappingExtensions
     {
         var player = playerName == game.Player.Name ? game.Player : game.Opponent;
         var opponent = playerName == game.Player.Name ? game.Opponent : game.Player;
-        string? error = game.GameError?.ErrorMessage;
+        var error = game.GameError;
         if(playerName == game.Player.Name)
         {
-            // Console.WriteLine(Environment.StackTrace);
             game.GameError = null;
         }
         return new GameView()
@@ -27,7 +25,7 @@ public static class MappingExtensions
             Log = game.Log,
             GameStatus = game.GameStatus,
             GameResult = game.GameResult,
-            ErrorMessage = error
+            Error = error
         };
     }
 }

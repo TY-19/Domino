@@ -11,6 +11,7 @@ using Domino.Application.Models;
 using Domino.Application.Queries.Games.CheckDoublePlay;
 using Domino.Application.Queries.Games.GetCurrentGame;
 using Domino.Domain.Entities;
+using Domino.Domain.Enums;
 using MediatR;
 using Microsoft.Extensions.Logging;
 
@@ -69,7 +70,7 @@ public class GameService : IGameService
         };
         if(await _mediator.Send(request))
         {
-            game.GameError = new GameError() { ErrorMessage = "You cannot play these tiles together."};
+            game.GameError = new GameError(ErrorType.NoDoublePlayPossible);
             return game.ToGameView(playerName);
         }
         game = await _mediator.Send(new PlayTileCommand() { Game = game, PlayTileDto = playTileDtos[0] });
