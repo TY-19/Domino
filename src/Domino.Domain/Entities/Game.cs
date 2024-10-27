@@ -26,17 +26,18 @@ public class Game
         Player = null!;
         Opponent = null!;
     }
-    public Game(long id, string playerName = "Player", string opponentName = "AI") : this(id)
+    public Game(long id, string playerName = "Player", string opponentName = "AI")
+        : this(id, new Player(playerName), new Player(opponentName))
     {
-        Player = new HumanPlayer(playerName);
-        Opponent = new AiPlayer(opponentName);
-        SetGameType();
-        Table = new(GameRules, GameStatus.GameType);
     }
-    public Game(long id, PlayerInfo player, PlayerInfo opponent) : this(id)
+    public Game(long id, PlayerInfo player, PlayerInfo opponent)
+        : this(id, new Player(player), new Player(opponent))
     {
-        Player = new HumanPlayer(player);
-        Opponent = new AiPlayer(opponent);
+    }
+    public Game(long id, Player player, Player opponent) : this(id)
+    {
+        Player = player;
+        Opponent = opponent;
         SetGameType();
         Table = new(GameRules, GameStatus.GameType);
     }

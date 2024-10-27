@@ -6,7 +6,7 @@ public class StrategyCoefficients
     public double MyHandCoeff { get; set; } = 5;
     public double OpponentHandCoeff { get; set; } = 5;
     public double OpponentPossibleHandCoeff { get; set; } = 5;
-    public double LeaveOfficerCoeff { get; set; } = 100;
+    public double LeaveOfficerCoeff { get; set; } = 1;
     public double DontKeepDoublesCoeff { get; set; } = 10;
     public double GetRidOfPointsCoeff { get; set; } = 0.125;
     public double CutOpponentDoubleCoeff { get; set; } = 3;

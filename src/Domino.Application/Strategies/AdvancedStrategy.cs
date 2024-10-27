@@ -6,7 +6,7 @@ namespace Domino.Application.Strategies;
 
 public class AdvancedStrategy : StrategyBase
 {
-    private StrategyCoefficients _strategyCoefficients = new();
+    private StrategyCoefficients _strategyCoefficients;
     private List<TileDetails> _myTiles = [];
     private List<TileDetails> _tableTiles = [];
     private List<TileDetails> _hiddenTiles = [];
@@ -14,14 +14,25 @@ public class AdvancedStrategy : StrategyBase
     private List<TileDetails> _marketTiles = [];
     private List<int> _myEdges = [];
     private List<int> _oppWeaknesses = [];
+    public AdvancedStrategy()
+    {
+        _strategyCoefficients = new();
+    }
+    public AdvancedStrategy(StrategyCoefficients coefficients)
+    {
+        _strategyCoefficients = coefficients;
+    }
     protected override PlayTileMove SelectPlayTileMove(GameView gameView)
     {
         _myTiles = gameView.Player.Hand;
         _tableTiles = gameView.Table.TilesOnTable.Select(dt => dt.TileDetails).ToList();
         _hiddenTiles = new DominoSet().Tiles.Except(_myTiles).Except(_tableTiles).ToList();
         AnalyzeLog(gameView);
+        if(_marketTiles.Count >= _hiddenTiles.Count - gameView.Opponent.Hand.Count)
+        {
+            _opponentHand = _hiddenTiles.Except(_marketTiles).ToList();
+        }
         Dictionary<int, double> weights = GetMovesWeights(gameView);
-        Serilog.Log.Information("Log all weights:\n{@w}", weights);
         int moveIndex = weights.MaxBy(x => x.Value).Key;
         return PossibleMoves[moveIndex];
     }
@@ -92,7 +103,7 @@ public class AdvancedStrategy : StrategyBase
                 MyHand = CountMyHandWeight(tile, endOne, endTwo),
                 OpponentHand = CountOpponentHandWeight(endOne, endTwo),
                 OpponentPossibleHand = CountOpponentPossibleHandWeight(gameView.Opponent.TilesCount, endOne, endTwo),
-                LeaveOfficer = tile.IsOfficer ? -1 : 0,
+                LeaveOfficer = tile.IsOfficer ? -100 : 0,
                 DontKeepDoubles = tile.IsDouble
                     ? gameView.Table.TilesOnTable.Select(td => td.TileDetails)
                         .Count(t => t.SideA == tile.SideA || t.SideB == tile.SideB)
@@ -176,7 +187,7 @@ public class AdvancedStrategy : StrategyBase
             int hiddenNotPlayable = _hiddenTiles.Count - hiddenPossibleToPlay;
             int opponentNotPlayable = opponentHiddenCount - i;
             // Ways to select (hidden opponent tiles - i) non-playable tiles out of all non-playable tiles
-            double p3 = opponentNotPlayable >= 0
+            double p3 = opponentNotPlayable >= 0 && hiddenNotPlayable > opponentNotPlayable
                 ? Factorial(hiddenNotPlayable)/(Factorial(opponentNotPlayable)*Factorial(hiddenNotPlayable - opponentNotPlayable))
                 : 1;
             // Probability to select i playable tiles among all tiles into the opponent hand

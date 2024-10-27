@@ -1,3 +1,5 @@
+using Domino.AITournament.Interfaces;
+using Domino.AITournament.Services;
 using Domino.Application;
 using Domino.Application.Interfaces;
 using Domino.Application.Services;
@@ -34,8 +36,10 @@ public class Program
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "Domino", Version = "v1" });
         });
         builder.Services.AddControllers();
+        builder.Services.AddScoped<TournamentService>();
         builder.Services.AddScoped<IGameRepository, GameRepository>();
         builder.Services.AddScoped<IPlayerRepository, PlayerStatisticRepository>();
+        builder.Services.AddScoped<IEngineRepository, EngineRepository>();
         builder.Services.AddScoped<IGameService, GameService>();
         builder.Services.AddScoped<IPlayerService, PlayerService>();
         builder.Services.AddScoped<IStrategyFactory, StrategyFactory>();

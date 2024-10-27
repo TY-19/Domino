@@ -4,5 +4,6 @@ public enum MoveType
 {
     Undefined,
     PlayTile,
-    GrabTile
+    GrabTile,
+    DoublePlay
 }
