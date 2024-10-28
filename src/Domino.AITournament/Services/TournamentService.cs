@@ -3,13 +3,10 @@ using Domino.AITournament.Interfaces;
 using Domino.AITournament.Models;
 using Domino.Application.Commands.Games.MakeOpponentMove;
 using Domino.Application.Commands.Games.SaveGame;
-using Domino.Application.Commands.Games.SelectOpponentMove;
-using Domino.Application.Commands.Games.StartGame;
 using Domino.Application.Commands.Players.UpdatePlayersStatistic;
 using Domino.Application.Extensions;
 using Domino.Application.Interfaces;
 using Domino.Application.Models;
-using Domino.Application.Strategies;
 using Domino.Domain.Entities;
 using Domino.Domain.Enums;
 using MediatR;
@@ -19,50 +16,69 @@ namespace Domino.AITournament.Services;
 public class TournamentService
 {
     private readonly IEngineRepository _engineRepository;
+    private readonly IGameRepository _gameRepository;
     private readonly IMediator _mediator;
     private readonly IStrategyFactory _strategyFactory;
     public TournamentService(
         IEngineRepository engineRepository,
+        IGameRepository gameRepository,
         IMediator mediator,
         IStrategyFactory strategyFactory
         )
     {
         _engineRepository = engineRepository;
+        _gameRepository = gameRepository;
         _mediator = mediator;
         _strategyFactory = strategyFactory;
+    }
+    public async Task<Game?> GetGameByIdAsync(long id)
+    {
+        return await _gameRepository.GetGameAsync(id);
     }
     public async Task<List<Engine>> GetEnginesAsync()
     {
         return await _engineRepository.GetAllEnginesAsync();
     }
-    public async Task<List<Engine>> CreateTournament()
+    public async Task<Engine?> GetEngineAsync(string name)
+    {
+        return await _engineRepository.GetEngineAsync(name);
+    }
+    public async Task CreateEnginesAsync()
     {
         long id = DateTime.UtcNow.Ticks;
-        List<Engine> samples = (await _engineRepository.GetAllEnginesAsync()).ToList();
-        if(samples.Count < 10)
-        {
-            samples = new NLHSampler(1024).GenerateSamples()
+        var samples = new NLHSampler(1024).GenerateSamples()
                 .Select((s, i) => new Engine($"{id}_{i}", s))
                 .ToList();
-            foreach(var sample in samples)
-            {
-                await _engineRepository.CreateEngineAsync(sample);
-            }
-        }
+        await _engineRepository.CreateEnginesAsync(samples);
+    }
+    public async Task<List<Engine>> CreateTournamentAsync()
+    {
+        List<Engine> samples = (await _engineRepository.GetAllEnginesAsync()).ToList();
         List<Engine> starters = [];
         starters.AddRange(samples);
+        if(starters.Count < 128)
+        {
+            Console.WriteLine("Creating engines");
+            await CreateEnginesAsync();
+            return [];
+        }
         while(starters.Count > 100)
         {
             List<Engine> winners = [];
             for(int i = 1; i <= 8; i++)
             {
+                Console.WriteLine($"Round of {starters}: {i}");
                 var startInd = 128 * (i - 1);
+                if(starters.Count < startInd + 127)
+                {
+                    Console.WriteLine("break 63");
+                    break;
+                }
                 winners.AddRange(await PlayStage(starters.GetRange(startInd, 128)));
             }
             starters = [];
             starters.AddRange(winners);
         }
-        List<Engine> tops = [];
         return await PlayStage(starters, 50);
     }
     private async Task<List<Engine>> PlayStage(List<Engine> engines, int rounds = 10)
@@ -83,18 +99,18 @@ public class TournamentService
     }
     public async Task<GameView?> PlayMatchAsync(Engine one, Engine two)
     {
-        var time = DateTimeOffset.UtcNow;
+        // var time = DateTimeOffset.UtcNow;
         
         // repository to create player
         long id = DateTime.UtcNow.Ticks;
         var game = new Game(id, one.Player, two.Player);
-        if(game.GameStatus.GameType == GameType.Normal)
-        {
-            ServeStartHands(game);
-        }
-        else if(game.GameStatus.GameType == GameType.Hunt)
+        if(game.GameStatus.GameType == GameType.Hunt)
         {
             LeaveStarterToHunterAndServeHands(game);
+        }
+        else
+        {
+            ServeStartHands(game);
         }
         game.IsOpponentTurn = !IsPlayerFirst(game);
         
@@ -102,6 +118,7 @@ public class TournamentService
         int i = 0;
         while(!isEnded && i < 50)
         {
+            i++;
             var activePlayer = game.IsOpponentTurn ? game.Opponent : game.Player;
             if(game.IsOpponentTurn)
             {
@@ -118,18 +135,20 @@ public class TournamentService
                 {
                     continue;
                 }
-                while(game.IsOpponentTurn)
+                int j = 0;
+                while(game.IsOpponentTurn && j < 10)
                 {
+                    j++;
                     var strategy = _strategyFactory.SelectStrategy(activePlayer);
                     var move = strategy.SelectMove(game.ToGameView(activePlayer.Name));
                     game = await _mediator.Send(new MakeOpponentMoveCommand() { Game = game, Move = move });
                 }
-                game.TrySetResult();
-                if(game.GameResult?.IsEnded == true)
-                {
-                    await _mediator.Send(new UpdatePlayersStatisticCommand() { Game = game });
-                    await _mediator.Send(new SaveGameCommand() { Game = game });
-                }
+                // game.TrySetResult();
+                // if(game.GameResult?.IsEnded == true)
+                // {
+                //     await _mediator.Send(new UpdatePlayersStatisticCommand() { Game = game });
+                //     // await _mediator.Send(new SaveGameCommand() { Game = game });
+                // }
             }
             else
             {
@@ -142,24 +161,31 @@ public class TournamentService
                     isEnded = true;
                     continue;
                 }
-                while(!game.IsOpponentTurn)
+                int j = 0;
+                while(!game.IsOpponentTurn && j < 10)
                 {
+                    j++;
                     var strategy = _strategyFactory.SelectStrategy(activePlayer);
                     var move = strategy.SelectMove(game.ToGameView(activePlayer.Name));
                     game = await _mediator.Send(new MakeOpponentMoveCommand() { Game = game, Move = move });
                 }
-                game.TrySetResult();
-                if(game.GameResult?.IsEnded == true)
-                {
-                    await _mediator.Send(new UpdatePlayersStatisticCommand() { Game = game });
-                    await _mediator.Send(new SaveGameCommand() { Game = game });
-                }
+                // game.TrySetResult();
+                // if(game.GameResult?.IsEnded == true)
+                // {
+                //     await _mediator.Send(new UpdatePlayersStatisticCommand() { Game = game });
+                //     // await _mediator.Send(new SaveGameCommand() { Game = game });
+                // }
             }
             isEnded = game.GameResult?.IsEnded ?? false;
         }
-        var timeEnd = DateTimeOffset.UtcNow;
-        TimeSpan timeSpan = timeEnd - time;
-        Console.WriteLine("Game has took " + timeSpan.TotalSeconds + " seconds");
+        if(!isEnded)
+        {
+            Console.WriteLine("Game has not ended " + game.Id);
+            await _mediator.Send(new SaveGameCommand() { Game = game });
+        }
+        // var timeEnd = DateTimeOffset.UtcNow;
+        // TimeSpan timeSpan = timeEnd - time;
+        // Console.WriteLine("Game has took " + timeSpan.TotalSeconds + " seconds");
         return game.ToGameView(one.Player.Name);
     }
     private static int CompareEngineScores(Engine one, Engine two)

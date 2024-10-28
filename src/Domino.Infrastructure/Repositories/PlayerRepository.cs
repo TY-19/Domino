@@ -5,12 +5,12 @@ using Microsoft.Extensions.Configuration;
 
 namespace Domino.Infrastructure.Repositories;
 
-public class PlayerStatisticRepository : IPlayerRepository
+public class PlayerRepository : IPlayerRepository
 {
     private const string PlayersInfo = "playersInfo";
     private const string PlayersStatistics = "playersStatistics";
     private readonly string _connectionString;
-    public PlayerStatisticRepository(IConfiguration configuration)
+    public PlayerRepository(IConfiguration configuration)
     {
         _connectionString = configuration["ConnectionStrings:LiteDb"] ?? "";
     }
@@ -20,12 +20,11 @@ public class PlayerStatisticRepository : IPlayerRepository
         var col = db.GetCollection<PlayerInfo>(PlayersInfo);
         return Task.FromResult<IEnumerable<PlayerInfo>>(col.FindAll().ToList());
     }
-    public Task<PlayerInfo> GetPlayerInfoAsync(string playerName)
+    public Task<PlayerInfo?> GetPlayerInfoAsync(string playerName)
     {
         using var db = new LiteDatabase(_connectionString);
         var col = db.GetCollection<PlayerInfo>(PlayersInfo);
-        return Task.FromResult(col.Find(p => p.PlayerName == playerName).FirstOrDefault()
-            ?? new PlayerInfo() { PlayerName = playerName });
+        return Task.FromResult(col.Find(p => p.PlayerName == playerName).FirstOrDefault());
     }
     public Task UpdatePlayerInfoAsync(PlayerInfo playerInfo)
     {

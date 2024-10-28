@@ -30,7 +30,8 @@ public class UpdatePlayersStatisticCommandHandler : IRequestHandler<UpdatePlayer
     {
         var playerStatistic = await _playerRepository.GetPlayerStatisticsAsync(playerRecord.PlayerName)
             ?? new PlayerStatistic(playerRecord.PlayerName);
-        var playerInfo = await _playerRepository.GetPlayerInfoAsync(playerRecord.PlayerName);
+        var playerInfo = await _playerRepository.GetPlayerInfoAsync(playerRecord.PlayerName)
+            ?? new PlayerInfo(playerRecord.PlayerName);
         playerStatistic.GamesPlayed++;
         if(gameStatus.IsHunted(playerStatistic.PlayerName))
         {

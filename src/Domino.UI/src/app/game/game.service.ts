@@ -41,6 +41,15 @@ export class GameService {
     };
     return this.http.post<GameView>(url, playTileDto, { params });
   }
+  doublePlay(leftTileId: string, rightTileId: string) {
+    const url: string = baseUrl + "/Game/doublePlay";
+    let params = this.getPlayerNameQueryParameter(new HttpParams());
+    const tiles = [
+      { tileId: leftTileId, isLeft: true },
+      { tileId: rightTileId, isLeft: false },
+    ]
+    return this.http.post<GameView>(url, tiles, { params });
+  }
   grabTile(): Observable<GameView> {
     const url: string = baseUrl + "/Game/grab";
     let params = this.getPlayerNameQueryParameter(new HttpParams());

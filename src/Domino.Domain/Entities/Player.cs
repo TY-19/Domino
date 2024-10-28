@@ -1,8 +1,10 @@
+using Domino.Domain.Enums;
+
 namespace Domino.Domain.Entities;
 
 public class Player
 {
-    public string Name { get; }
+    public string Name { get; protected set; }
     public PlayerInfo Info { get; set; }
     private protected List<TileDetails> _hand = [];
     public List<TileDetails> Hand { get => _hand; }

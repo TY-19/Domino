@@ -1,1 +1,8 @@
 <div (click)="showMessage = false">{{message}}</div>
+@if(showConfirmation) {
+    <div class="choice">
+        <div (click)="makeChoice(true)" class="confirm">{{names?.yes}}</div>
+        <div class="gap"></div>
+        <div (click)="makeChoice(false)" class="deny">{{names?.no}}</div>
+    </div>
+}

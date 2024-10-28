@@ -1,4 +1,4 @@
-using Domino.Application.Strategies;
+using Domino.Domain.Enums;
 
 namespace Domino.Domain.Entities;
 
@@ -18,8 +18,9 @@ public class AiPlayer : Player
     {
         
     }
-    public AiPlayer(string name, StrategyCoefficients coefficients) : this(name)
+    public AiPlayer(string name, StrategyCoefficients coefficients)
     {
+        Name = name;
         _coeffs = coefficients;
     }
     public AiPlayer(PlayerInfo player, StrategyCoefficients coefficients) : this(player)

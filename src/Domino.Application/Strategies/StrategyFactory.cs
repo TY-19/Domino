@@ -7,15 +7,14 @@ public class StrategyFactory : IStrategyFactory
 {
     public IAiStrategy SelectStrategy(Player player)
     {
+        if(player.Name == "AI")
+        {
+            return new RandomStrategy();
+        }
         if(player is AiPlayer aiPlayer)
         {
             return new AdvancedStrategy(aiPlayer.Coefficients);
         }
-        return player.Name switch
-        {
-            "AI" => new RandomStrategy(),
-            "AI2" => new AdvancedStrategy(),
-            _ => new RandomStrategy()
-        };
+        return new RandomStrategy();
     }
 }

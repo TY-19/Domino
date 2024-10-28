@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
-import { PlayersStatisticsService } from '../../players-statistics/players-statistics.service';
-import { PlayerStatistic } from '../../_models/player-statistic';
+import { PlayersService } from '../../players-statistics/players.service';
+import { PlayerStatistic } from '../../_models/playerStatistic';
 import { LanguageService } from '../../_shared/language.service';
 import { StatisticsTranslation } from '../../_shared/translations';
 
@@ -20,12 +20,15 @@ export class PlayerInfoComponent {
   }
   playerStatistic: PlayerStatistic = null!;
   showStatistic: boolean = false;
-  constructor(private playerStatisticService: PlayersStatisticsService,
+  constructor(private playerStatisticService: PlayersService,
     private languageService: LanguageService
   ) {
 
   }
   ngOnInit() {
+    this.fetchPlayerInfo();
+  }
+  fetchPlayerInfo() {
     this.playerStatisticService.getPlayerStatistics(this.playerName)
       .subscribe(res => this.playerStatistic = res);
   }

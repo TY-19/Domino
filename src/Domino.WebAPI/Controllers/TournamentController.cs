@@ -2,6 +2,7 @@ using Domino.AITournament.Models;
 using Domino.AITournament.Services;
 using Domino.Application.Models;
 using Domino.Application.Strategies;
+using Domino.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Domino.WebAPI.Controllers;
@@ -15,15 +16,31 @@ public class TournamentController : ControllerBase
     {
         _tournamentService = tournamentService;
     }
+    [HttpGet("game/{id}")]
+    public async Task<ActionResult<Game?>> GetGame(long id)
+    {
+        return Ok(await _tournamentService.GetGameByIdAsync(id));
+    }
     [HttpGet("engines")]
     public async Task<ActionResult<List<Engine>>> GetEngines()
     {
         return Ok(await _tournamentService.GetEnginesAsync());
     }
+    [HttpGet("engines/{name}")]
+    public async Task<ActionResult<Engine>> GetEngine(string name)
+    {
+        return Ok(await _tournamentService.GetEngineAsync(name));
+    }
+    [HttpPost("engines")]
+    public async Task<ActionResult> CreateEngines()
+    {
+        await _tournamentService.CreateEnginesAsync();
+        return NoContent();
+    }
     [HttpPost("tournament")]
     public async Task<ActionResult<List<Engine>>> PlayTournament()
     {
-        return Ok(await _tournamentService.CreateTournament());
+        return Ok(await _tournamentService.CreateTournamentAsync());
     }
     [HttpGet("testplay")]
     public async Task<ActionResult<GameView?>> PlayMatch()

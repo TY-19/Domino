@@ -1,3 +1,5 @@
+using Domino.Domain.Entities;
+
 namespace Domino.Application.Strategies;
 
 public class MoveWeight

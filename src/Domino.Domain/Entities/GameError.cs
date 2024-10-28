@@ -18,6 +18,10 @@ public class GameError
     public ErrorType Type { get; set; }
     public string? Message { get; set; }
     public Dictionary<string, string> Data { get; set; } = [];
+    public GameError()
+    {
+        Type = ErrorType.Undefined;
+    }
     public GameError(ErrorType errorType, Dictionary<string, string>? data = null)
     {
         Type = errorType;

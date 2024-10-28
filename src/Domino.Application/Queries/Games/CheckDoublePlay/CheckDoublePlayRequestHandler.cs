@@ -10,8 +10,11 @@ public class CheckDoublePlayRequestHandler : IRequestHandler<CheckDoublePlayRequ
         {
             return Task.FromResult(false);
         }
-        var tile1 = request.Game.Player.GetTileFromHand(request.PlayTileDtos[0].TileId);
-        var tile2 = request.Game.Player.GetTileFromHand(request.PlayTileDtos[1].TileId);
+        var activePlayer = request.PlayerName == request.Game.Player.Name
+            ? request.Game.Player
+            : request.Game.Opponent;
+        var tile1 = activePlayer.GetTileFromHand(request.PlayTileDtos[0].TileId);
+        var tile2 = activePlayer.GetTileFromHand(request.PlayTileDtos[1].TileId);
         int leftEnd = request.Game.Table.LeftFreeEnd ?? -1;
         int rightEnd = request.Game.Table.RightFreeEnd ?? -1;
         bool result = tile1 != null && tile1.IsDouble && tile2 != null && tile2.IsDouble

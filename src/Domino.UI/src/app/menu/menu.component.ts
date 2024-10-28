@@ -6,6 +6,10 @@ import { LanguageSwitchComponent } from "./language-switch/language-switch.compo
 import { LanguageService } from '../_shared/language.service';
 import { MenuTranslation } from '../_shared/translations';
 import { VersionComponent } from "./version/version.component";
+import { Player } from '../_models/player';
+import { PlayersService } from '../players-statistics/players.service';
+import { PlayerInfo } from '../_models/playerInfo';
+import { PlayerType } from '../_enums/playerType';
 
 @Component({
   selector: 'Dom-menu',
@@ -27,11 +31,16 @@ export class MenuComponent implements OnInit {
   opponentName: string = "";
   editPlayer: boolean = false;
   editOpponent: boolean = false;
-  constructor(protected languageService: LanguageService,
+  opponents: PlayerInfo[] = [];
+  constructor(
+    private playersService: PlayersService,
+    private languageService: LanguageService,
     private localStorageService: LocalStorageService) {
 
   }
   ngOnInit() {
+    this.playersService.getPlayersInfo()
+      .subscribe(res => this.opponents = res.filter(r => r.type == PlayerType.AI) );
     let playerName = this.localStorageService.getPlayerName();
     if(playerName) {
       this.playerName = playerName;

@@ -33,6 +33,18 @@ export class GameplayService {
       return [true, ""];
     }
   }
+  checkForDoublePlay(game: GameView): [canDoublePlay: boolean, leftTileId: string | null, rightTileId: string | null] {
+    if(game.table.tilesOnTable.length > 0) {
+      let leftEnd = game.table.leftFreeEnd ?? -1;
+      let rightEnd = game.table.rightFreeEnd ?? -1;
+      let leftTile = game.player.hand.find(t => t.isDouble && t.sideA == leftEnd);
+      let rightTile = game.player.hand.find(t => t.isDouble && t.sideA == rightEnd);
+      if(leftTile && rightTile && leftTile !== rightTile) {
+        return [true, leftTile.tileId, rightTile.tileId];
+      }
+    }
+    return [false, null, null];
+  }
   checkForTurnEnd(game: GameView): boolean {
     return !this.hasTilesToPlay(game) && !this.canGrabAnotherTile(game);
   }

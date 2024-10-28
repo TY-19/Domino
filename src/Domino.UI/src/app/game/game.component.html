@@ -7,11 +7,16 @@
     [hidden]="!opponentMessage.showMessage || opponentMessage.message.length < 1"
     class="opponent-message">
   </Dom-message>
+  <Dom-message #playerMessage
+    (confirmChoice)="makeDoublePlayChoice($event)"
+    [hidden]="!playerMessage.showMessage || playerMessage.message.length < 1"
+    class="player-message">
+  </Dom-message>
   <div class="grid-container">
     <div [routerLink]="['']" class="grid-item menu-button">{{names?.menu}}</div>
     <div class="grid-item menu-button" (click)="changeColorScheme()">{{names?.colors}}</div>
     <div class="grid-item menu-button">{{names?.preference}}</div>
-    <div class="grid-item menu-button">Button 4</div>
+    <div class="grid-item menu-button" (click)="checkForDoublePlay()">{{names?.rules}}</div>
     <div class="grid-item menu-button">{{names?.market}}</div>
     <div class="grid-item menu-button">{{names?.log}}</div>
     @if(showOptions) {
@@ -35,13 +40,13 @@
         (selectTile)="selectTile($event)"
         class="grid-item player-hand">
       </Dom-player-hand>
-      <Dom-player-info 
+      <Dom-player-info #opponentInfo
         [playerName]="game.opponent.name"
         [currentPoints]="game.opponent.currentPoints"
         [isTop]="true"
         class="points opponent-points">
       </Dom-player-info>
-      <Dom-player-info 
+      <Dom-player-info #playerInfo
         [playerName]="game.player.name"
         [currentPoints]="game.player.currentPoints"
         [isTop]="false"

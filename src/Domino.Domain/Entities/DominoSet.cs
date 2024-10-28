@@ -33,6 +33,16 @@ public class DominoSet
         _tiles.RemoveAt(index);
         return toReturn;
     }
+    // For testing purposes only
+    public TileDetails? ServeTile(string tileId)
+    {
+        var tile = _tiles.Find(t => t.TileId == tileId);
+        if(tile != null)
+        {
+            _tiles.Remove(tile);
+        }
+        return tile;
+    }
     public TileDetails? LeaveStarterForHunter()
     {
         var starter = _tiles.Find(t => t.TileId == "6-6");

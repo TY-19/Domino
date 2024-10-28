@@ -115,8 +115,8 @@ public class AdvancedStrategy : StrategyBase
                 GetRidOfPoints = tile.SideA + tile.SideB
             };
             var weight = moveWeight.CalculateWeight(_strategyCoefficients);
-            Serilog.Log.Information("Move {@m}", PossibleMoves[i]);
-            Serilog.Log.Information("Weight {@cw}", moveWeight.SeeWeights(_strategyCoefficients));
+            // Serilog.Log.Information("Move {@m}", PossibleMoves[i]);
+            // Serilog.Log.Information("Weight {@cw}", moveWeight.SeeWeights(_strategyCoefficients));
             weights.Add(i, weight);
         }
         return weights;
@@ -164,7 +164,7 @@ public class AdvancedStrategy : StrategyBase
     private double CountOpponentPossibleHandWeight(int totalOpponentTiles, int endOne, int endTwo)
     {
         int opponentHiddenCount = totalOpponentTiles - _opponentHand.Count;
-        if(opponentHiddenCount == 0)
+        if(opponentHiddenCount <= 0)
         {
             return 0;
         }
@@ -181,14 +181,24 @@ public class AdvancedStrategy : StrategyBase
         for(int i = 1; i <= hiddenPossibleToPlay; i++)
         {
             // Ways to select opponent tiles out of all hidden tiles 
-            double totalWays = Factorial(_hiddenTiles.Count)/(Factorial(opponentHiddenCount)*Factorial(_hiddenTiles.Count-opponentHiddenCount));
+            if(_hiddenTiles.Count < opponentHiddenCount)
+            {
+                return 0;
+            }
+            double totalWays = Factorial(_hiddenTiles.Count)
+                / (Factorial(opponentHiddenCount) * Factorial(_hiddenTiles.Count-opponentHiddenCount));
             // Ways to select i playable tiles out of all playable tiles
-            double playableTilesWays = Factorial(hiddenPossibleToPlay)/(Factorial(i)*Factorial(hiddenPossibleToPlay - i));
+            if(_hiddenTiles.Count < hiddenPossibleToPlay || hiddenPossibleToPlay < i)
+            {
+                return 0;
+            }
+            double playableTilesWays = Factorial(hiddenPossibleToPlay)
+                / (Factorial(i) * Factorial(hiddenPossibleToPlay - i));
             int hiddenNotPlayable = _hiddenTiles.Count - hiddenPossibleToPlay;
             int opponentNotPlayable = opponentHiddenCount - i;
             // Ways to select (hidden opponent tiles - i) non-playable tiles out of all non-playable tiles
-            double p3 = opponentNotPlayable >= 0 && hiddenNotPlayable > opponentNotPlayable
-                ? Factorial(hiddenNotPlayable)/(Factorial(opponentNotPlayable)*Factorial(hiddenNotPlayable - opponentNotPlayable))
+            double p3 = opponentNotPlayable >= 0 && hiddenNotPlayable >= opponentNotPlayable
+                ? Factorial(hiddenNotPlayable) / (Factorial(opponentNotPlayable) * Factorial(hiddenNotPlayable - opponentNotPlayable))
                 : 1;
             // Probability to select i playable tiles among all tiles into the opponent hand
             double probability = playableTilesWays * p3 / totalWays;

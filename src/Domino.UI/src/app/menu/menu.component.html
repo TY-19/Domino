@@ -23,9 +23,10 @@
                     <span class="text-sm text-gray-400">{{ names?.selectOpponent ?? "Select opponent"}}</span><br>
                     <select [(ngModel)]="opponentName"
                         (ngModelChange)="changeOpponent($event)"
-                         class="mr-2 w-full">
-                        <option value="AI">AI</option>
-                        <option value="AI2">AI2</option>
+                        class="mr-2 w-full">
+                        @for(opponent of opponents; track opponent.playerName) {
+                            <option [value]="opponent.playerName">{{opponent.playerName}}</option>
+                        }
                     </select>
                 </div>
             } @else {

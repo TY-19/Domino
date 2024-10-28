@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { PlayerStatistic } from '../_models/player-statistic';
-import { PlayersStatisticsService } from './players-statistics.service';
+import { PlayerStatistic } from '../_models/playerStatistic';
+import { PlayersService } from './players.service';
 import { RouterLink } from '@angular/router';
 import { LanguageService } from '../_shared/language.service';
 import { StatisticsTranslation } from '../_shared/translations';
@@ -19,7 +19,7 @@ export class PlayersStatisticsComponent implements OnInit {
   get names(): StatisticsTranslation | undefined {
     return this.languageService.translation?.statistics;
   }
-  constructor(private playersStatisticsService: PlayersStatisticsService,
+  constructor(private playersStatisticsService: PlayersService,
     private languageService: LanguageService
   ) {
 

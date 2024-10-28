@@ -1,0 +1,20 @@
+.choice {
+    display: flex;
+    width: fit-content;
+    margin: auto;
+}
+.confirm {
+    padding: 4px 6px;
+    margin: 1px;
+    background-color: green;
+    cursor: default;
+}
+.deny {
+    padding: 4px 6px;
+    margin: 1px;
+    background-color: pink;
+    cursor: default;
+}
+.gap {
+    min-width: 3vh;
+}

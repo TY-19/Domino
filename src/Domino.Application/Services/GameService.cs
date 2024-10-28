@@ -4,6 +4,7 @@ using Domino.Application.Commands.Games.PlayTile;
 using Domino.Application.Commands.Games.SaveGame;
 using Domino.Application.Commands.Games.SelectOpponentMove;
 using Domino.Application.Commands.Games.StartGame;
+using Domino.Application.Commands.Players.CreatePlayer;
 using Domino.Application.Commands.Players.UpdatePlayersStatistic;
 using Domino.Application.Extensions;
 using Domino.Application.Interfaces;
@@ -39,24 +40,23 @@ public class GameService : IGameService
     {
         var command = new StartGameCommand()
         {
-            PlayerName = playerName,
-            OpponentName = opponentName
+            Player = await _mediator.Send(new CreatePlayerCommand() { PlayerName = playerName }),
+            Opponent = await _mediator.Send(new CreatePlayerCommand() { PlayerName = opponentName, IsAI = true }),
         };
         var game = await _mediator.Send(command);
+        // _logger.LogInformation("Current game: {@game}", game);
         if(game.IsOpponentTurn)
         {
             await WaitOpponentTurnAsync(game);
         }
         return game.ToGameView(game.Player.Name);
     }
-    
     public async Task<GameView> PlayTileAsync(string playerName, PlayTileDto playTileDto)
     {
         _logger.LogInformation("PlayTile {tileId} to edge, left: {isLeft}", playTileDto.TileId, playTileDto.IsLeft);
         Game game = await GetGameAsync(playerName);
         // _logger.LogInformation("Current game: {@game}", game);
         game = await _mediator.Send(new PlayTileCommand() { Game = game, PlayTileDto = playTileDto });
-        _logger.LogInformation("Waiting for opponent");
         return await WaitOpponentTurnAsync(game);
     }
     public async Task<GameView> DoublePlayAsync(string playerName, PlayTileDto[] playTileDtos)
@@ -68,7 +68,7 @@ public class GameService : IGameService
             Game = game,
             PlayTileDtos = playTileDtos
         };
-        if(await _mediator.Send(request))
+        if(!await _mediator.Send(request))
         {
             game.GameError = new GameError(ErrorType.NoDoublePlayPossible);
             return game.ToGameView(playerName);
@@ -130,7 +130,16 @@ public class GameService : IGameService
 
     private async Task<Game> GetGameAsync(string playerName)
     {
-        return await _mediator.Send(new GetCurrentGameRequest() { PlayerName = playerName })
-            ?? await _mediator.Send(new StartGameCommand() { PlayerName = playerName, OpponentName = "AI" });
+        var game = await _mediator.Send(new GetCurrentGameRequest() { PlayerName = playerName });
+        if(game == null)
+        {
+            var command = new StartGameCommand()
+            {
+                Player = await _mediator.Send(new CreatePlayerCommand() { PlayerName = playerName }),
+                Opponent = await _mediator.Send(new CreatePlayerCommand() { PlayerName = "AI", IsAI = true }),
+            };
+            game = await _mediator.Send(command);
+        }
+        return game;
     }
 }

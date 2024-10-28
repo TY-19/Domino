@@ -1,4 +1,4 @@
-using Domino.Application.Strategies;
+using Domino.Domain.Entities;
 
 namespace Domino.AITournament.Helpers;
 

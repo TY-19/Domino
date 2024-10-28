@@ -1,6 +1,5 @@
 using Domino.Application.Interfaces;
 using Domino.Application.Models;
-using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Domino.WebAPI.Controllers;

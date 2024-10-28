@@ -4,13 +4,16 @@ using Domino.Application;
 using Domino.Application.Interfaces;
 using Domino.Application.Services;
 using Domino.Application.Strategies;
+using Domino.Application.Validators;
 using Domino.Infrastructure.Repositories;
 using Domino.WebAPI.Common;
 using ElectronNET.API;
 using ElectronNET.API.Entities;
+using FluentValidation;
 using Microsoft.OpenApi.Models;
 using Serilog;
 using Serilog.Events;
+using SharpGrip.FluentValidation.AutoValidation.Mvc.Extensions;
 
 namespace Domino.WebAPI;
 
@@ -31,6 +34,11 @@ public class Program
                     cfg.WithOrigins("*");
                 });
         });
+
+        builder.Services.AddValidatorsFromAssemblyContaining<PlayerCreateDtoValidator>();
+        builder.Services.AddFluentValidationAutoValidation();
+
+
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(options => {
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "Domino", Version = "v1" });
@@ -38,7 +46,7 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddScoped<TournamentService>();
         builder.Services.AddScoped<IGameRepository, GameRepository>();
-        builder.Services.AddScoped<IPlayerRepository, PlayerStatisticRepository>();
+        builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
         builder.Services.AddScoped<IEngineRepository, EngineRepository>();
         builder.Services.AddScoped<IGameService, GameService>();
         builder.Services.AddScoped<IPlayerService, PlayerService>();

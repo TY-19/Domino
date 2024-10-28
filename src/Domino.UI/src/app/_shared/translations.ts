@@ -25,9 +25,13 @@ export interface GameTranslation {
   menu: string;
   colors: string;
   preference: string;
+  rules: string;
   market: string;
   log: string;
   impossibleMove: string;
+  doublePlay: string;
+  yes: string;
+  no: string;
 }
 export interface HintTranslation {
   noNeedToGrab: string;

@@ -133,6 +133,18 @@ $start-button-bg-color: var(--start-button-bg-color);
     font-size: 1.4rem;
     white-space: pre-line;
 }
+.player-message {
+    position: absolute;
+    bottom: 20vh;
+    left: 25%;
+    z-index: 10;
+    width: fit-content;
+    padding: 5px;
+    color: $message-text-color;
+    background-color: $message-bg-color;
+    font-size: 1.4rem;
+    white-space: pre-line;
+}
 .points {
     font-size: larger;
 }

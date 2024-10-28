@@ -24,7 +24,6 @@ public class PlayTileCommandHandler : IRequestHandler<PlayTileCommand, Game>
         }
         currentPlayer.PlayTile(tileDetails);
         var tile = game.Table.PlaceTile(tileDetails, position!.Value);
-        _logger.LogInformation("Writing log");
         game.Log.AddEntry(new GameLogEntry()
         {
             PlayerName = currentPlayer.Name,

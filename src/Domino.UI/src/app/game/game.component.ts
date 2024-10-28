@@ -17,6 +17,7 @@ import { GameplayService } from './gameplay.service';
 import { LanguageService } from '../_shared/language.service';
 import { GameTranslation } from '../_shared/translations';
 import { PlayerInfoComponent } from './player-info/player-info.component';
+import { LocalStorageService } from '../_shared/localstorage.service';
 
 @Component({
   selector: 'Dom-game',
@@ -44,6 +45,9 @@ export class GameComponent implements OnInit {
   @ViewChild(MarketComponent) market: MarketComponent = null!;
   @ViewChild('message') message: MessageComponent = null!;
   @ViewChild('opponentMessage') opponentMessage: MessageComponent = null!;
+  @ViewChild('playerMessage') playerMessage: MessageComponent = null!;
+  @ViewChild('playerInfo') playerInfo: PlayerInfoComponent = null!;
+  @ViewChild('opponentInfo') opponentInfo: PlayerInfoComponent = null!;
   game: GameView = null!;
   // game: GameView = TestGame.getGame();
   showOptions: boolean = false;
@@ -55,7 +59,8 @@ export class GameComponent implements OnInit {
 
   constructor(private gameService: GameService,
     private gameplayService: GameplayService,
-    protected languageService: LanguageService,
+    private languageService: LanguageService,
+    private localStorageService: LocalStorageService,
     private cdr: ChangeDetectorRef,
     private elemRef: ElementRef,
     private displayOptionsService: DisplayOptionsService
@@ -76,7 +81,10 @@ export class GameComponent implements OnInit {
     this.displayOptionsService.setVariables(this.elemRef);
     this.gameService.getCurrentGame()
       .subscribe((game) => {
-        if(game === null) {
+        if(game === null
+          || game.player.name !== this.localStorageService.getPlayerName()
+          || game.opponent.name !== this.localStorageService.getOpponentName()
+        ) {
           this.startGame();
         } else {
           this.game = game;
@@ -92,6 +100,8 @@ export class GameComponent implements OnInit {
         this.cdr.detectChanges();
         this.prepareGame(true);
       });
+    this.playerInfo.fetchPlayerInfo();
+    this.opponentInfo.fetchPlayerInfo();
   }
   private prepareGame(clear?: boolean): void {
     if(clear || this.game.table.tilesOnTable.length <= 0) {
@@ -108,6 +118,11 @@ export class GameComponent implements OnInit {
   }
   selectTile(tileDetails: TileDetails) {
     this.activeTile = tileDetails;
+    if(this.doublePlay
+      && (this.activeTile.tileId === this.doublePlay[0]
+        || this.activeTile.tileId === this.doublePlay[1])) {
+      return;
+    }
     let [play, isLeft] = this.gameplayService.moveSelectedTile(tileDetails, this.game)
     if(play) {
       this.playToSide(isLeft);
@@ -191,6 +206,37 @@ export class GameComponent implements OnInit {
       .buildOpponentMessage(this.game.log.events, this.currentTurn, this.game.opponent.name);
     this.opponentMessage.displayMessage(message);
     this.currentTurn = newCurrentTurn;
+    this.checkForDoublePlay();
+  }
+  checkForDoublePlay() {
+    let [canDoublePlay, leftTileId, rightTileId] = this.gameplayService.checkForDoublePlay(this.game);
+    if(canDoublePlay) {
+      this.doublePlay = [leftTileId ?? "", rightTileId ?? ""];
+      let message = this.names?.doublePlay
+        .replace("{tile1}", leftTileId!)
+        .replace("{tile2}", rightTileId!);
+      this.playerMessage.askForConfirmation(message ?? "");
+    }
+  }
+  doublePlay?: [leftTileId: string, rightTileId: string];
+  makeDoublePlayChoice(confirm: boolean) {
+    if(confirm) {
+      if(!this.doublePlay) {
+        let [canDoublePlay, leftTileId, rightTileId] = this.gameplayService.checkForDoublePlay(this.game);
+        if(canDoublePlay) {
+          this.doublePlay = [leftTileId ?? "", rightTileId ?? ""];
+        } else {
+          return;
+        }
+      }
+      this.gameService.doublePlay(this.doublePlay![0], this.doublePlay![1])
+        .subscribe(gs =>  {
+          this.game = gs;
+          this.updateGameState();
+        });
+    } else {
+      this.doublePlay = undefined;
+    }
   }
   changeColorScheme() {
     this.displayOptionsService.setVariables(this.elemRef);

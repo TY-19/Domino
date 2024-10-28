@@ -10,7 +10,8 @@ public class GrabTileCommandHandler : IRequestHandler<GrabTileCommand, Game>
     {
         var game = command.Game;
         Player currentPlayer = game.IsOpponentTurn ? game.Opponent : game.Player;
-        if(CanGrabAnotherTile(game, currentPlayer))
+        Player previousPlayer = game.IsOpponentTurn ? game.Player : game.Opponent;
+        if(CanGrabAnotherTile(game, currentPlayer, previousPlayer))
         {
             var tile = game.Set.ServeTile();
             currentPlayer.GrabTile(tile);
@@ -26,8 +27,13 @@ public class GrabTileCommandHandler : IRequestHandler<GrabTileCommand, Game>
         }
         return Task.FromResult(game);
     }
-    public static bool CanGrabAnotherTile(Game game, Player currentPlayer)
+    public static bool CanGrabAnotherTile(Game game, Player currentPlayer, Player previousPlayer)
     {
+        if(previousPlayer.GrabInRow >= game.GameRules.MaxGrabsInRow && 
+            currentPlayer.GrabInRow == game.GameRules.MaxGrabsInRow)
+        {
+            previousPlayer.GrabInRow = 0;
+        }
         return currentPlayer.GrabInRow < game.GameRules.MaxGrabsInRow
             && game.Set.TilesCount > game.GameRules.MinLeftInMarket;
     }

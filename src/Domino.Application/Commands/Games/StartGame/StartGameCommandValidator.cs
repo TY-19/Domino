@@ -6,7 +6,7 @@ public class StartGameCommandValidator : AbstractValidator<StartGameCommand>
 {
     public StartGameCommandValidator()
     {
-        RuleFor(x => x.PlayerName).NotEmpty();
-        RuleFor(x => x.OpponentName).NotEmpty();
+        RuleFor(x => x.Player).NotNull();
+        RuleFor(x => x.Opponent).NotNull();
     }
 }

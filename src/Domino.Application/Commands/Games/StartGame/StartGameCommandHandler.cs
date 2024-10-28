@@ -1,4 +1,3 @@
-using Domino.Application.Interfaces;
 using Domino.Domain.Entities;
 using Domino.Domain.Enums;
 using MediatR;
@@ -8,21 +7,16 @@ namespace Domino.Application.Commands.Games.StartGame;
 
 public class StartGameCommandHandler : IRequestHandler<StartGameCommand, Game>
 {
-    private readonly IPlayerRepository _playerRepository;
     private readonly IMemoryCache _cache;
     public StartGameCommandHandler(
-        IPlayerRepository playerRepository,
         IMemoryCache cache)
     {
-        _playerRepository = playerRepository;
         _cache = cache;
     }
-    public async Task<Game> Handle(StartGameCommand command, CancellationToken cancellationToken)
+    public Task<Game> Handle(StartGameCommand command, CancellationToken cancellationToken)
     {
         long id = DateTime.UtcNow.Ticks;
-        PlayerInfo player = await _playerRepository.GetPlayerInfoAsync(command.PlayerName);
-        PlayerInfo opponent = await _playerRepository.GetPlayerInfoAsync(command.OpponentName);
-        var game = new Game(id, player, opponent);
+        var game = new Game(id, command.Player, command.Opponent);
         if(game.GameStatus.GameType == GameType.Normal)
         {
             ServeStartHands(game);
@@ -32,8 +26,8 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, Game>
             LeaveStarterToHunterAndServeHands(game);
         }
         game.IsOpponentTurn = !IsPlayerFirst(game);
-        _cache.Set(player.PlayerName, game);
-        return game;
+        _cache.Set(command.Player.Name, game);
+        return Task.FromResult(game);
     }
     private static void ServeStartHands(Game game, int tilesNumber = 7)
     {

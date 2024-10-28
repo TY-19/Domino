@@ -13,6 +13,12 @@ public class EngineRepository : IEngineRepository
     {
         _connectionString = configuration["ConnectionStrings:LiteDb"] ?? "";
     }
+    public Task<Engine?> GetEngineAsync(string name)
+    {
+        using var db = new LiteDatabase(_connectionString);
+        var col = db.GetCollection<Engine>(Engines);
+        return Task.FromResult(col.Find(e => e.Statistic.PlayerName == name).FirstOrDefault());
+    }
     public Task<List<Engine>> GetAllEnginesAsync()
     {
         using var db = new LiteDatabase(_connectionString);
@@ -20,11 +26,21 @@ public class EngineRepository : IEngineRepository
         return Task.FromResult(col.FindAll().ToList());
     }
     
-     public Task CreateEngineAsync(Engine engine)
+    public Task CreateEngineAsync(Engine engine)
     {
         using var db = new LiteDatabase(_connectionString);
         var col = db.GetCollection<Engine>(Engines);
         col.Upsert(engine.Player.Name, engine);
+        return Task.CompletedTask;
+    }
+    public Task CreateEnginesAsync(List<Engine> engines)
+    {
+        using var db = new LiteDatabase(_connectionString);
+        var col = db.GetCollection<Engine>(Engines);
+        foreach(var engine in engines)
+        {
+            col.Upsert(engine.Statistic.PlayerName, engine);
+        }
         return Task.CompletedTask;
     }
 }

@@ -13,9 +13,13 @@
     "menu": "Menu",
     "colors": "Colors",
     "preference": "Preference",
+    "rules": "Rules",
     "market": "Market",
     "log": "Log",
-    "impossibleMove": "Impossible move"
+    "impossibleMove": "Impossible move",
+    "doublePlay": "You may play two doubles at once.\nDo you want to play {tile1} and {tile2} together?",
+    "yes": "Yes",
+    "no": "No"
   },
   "hints": {
     "noNeedToGrab": "You have a possible tile to play in your hand.\nNo need to grab another one.",

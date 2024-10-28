@@ -5,6 +5,6 @@ namespace Domino.Application.Commands.Games.StartGame;
 
 public class StartGameCommand : IRequest<Game>
 {
-    public string PlayerName { get; set; } = null!;
-    public string OpponentName { get; set; } = null!;
+    public Player Player { get; set; } = null!;
+    public Player Opponent { get; set; } = null!;
 }

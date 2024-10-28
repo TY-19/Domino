@@ -1,4 +1,4 @@
-namespace Domino.Application.Strategies;
+namespace Domino.Domain.Entities;
 
 public class StrategyCoefficients
 {
@@ -11,7 +11,6 @@ public class StrategyCoefficients
     public double GetRidOfPointsCoeff { get; set; } = 0.125;
     public double CutOpponentDoubleCoeff { get; set; } = 3;
     public double PlaySafeCoeff { get; set; } = 1;
-    // Prevent opponent to reverse table to your weakness
     public double ProtectWeaknessCoeff { get; set; } = 1;
     public double NotBeatOwnEdgeCoeff { get; set; } = 1;
 }
