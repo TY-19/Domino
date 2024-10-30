@@ -18,6 +18,14 @@ $start-button-bg-color: var(--start-button-bg-color);
     grid-template-rows: repeat(24, calc(100vh/24));
     gap: 0px;
 }
+@media screen and (max-width: 80vh) {
+    .grid-container {
+        display: grid;
+        grid-template-columns: repeat(12, calc(100vh/12));
+        grid-template-rows: repeat(24, calc(100vh/24));
+        gap: 0px;
+    }
+}
 .grid-item {
     text-align: center;
     border: 1px solid black;
@@ -46,6 +54,7 @@ $start-button-bg-color: var(--start-button-bg-color);
     color: $menu-text-color;
     background-color: $menu-bg-color;
     cursor: default;
+    font-size: 1.15vw;
 }
 .menu-open {
     grid-row-start: 4;
@@ -68,7 +77,7 @@ $start-button-bg-color: var(--start-button-bg-color);
     grid-template-rows: repeat(auto-fill, 3vh);
     gap: 0;
 }
-.market {
+.sidebar {
     grid-column-start: 11;
     grid-column-end: -1;
     grid-row-start: 4;
@@ -77,6 +86,8 @@ $start-button-bg-color: var(--start-button-bg-color);
     border-top-width: 2px;
     border-right: none;
     padding: 5px 5px 5px 5px;
+    height: 75.1vh;
+    overflow-y: auto;
 }
 .player-hand {
     grid-column-start: 1;

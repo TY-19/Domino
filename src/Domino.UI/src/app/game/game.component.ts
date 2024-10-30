@@ -18,6 +18,9 @@ import { LanguageService } from '../_shared/language.service';
 import { GameTranslation } from '../_shared/translations';
 import { PlayerInfoComponent } from './player-info/player-info.component';
 import { LocalStorageService } from '../_shared/localstorage.service';
+import { SideBarType } from './enums/sidebarType';
+import { GameLogComponent } from "./game-log/game-log.component";
+import { GameRulesComponent } from './game-rules/game-rules.component';
 
 @Component({
   selector: 'Dom-game',
@@ -26,12 +29,14 @@ import { LocalStorageService } from '../_shared/localstorage.service';
     RouterLink,
     TileComponent,
     GameTableComponent,
+    GameRulesComponent,
     OpponentHandComponent,
     MarketComponent,
     PlayerInfoComponent,
     PlayerHandComponent,
     DisplayOptionsComponent,
-    MessageComponent
+    MessageComponent,
+    GameLogComponent
 ],
   templateUrl: './game.component.html',
   styleUrl: './game.component.scss',
@@ -50,7 +55,9 @@ export class GameComponent implements OnInit {
   @ViewChild('opponentInfo') opponentInfo: PlayerInfoComponent = null!;
   game: GameView = null!;
   // game: GameView = TestGame.getGame();
-  showOptions: boolean = false;
+  showOptions: boolean = true;
+  optionsContent: number = 2;
+  sideBarContent: SideBarType = SideBarType.Market;
   activeTile: TileDetails | null = null;
   currentTurn: number = 0;
   get names(): GameTranslation | undefined {
@@ -240,6 +247,11 @@ export class GameComponent implements OnInit {
   }
   changeColorScheme() {
     this.displayOptionsService.setVariables(this.elemRef);
+    this.optionsContent = 1;
+    this.showOptions = !this.showOptions;
+  }
+  changeRules() {
+    this.optionsContent = 2;
     this.showOptions = !this.showOptions;
   }
 }

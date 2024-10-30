@@ -16,12 +16,18 @@
     <div [routerLink]="['']" class="grid-item menu-button">{{names?.menu}}</div>
     <div class="grid-item menu-button" (click)="changeColorScheme()">{{names?.colors}}</div>
     <div class="grid-item menu-button">{{names?.preference}}</div>
-    <div class="grid-item menu-button" (click)="checkForDoublePlay()">{{names?.rules}}</div>
-    <div class="grid-item menu-button">{{names?.market}}</div>
-    <div class="grid-item menu-button">{{names?.log}}</div>
+    <div class="grid-item menu-button" (click)="changeRules()">{{names?.rules}}</div>
+    <div class="grid-item menu-button" (click)="sideBarContent = 0">{{names?.market}}</div>
+    <div class="grid-item menu-button" (click)="sideBarContent = 1">{{names?.log}}</div>
     @if(showOptions) {
-      <Dom-display-options (closeOptions)="changeColorScheme()" class="grid-item menu-open">
-      </Dom-display-options>
+      @if(optionsContent === 1) {
+        <Dom-display-options (closeOptions)="changeColorScheme()" class="grid-item menu-open">
+        </Dom-display-options>
+      }
+      @else {
+        <Dom-game-rules class="grid-item menu-open">
+        </Dom-game-rules>
+      }
     }
     @if(game) {
       <Dom-opponent-hand class="grid-item opponent-hand">
@@ -30,10 +36,15 @@
         (playToSide)="playToSide($event)"
         class="grid-item game-table">
       </Dom-game-table>
-      <div class="grid-item market">
-        <p>{{names?.market}}</p>
-        <Dom-market (grabTile)="grabTile($event)">
-        </Dom-market>
+      <div class="grid-item sidebar">
+        @if(sideBarContent == 0) {
+          <Dom-market [count]="game.marketTilesCount"
+            (grabTile)="grabTile($event)">
+          </Dom-market>
+        } @else {
+          <Dom-game-log [log]="game.log.events">
+          </Dom-game-log>
+        }
       </div>
       <Dom-player-hand [playerHand]="game.player.hand"
         [activeTileId]="activeTile?.tileId"

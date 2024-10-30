@@ -1,0 +1,17 @@
+.minus {
+    display: inline-block;
+    background-color: red;
+    margin-left: 2px;
+    margin-right: 16px;
+    inline-size: 20px;
+}
+.plus {
+    background-color: green;
+    inline-size: 20px;
+    margin-left: -20px; 
+}
+.elements {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 10px;
+}

@@ -1,0 +1,95 @@
+<div class="ml-4 relative">
+    <div>{{names?.instruction}}</div>
+    <div (click)="saveRules()"
+        class="text-2xl/10 right-1 top-1 p-2 absolute bg-green-500 cursor-default">
+        {{names?.save}}
+    </div>
+    <div>
+      <div class="flex flex-row border-b-2 pb-4 mb-4">
+        <div class="mr-4">{{names?.maxGrabsInRow}}</div>
+        <input type="number" min="0" max="28" [(ngModel)]="gameRules.maxGrabsInRow" class="w-11 pl-2">
+      </div>
+    </div>
+    <div>
+      <div class="flex flex-row border-b-2 pb-4 mb-4">
+        <div class="mr-4">{{names?.minLeftInMarket}}</div>
+        <input type="number" min="0" max="28" [(ngModel)]="gameRules.minLeftInMarket" class="w-11 pl-2">
+      </div>
+    </div>
+    <div>
+      <div class="flex flex-row border-b-2 pb-4 mb-4">
+        <div class="mr-4">{{names?.starterTiles}}</div>
+        <div class="elements">
+            @for(id of gameRules.starterTiles; track id) {
+                <p (click)="removeStarterTile(id)" class="whitespace-nowrap">
+                    <span class="font-bold">{{id}}</span>
+                    <span class="minus">-</span>
+                </p>
+            }
+            <input #starterTileId type="text" placeholder="1-1" pattern="[0123456]-[0123456]"
+                class="w-11 pl-2 invalid:text-red-500">
+            <p class="plus" (click)="addStarterTile(starterTileId)">+</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="flex flex-row border-b-2 pb-4 mb-4">
+        <div class="mr-4">{{names?.huntStarterTiles}}</div>
+        <div class="elements">
+            @for(id of gameRules.huntStarterTiles; track id) {
+                <p (click)="removeHuntStarterTile(id)" class="whitespace-nowrap">
+                    <span class="font-bold">{{id}}</span>
+                    <span class="minus">-</span>
+                </p>
+            }
+            <input #huntStarterTileId type="text" placeholder="1-1" pattern="[0123456]-[0123456]"
+                class="w-11 pl-2 invalid:text-red-500">
+            <p class="plus" (click)="addHuntStarterTile(huntStarterTileId)">+</p>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="flex flex-row border-b-2 pb-4 mb-4">
+        <div class="mr-4">{{names?.pointsToStartHunt}}</div>
+        <input type="number" min="0" max="9999" [(ngModel)]="gameRules.pointsToStartHunt" class="w-16 pl-2">
+      </div>
+    </div>
+    <div>
+      <div class="flex flex-row border-b-2 pb-4 mb-4">
+        <div class="mr-4">{{names?.workGoat}}</div>
+        <input type="checkbox" [(ngModel)]="gameRules.workGoat">
+      </div>
+    </div>
+    <div>
+      <div class="flex flex-row border-b-2 pb-4 mb-4">
+        <div class="mr-4">{{names?.totalPointsToLoseWithGoat}}</div>
+        <input type="number" min="0" max="9999" [(ngModel)]="gameRules.totalPointsToLoseWithGoat" class="w-16 pl-2">
+      </div>
+    </div>
+    <div>
+      <div class="flex flex-row border-b-2 pb-4 mb-4">
+        <div class="mr-4">{{names?.lastTilePoints}}</div>
+        <div class="elements">
+            <!-- @for(record of iterateThrough(gameRules.lastTilePoints); track record.key) {
+                <p class="whitespace-nowrap">
+                    <span class="font-bold">{{record.key}}</span>
+                    <span class="font-bold">{{record.value}}</span>
+                    <span class="minus">-</span>
+                </p>
+            }
+            <input #lastTilePoints type="text" placeholder="1-1" pattern="[0123456]-[0123456]"
+                class="w-11 pl-2 invalid:text-red-500">
+            <input #lastTilePoints type="number" min="0" max="9999"
+                class="w-11 pl-2">
+            <p class="plus">+</p> -->
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="flex flex-row border-b-2 pb-4 mb-4">
+        <div class="mr-4">{{names?.morePointToEndWith}}</div>
+        <div></div>
+      </div>
+    </div>
+  </div>
+  

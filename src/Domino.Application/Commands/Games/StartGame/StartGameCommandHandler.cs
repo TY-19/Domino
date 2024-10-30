@@ -16,7 +16,7 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, Game>
     public Task<Game> Handle(StartGameCommand command, CancellationToken cancellationToken)
     {
         long id = DateTime.UtcNow.Ticks;
-        var game = new Game(id, command.Player, command.Opponent);
+        var game = new Game(id, command.Player, command.Opponent, command.Rules);
         if(game.GameStatus.GameType == GameType.Normal)
         {
             ServeStartHands(game);

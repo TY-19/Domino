@@ -15,8 +15,8 @@ public class GameResult
         if(winner == null)
         {
             IsDraw = true;
-            var playerRecord = new PlayerResultRecord(game.Player, PlayerResultType.Draw);
-            var opponentRecord = new PlayerResultRecord(game.Opponent, PlayerResultType.Draw);
+            var playerRecord = new PlayerResultRecord(game.Player, PlayerResultType.Draw, game.GameRules);
+            var opponentRecord = new PlayerResultRecord(game.Opponent, PlayerResultType.Draw, game.GameRules);
             PlayerResultRecords.Add(playerRecord);
             PlayerResultRecords.Add(opponentRecord);
             Dictionary<string, string> data = new()
@@ -32,11 +32,19 @@ public class GameResult
         {
             IsDraw = false;
             Player loser = winner.Name == game.Player.Name ? game.Opponent : game.Player;
-            var winnerRecord = new PlayerResultRecord(winner, PlayerResultType.Win);
-            var loserRecord = new PlayerResultRecord(loser, PlayerResultType.Lose);
+            var winnerRecord = new PlayerResultRecord(winner, PlayerResultType.Win, game.GameRules);
+            var loserRecord = new PlayerResultRecord(loser, PlayerResultType.Lose, game.GameRules);
+            var lastTileId = game.Log.Events
+                .Where(e => e.PlayerName == winner.Name)
+                .MaxBy(e => e.MoveNumber)?.Tile?.TileDetails.TileId ?? "-1";
+            var victoryType = ChooseVictoryType(winner, loser, game, lastTileId);
+            if(game.GameRules.MorePointToEndWith.TryGetValue(lastTileId, out int additionalPoints)
+                && victoryType == VictoryType.Normal)
+            {
+                loserRecord.PointsLeft += additionalPoints;
+            }
             PlayerResultRecords.Add(winnerRecord);
             PlayerResultRecords.Add(loserRecord);
-            var victoryType = ChooseVictoryType(winner, loser, game);
             Dictionary<string, string> data = new()
             {
                 { "winner", winner.Name },
@@ -49,18 +57,15 @@ public class GameResult
             Result = new(victoryType, data);
         }
     }
-    private static VictoryType ChooseVictoryType(Player winner, Player loser, Game game)
+    private static VictoryType ChooseVictoryType(Player winner, Player loser, Game game, string lastTileId)
     {
-        var lastTile = game.Log.Events
-            .Where(e => e.PlayerName == winner.Name)
-            .MaxBy(e => e.MoveNumber);
         if(game.GameStatus.IsHunted(loser.Name))
         {
-            return lastTile?.Tile?.TileDetails.TileId == "0-0" 
+            return lastTileId == "0-0" 
                 ? VictoryType.General
                 : VictoryType.Goat;
         }
-        else if(lastTile?.Tile?.TileDetails.TileId == "0-0")
+        else if(lastTileId == "0-0")
         {
             return VictoryType.Officer;
         }

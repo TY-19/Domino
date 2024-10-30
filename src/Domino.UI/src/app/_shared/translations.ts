@@ -10,6 +10,8 @@ export interface Translation {
   errors: Record<ErrorType, string>;
   results: Record<VictoryType, string>;
   statistics: StatisticsTranslation;
+  log: LogTranslation;
+  rules: RulesTranslation;
 }
 export interface MenuTranslation {
   startGame: string;
@@ -78,4 +80,25 @@ export interface StatisticsTranslation {
   hunted: string;
   clearPoints: string;
   totalPoints: string;
+}
+export interface LogTranslation {
+  number: string;
+  move: string;
+  playTile: string;
+  grabTile: string;
+}
+export interface RulesTranslation {
+  instruction: string;
+  save: string;
+  maxGrabsInRow: string;
+  minLeftInMarket: string;
+  pointsToStartHunt: string;
+  workGoat: string;
+  totalPointsToLoseWithGoat: string;
+  starterTiles: string;
+  huntStarterTiles: string;
+  add: string;
+  remove: string;
+  lastTilePoints: string;
+  morePointToEndWith: string;
 }

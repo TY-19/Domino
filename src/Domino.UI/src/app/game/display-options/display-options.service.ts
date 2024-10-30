@@ -1,6 +1,6 @@
 import { ElementRef, Injectable } from "@angular/core";
 import { LocalStorageService } from "../../_shared/localstorage.service";
-import { DefaultDisplayOptions } from "../../_defaults/default-display-options";
+import { DefaultDisplayOptions } from "../../_defaults/defaultDisplayOptions";
 import { DisplayOptions } from "../../_models/displayOptions";
 
 @Injectable({

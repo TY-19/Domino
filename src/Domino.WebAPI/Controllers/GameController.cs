@@ -1,5 +1,6 @@
 using Domino.Application.Interfaces;
 using Domino.Application.Models;
+using Domino.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Domino.WebAPI.Controllers;
@@ -20,10 +21,11 @@ public class GameController : ControllerBase
         return currentGame == null ? NotFound() : Ok(currentGame);
     }
 
-    [HttpGet("start")]
-    public async Task<ActionResult<GameView>> StartGame(string playerName = "Test", string opponentName = "AI")
+    [HttpPost("start")]
+    public async Task<ActionResult<GameView>> StartGame(string playerName = "Test",
+        string opponentName = "AI", GameRules? rules = null)
     {
-        return Ok(await _gameService.StartGameAsync(playerName, opponentName));
+        return Ok(await _gameService.StartGameAsync(playerName, opponentName, rules));
     }
     [HttpPost("play")]
     public async Task<ActionResult<GameView>> PlayTile(string playerName, PlayTileDto playTileDto)

@@ -103,10 +103,10 @@ public class AdvancedStrategy : StrategyBase
                 MyHand = CountMyHandWeight(tile, endOne, endTwo),
                 OpponentHand = CountOpponentHandWeight(endOne, endTwo),
                 OpponentPossibleHand = CountOpponentPossibleHandWeight(gameView.Opponent.TilesCount, endOne, endTwo),
-                LeaveOfficer = tile.IsOfficer ? -100 : 0,
+                LeaveOfficer = tile.IsOfficer ? -10 : 0,
                 DontKeepDoubles = tile.IsDouble
                     ? gameView.Table.TilesOnTable.Select(td => td.TileDetails)
-                        .Count(t => t.SideA == tile.SideA || t.SideB == tile.SideB)
+                        .Count(t => t.SideA == tile.SideA || t.SideB == tile.SideB) * 2
                     : 0,
                 CutOpponentDouble = CalculateCutOpponentTileWeight(gameView, i),
                 PlaySafe = CalculatePlaySafeWeight(gameView, tile, endOne, endTwo),
@@ -254,11 +254,11 @@ public class AdvancedStrategy : StrategyBase
         {
             if(_hiddenTiles.Any(t => t.IsOfficer) && (endOne == 0 || endTwo == 0))
             {
-                weight -= 100;
+                weight -= 10;
             }
             if(_hiddenTiles.Any(t => t.TileId == "6-6") && (endOne == 6 || endTwo == 6))
             {
-                weight -= 50;
+                weight -= 5;
             }
         }
         else if(gameView.Opponent.TilesCount == 2)
@@ -266,7 +266,7 @@ public class AdvancedStrategy : StrategyBase
             if(_hiddenTiles.Any(t => t.IsOfficer) && (endOne == 0 || endTwo == 0)
                 && _hiddenTiles.Any(t => t.TileId == "6-6") && (endOne == 6 || endTwo == 6))
             {
-                weight -= 200;
+                weight -= 20;
             }
         }
         return weight;

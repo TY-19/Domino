@@ -15,27 +15,13 @@ public class Game
     public GameResult? GameResult { get; private set; }
     public GameError? GameError { get; set; }
     public bool IsOpponentTurn { get; set; }
-    private Game(long id)
+    public Game(long id, Player player, Player opponent, GameRules gameRules)
     {
         Id = id;
         Set = new();
-        GameRules = new(new GameRulesPrototype());
-        Table = null!;
         Log = new();
         GameStatus = new();
-        Player = null!;
-        Opponent = null!;
-    }
-    public Game(long id, string playerName = "Player", string opponentName = "AI")
-        : this(id, new Player(playerName), new Player(opponentName))
-    {
-    }
-    public Game(long id, PlayerInfo player, PlayerInfo opponent)
-        : this(id, new Player(player), new Player(opponent))
-    {
-    }
-    public Game(long id, Player player, Player opponent) : this(id)
-    {
+        GameRules = gameRules;
         Player = player;
         Opponent = opponent;
         SetGameType();

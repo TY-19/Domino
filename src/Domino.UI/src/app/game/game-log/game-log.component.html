@@ -1,0 +1,12 @@
+<table class="w-full">
+    <tr>
+        <th class="w-[4vh] px-2 text-left font-bold">#</th>
+        <th class="text-center">Event</th>
+    </tr>
+    @for(event of log; track event.moveNumber) {
+        <tr>
+            <td class="px-2 text-left">{{event.moveNumber}}:</td>
+            <td class="text-left"><span class="font-bold">{{event.playerName}}</span>{{getText(event)}}</td>
+        </tr>
+    }
+</table>

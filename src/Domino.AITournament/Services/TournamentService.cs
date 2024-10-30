@@ -15,6 +15,21 @@ namespace Domino.AITournament.Services;
 
 public class TournamentService
 {
+    private static readonly GameRules DefaultRules = new() 
+    {
+        MaxGrabsInRow = 3,
+        MinLeftInMarket = 1,
+        PointsToStartHunt = 25,
+        WorkGoat = true,
+        TotalPointsToLoseWithGoat = 125,
+        StarterTiles = ["1-1", "2-2", "3-3", "4-4", "5-5", "6-6"],
+        HuntStarterTiles = ["6-6"],
+        LastTilePoints = new()
+        {
+            { "0-0", 25 },
+            { "6-6", 100 }
+        }
+    };
     private readonly IEngineRepository _engineRepository;
     private readonly IGameRepository _gameRepository;
     private readonly IMediator _mediator;
@@ -99,11 +114,8 @@ public class TournamentService
     }
     public async Task<GameView?> PlayMatchAsync(Engine one, Engine two)
     {
-        // var time = DateTimeOffset.UtcNow;
-        
-        // repository to create player
         long id = DateTime.UtcNow.Ticks;
-        var game = new Game(id, one.Player, two.Player);
+        var game = new Game(id, one.Player, two.Player, DefaultRules);
         if(game.GameStatus.GameType == GameType.Hunt)
         {
             LeaveStarterToHunterAndServeHands(game);
@@ -143,12 +155,6 @@ public class TournamentService
                     var move = strategy.SelectMove(game.ToGameView(activePlayer.Name));
                     game = await _mediator.Send(new MakeOpponentMoveCommand() { Game = game, Move = move });
                 }
-                // game.TrySetResult();
-                // if(game.GameResult?.IsEnded == true)
-                // {
-                //     await _mediator.Send(new UpdatePlayersStatisticCommand() { Game = game });
-                //     // await _mediator.Send(new SaveGameCommand() { Game = game });
-                // }
             }
             else
             {
@@ -169,12 +175,6 @@ public class TournamentService
                     var move = strategy.SelectMove(game.ToGameView(activePlayer.Name));
                     game = await _mediator.Send(new MakeOpponentMoveCommand() { Game = game, Move = move });
                 }
-                // game.TrySetResult();
-                // if(game.GameResult?.IsEnded == true)
-                // {
-                //     await _mediator.Send(new UpdatePlayersStatisticCommand() { Game = game });
-                //     // await _mediator.Send(new SaveGameCommand() { Game = game });
-                // }
             }
             isEnded = game.GameResult?.IsEnded ?? false;
         }
@@ -183,9 +183,6 @@ public class TournamentService
             Console.WriteLine("Game has not ended " + game.Id);
             await _mediator.Send(new SaveGameCommand() { Game = game });
         }
-        // var timeEnd = DateTimeOffset.UtcNow;
-        // TimeSpan timeSpan = timeEnd - time;
-        // Console.WriteLine("Game has took " + timeSpan.TotalSeconds + " seconds");
         return game.ToGameView(one.Player.Name);
     }
     private static int CompareEngineScores(Engine one, Engine two)

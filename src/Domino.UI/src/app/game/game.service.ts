@@ -5,6 +5,7 @@ import { GameView } from "../_models/gameView";
 import { catchError, Observable, of, throwError } from "rxjs";
 import { DominoTile } from "../_models/dominoTile";
 import { LocalStorageService } from "../_shared/localstorage.service";
+import { defaultRules } from "../_defaults/defaultRules";
 
 @Injectable({
     providedIn: 'root',
@@ -29,7 +30,8 @@ export class GameService {
     if(opponentName) {
       params = params.set('opponentName', opponentName);
     }
-    return this.http.get<GameView>(url, { params });
+    let gameRules = this.localStorageService.getGameRules() ?? defaultRules;
+    return this.http.post<GameView>(url, gameRules, { params });
   }
   playTile(tile: DominoTile): Observable<GameView> {
     const url: string = baseUrl + "/Game/play";

@@ -8,5 +8,6 @@ public class StartGameCommandValidator : AbstractValidator<StartGameCommand>
     {
         RuleFor(x => x.Player).NotNull();
         RuleFor(x => x.Opponent).NotNull();
+        RuleFor(x => x.Rules).NotNull();
     }
 }

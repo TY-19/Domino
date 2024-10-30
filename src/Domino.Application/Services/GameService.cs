@@ -36,12 +36,14 @@ public class GameService : IGameService
         });
         return game?.ToGameView(game.Player.Name);
     }
-    public async Task<GameView> StartGameAsync(string playerName, string opponentName)
+    public async Task<GameView> StartGameAsync(string playerName, string opponentName,
+        GameRules? rules = null)
     {
         var command = new StartGameCommand()
         {
             Player = await _mediator.Send(new CreatePlayerCommand() { PlayerName = playerName }),
             Opponent = await _mediator.Send(new CreatePlayerCommand() { PlayerName = opponentName, IsAI = true }),
+            Rules = rules ?? DefaultRules
         };
         var game = await _mediator.Send(command);
         // _logger.LogInformation("Current game: {@game}", game);
@@ -142,4 +144,24 @@ public class GameService : IGameService
         }
         return game;
     }
+
+    private static readonly GameRules DefaultRules = new() 
+    {
+        MaxGrabsInRow = 3,
+        MinLeftInMarket = 1,
+        PointsToStartHunt = 25,
+        WorkGoat = true,
+        TotalPointsToLoseWithGoat = 125,
+        StarterTiles = ["1-1", "2-2", "3-3", "4-4", "5-5", "6-6"],
+        HuntStarterTiles = ["6-6"],
+        LastTilePoints = new()
+        {
+            { "0-0", 25 },
+            { "6-6", 50 }
+        },
+        MorePointToEndWith = new()
+        {
+            { "6-6", 100 }
+        }
+    };
 }

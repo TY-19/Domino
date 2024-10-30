@@ -83,5 +83,26 @@
     "hunted": "Hunted",
     "clearPoints": "Clear points",
     "totalPoints": "Total points left with"
+  },
+  "log": {
+    "number": "#",
+    "move": "Move",
+    "playTile": " plays ",
+    "grabTile": " grabs a tile."
+  },
+  "rules": {
+    "instruction": "Select set of rules that will be applied when new game starts:",
+    "save": "Save",
+    "maxGrabsInRow": "Maximal number of tiles that can be grabbed from the market in a row:",
+    "minLeftInMarket": "Minimal number of tiles that must remain on the market and cannot be grabbed:",
+    "pointsToStartHunt": "Number of point that player must be left with that starts a hunt:",
+    "workGoat": "Allow a work goat lose (a player with certain amount of points lose with goat without a hunt):",
+    "totalPointsToLoseWithGoat": "Total points that needs to be impose on player to become a work goat:",
+    "starterTiles": "Tiles that can start game by the priority:",
+    "huntStarterTiles": "Tiles that can start hunt by the priority:",
+    "add": "Add",
+    "remove": "Remove",
+    "lastTilePoints": "Tiles that can impose additional points if left in the losing hand by itself:",
+    "morePointToEndWith": "Tiles that can impose additional points on the loser if game ended with it:"
   }
 }

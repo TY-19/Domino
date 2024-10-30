@@ -8,5 +8,5 @@ import { Component } from '@angular/core';
   styleUrl: './version.component.scss'
 })
 export class VersionComponent {
-  version: string = "v. 0.0.40";
+  version: string = "v. 0.0.41";
 }
