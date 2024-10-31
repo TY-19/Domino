@@ -107,8 +107,12 @@ export class GameComponent implements OnInit {
         this.cdr.detectChanges();
         this.prepareGame(true);
       });
-    this.playerInfo.fetchPlayerInfo();
-    this.opponentInfo.fetchPlayerInfo();
+    if(this.playerInfo) {
+      this.playerInfo.fetchPlayerInfo();
+    }
+    if(this.opponentInfo) {
+      this.opponentInfo.fetchPlayerInfo();
+    }
   }
   private prepareGame(clear?: boolean): void {
     if(clear || this.game.table.tilesOnTable.length <= 0) {

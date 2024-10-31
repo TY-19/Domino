@@ -74,45 +74,6 @@ public class DefaultCoefficients
         },
         new() {
             RandomnessCoef = 0,
-            MyHandCoeff = 1.3011917918964442,
-            OpponentHandCoeff = 0.05734225438972312,
-            OpponentPossibleHandCoeff = 0.7786694064862578,
-            LeaveOfficerCoeff = 0.13541691709394502,
-            DontKeepDoublesCoeff = 0.7841061555934975,
-            GetRidOfPointsCoeff = 1.1324561052336177,
-            CutOpponentDoubleCoeff = 1.5228528450602423,
-            PlaySafeCoeff = 1.228654247866952,
-            ProtectWeaknessCoeff = 1.072793538149269,
-            NotBeatOwnEdgeCoeff = 0.9865167382300518
-        },
-        new() {
-            RandomnessCoef = 0,
-            MyHandCoeff = 0.2143560046301151,
-            OpponentHandCoeff = 1.7582825062331873,
-            OpponentPossibleHandCoeff = 0.2074028869279584,
-            LeaveOfficerCoeff = 0.7642748058406539,
-            DontKeepDoublesCoeff = 1.1816430651360732,
-            GetRidOfPointsCoeff = 1.3868977527098927,
-            CutOpponentDoubleCoeff = 1.5295461291090247,
-            PlaySafeCoeff = 0.5661700155245628,
-            ProtectWeaknessCoeff = 0.20892552459654531,
-            NotBeatOwnEdgeCoeff = 1.1825013092919874
-        },
-        new() {
-            RandomnessCoef = 0,
-            MyHandCoeff = 1.6637056314917666,
-            OpponentHandCoeff = 0.45842061516629173,
-            OpponentPossibleHandCoeff = 1.616543722216446,
-            LeaveOfficerCoeff = 0.025946345477366996,
-            DontKeepDoublesCoeff = 0.6121072583797,
-            GetRidOfPointsCoeff = 0.08708613473634073,
-            CutOpponentDoubleCoeff = 0.4016534437448292,
-            PlaySafeCoeff = 0.9756910748367938,
-            ProtectWeaknessCoeff = 1.6928486718854652,
-            NotBeatOwnEdgeCoeff = 1.4659971020649998
-        },
-        new() {
-            RandomnessCoef = 0,
             MyHandCoeff = 0.9740013864441693,
             OpponentHandCoeff = 0.9933149332798719,
             OpponentPossibleHandCoeff = 1.0931494212511808,
@@ -136,19 +97,6 @@ public class DefaultCoefficients
             PlaySafeCoeff = 0.05314166411569729,
             ProtectWeaknessCoeff = 0.8835669345043345,
             NotBeatOwnEdgeCoeff = 1.185470469748581
-        },
-        new() {
-            RandomnessCoef = 0,
-            MyHandCoeff = 0.3682299226231207,
-            OpponentHandCoeff = 0.1587192561034278,
-            OpponentPossibleHandCoeff = 1.1487511463367726,
-            LeaveOfficerCoeff = 1.4963476853069557,
-            DontKeepDoublesCoeff = 0.9896363760415855,
-            GetRidOfPointsCoeff = 1.4663673014874705,
-            CutOpponentDoubleCoeff = 0.9211950317689983,
-            PlaySafeCoeff = 1.502685711761938,
-            ProtectWeaknessCoeff = 0.4236443122689586,
-            NotBeatOwnEdgeCoeff = 0.5244232563007726
         }
     ];
     public StrategyCoefficients GetOneOfDefaultCoefficients()

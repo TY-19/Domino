@@ -15,10 +15,9 @@ public class GameController : ControllerBase
         _gameService = gameService;
     }
     [HttpGet("current")]
-    public async Task<ActionResult<GameView>> GetCurrentGame(string playerName)
+    public async Task<ActionResult<GameView?>> GetCurrentGame(string playerName)
     {
-        var currentGame = await _gameService.GetCurrentGameAsync(playerName);
-        return currentGame == null ? NotFound() : Ok(currentGame);
+        return Ok(await _gameService.GetCurrentGameAsync(playerName));
     }
 
     [HttpPost("start")]

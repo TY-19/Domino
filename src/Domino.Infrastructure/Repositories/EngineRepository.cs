@@ -33,7 +33,7 @@ public class EngineRepository : IEngineRepository
         col.Upsert(engine.Player.Name, engine);
         return Task.CompletedTask;
     }
-    public Task CreateEnginesAsync(List<Engine> engines)
+    public Task SaveEnginesAsync(List<Engine> engines)
     {
         using var db = new LiteDatabase(_connectionString);
         var col = db.GetCollection<Engine>(Engines);

@@ -41,9 +41,16 @@ public class PlayerRepository : IPlayerRepository
     }
     public Task<PlayerStatistic?> GetPlayerStatisticsAsync(string playerName)
     {
-        using var db = new LiteDatabase(_connectionString);
-        var col = db.GetCollection<PlayerStatistic>(PlayersStatistics);
-        return Task.FromResult(col.Find(e => e.PlayerName == playerName).FirstOrDefault());
+        try
+        {
+            using var db = new LiteDatabase(_connectionString);
+            var col = db.GetCollection<PlayerStatistic>(PlayersStatistics);
+            return Task.FromResult(col.Find(e => e.PlayerName == playerName).FirstOrDefault());
+        }
+        catch
+        {
+            return Task.FromResult((PlayerStatistic?)null);
+        }
     }
     public Task UpdatePlayerStatisticAsync(PlayerStatistic playerStatistic)
     {

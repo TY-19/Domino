@@ -8,7 +8,7 @@ public class NLHSampler
     private readonly int _sampleSize = 1000;
     private readonly int _parameterCount = 10;
     private readonly double _parameterRange = 9.0;
-    public NLHSampler(int sampleSize = 1000, int parameterCount = 10, double parameterRange = 9.0)
+    public NLHSampler(int sampleSize = 1000, int parameterCount = 10, double parameterRange = 999.0)
     {
         _sampleSize = sampleSize;
         _parameterCount = parameterCount;

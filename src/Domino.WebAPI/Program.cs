@@ -72,7 +72,7 @@ public class Program
 
         if(!HybridSupport.IsElectronActive)
         {
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
         }
         
         app.MapGet("/api/test", () => new { result = "Succeeded" });

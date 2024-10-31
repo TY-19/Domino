@@ -20,8 +20,7 @@ export class GameService {
   getCurrentGame(): Observable<GameView | null> {
     let url: string = baseUrl + "/Game/current";
     let params = this.getPlayerNameQueryParameter(new HttpParams());
-    return this.http.get<GameView>(url, { params })
-      .pipe(catchError(() => of(null)));
+    return this.http.get<GameView | null>(url, { params });
   }
   startGame(): Observable<GameView> {
     let url: string = baseUrl + "/Game/start";

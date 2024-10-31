@@ -42,12 +42,27 @@ public class TournamentController : ControllerBase
     {
         return Ok(await _tournamentService.CreateTournamentAsync());
     }
+    [HttpGet("playRealMatch")]
+    public async Task<ActionResult<IEnumerable<Engine>>> PlayMatch(int numberGames, string one, string two)
+    {
+        return Ok(await _tournamentService.PlayMatchAsync(numberGames, one, two));
+    }
+    [HttpPost("playDefaultAI")]
+    public async Task<ActionResult<IEnumerable<Engine>>> PlayDefaultAI(int numberGames = 50)
+    {
+        return Ok(await _tournamentService.PlayDefaultAITournamentAsync(numberGames));
+    }
     [HttpGet("testplay")]
-    public async Task<ActionResult<GameView?>> PlayMatch()
+    public async Task<ActionResult<GameView?>> PlayTestMatch()
     {
         var engineOne = new Engine("test_tournament_1", new StrategyCoefficients());
         var engineTwo = new Engine("test_tournament_2", new StrategyCoefficients());
         var game = await _tournamentService.PlayMatchAsync(engineOne, engineTwo);
         return Ok(game);
+    }
+    [HttpGet("testmatch")]
+    public async Task<ActionResult<List<Engine>>> PlayTest()
+    {
+        return Ok(await _tournamentService.TestPlayMatch());
     }
 }

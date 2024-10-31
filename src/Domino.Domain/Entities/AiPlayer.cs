@@ -18,7 +18,7 @@ public class AiPlayer : Player
     {
         
     }
-    public AiPlayer(string name, StrategyCoefficients coefficients)
+    public AiPlayer(string name, StrategyCoefficients coefficients): this(new PlayerInfo(name, coefficients))
     {
         Name = name;
         _coeffs = coefficients;
