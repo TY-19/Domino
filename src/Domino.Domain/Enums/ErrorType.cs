@@ -8,5 +8,6 @@ public enum ErrorType
     NoTileInHand = 103,
     NoPlaceForTile = 104,
     TileCannotStartGame = 105,
-    TileCannotStartHunt = 106
+    TileCannotStartHunt = 106,
+    GameEnded = 107
 }

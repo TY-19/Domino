@@ -67,6 +67,6 @@ public class StartGameCommandHandler : IRequestHandler<StartGameCommand, Game>
                 return false;
             }
         }
-        return true;
+        return false;
     }
 }

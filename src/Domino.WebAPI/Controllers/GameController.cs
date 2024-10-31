@@ -1,6 +1,9 @@
+using Domino.Application.Exceptions;
+using Domino.Application.Extensions;
 using Domino.Application.Interfaces;
 using Domino.Application.Models;
 using Domino.Domain.Entities;
+using Domino.Domain.Enums;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Domino.WebAPI.Controllers;

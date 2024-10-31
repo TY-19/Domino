@@ -55,7 +55,8 @@
     "103": "No tile with such an id in the hand.",
     "104": "The tile can't be played on the table.",
     "105": "The tile {tileId} cannot start the game.\nCurrent rules define starter tiles in such an order:\n{starters}",
-    "106": "The tile {tileId} cannot start the hunt.\nYou need to play {starters} and if you win it will counts as Goat Victory!\n"
+    "106": "The tile {tileId} cannot start the hunt.\nYou need to play {starters} and if you win it will counts as Goat Victory!\n",
+    "107": "The game has already ended."
   },
   "results": {
     "0": "{winner} win! Normal victory. \n{loser} is left with {pointsLeft} points.",

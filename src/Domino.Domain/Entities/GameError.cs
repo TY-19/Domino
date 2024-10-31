@@ -14,6 +14,7 @@ public class GameError
         { ErrorType.NoPlaceForTile, "The tile can't be played on the table." },
         { ErrorType.TileCannotStartGame, "The tile {tileId} cannot start the game.\nCurrent rules define starter tiles in such an order:\n{starters}"},
         { ErrorType.TileCannotStartHunt, "The tile {tileId} cannot start the hunt.\nYou need to play {starters} and if you win it will counts as Goat Victory!\n"},
+        { ErrorType.GameEnded, "The game has already ended." }
     };
     public ErrorType Type { get; set; }
     public string? Message { get; set; }

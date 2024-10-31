@@ -20,8 +20,6 @@ public class PlayTileCommandHandler : IRequestHandler<PlayTileCommand, Game>
         if(!TryGetPosition(tileDetails, command.PlayTileDto.IsLeft, game, out int? position)
             || tileDetails == null)
         {
-            Console.WriteLine("Not played");
-            _logger.LogInformation("{@td}, {isLeft}, {@game}, {pos}", tileDetails, command.PlayTileDto.IsLeft, game, position);
             return Task.FromResult(game);
         }
         currentPlayer.PlayTile(tileDetails);

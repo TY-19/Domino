@@ -6,6 +6,7 @@ using Domino.Application.Commands.Games.SelectOpponentMove;
 using Domino.Application.Commands.Games.StartGame;
 using Domino.Application.Commands.Players.CreatePlayer;
 using Domino.Application.Commands.Players.UpdatePlayersStatistic;
+using Domino.Application.Exceptions;
 using Domino.Application.Extensions;
 using Domino.Application.Interfaces;
 using Domino.Application.Models;
@@ -22,6 +23,25 @@ public class GameService : IGameService
 {
     private readonly IMediator _mediator;
     private readonly ILogger<GameService> _logger;
+    private static readonly GameRules DefaultRules = new() 
+    {
+        MaxGrabsInRow = 3,
+        MinLeftInMarket = 1,
+        PointsToStartHunt = 25,
+        WorkGoat = true,
+        TotalPointsToLoseWithGoat = 125,
+        StarterTiles = ["1-1", "2-2", "3-3", "4-4", "5-5", "6-6"],
+        HuntStarterTiles = ["6-6"],
+        LastTilePoints = new()
+        {
+            { "0-0", 25 },
+            { "6-6", 50 }
+        },
+        MorePointToEndWith = new()
+        {
+            { "6-6", 100 }
+        }
+    };
     public GameService(
         IMediator mediator,
         ILogger<GameService> logger)
@@ -57,6 +77,7 @@ public class GameService : IGameService
     {
         _logger.LogInformation("PlayTile {tileId} to edge, left: {isLeft}", playTileDto.TileId, playTileDto.IsLeft);
         Game game = await GetGameAsync(playerName);
+        EnsureGameHasNotEnded(game);
         // _logger.LogInformation("Current game: {@game}", game);
         game = await _mediator.Send(new PlayTileCommand() { Game = game, PlayTileDto = playTileDto });
         return await WaitOpponentTurnAsync(game);
@@ -64,6 +85,7 @@ public class GameService : IGameService
     public async Task<GameView> DoublePlayAsync(string playerName, PlayTileDto[] playTileDtos)
     {
         Game game = await GetGameAsync(playerName);
+        EnsureGameHasNotEnded(game);
         var request = new CheckDoublePlayRequest()
         {
             PlayerName = playerName,
@@ -82,12 +104,14 @@ public class GameService : IGameService
     public async Task<GameView> GrabTileAsync(string playerName)
     {
         var game = await GetGameAsync(playerName);
+        EnsureGameHasNotEnded(game);
         game = await _mediator.Send(new GrabTileCommand() { Game = game });
         return game.ToGameView(game.Player.Name);
     }
     public async Task<GameView> WaitOpponentTurnAsync(string playerName)
     {
         var game = await GetGameAsync(playerName);
+        EnsureGameHasNotEnded(game);
         if(!game.IsOpponentTurn)
         {
             game = await _mediator.Send(new GrabTileCommand() { Game = game });
@@ -144,24 +168,12 @@ public class GameService : IGameService
         }
         return game;
     }
-
-    private static readonly GameRules DefaultRules = new() 
+    private static void EnsureGameHasNotEnded(Game game)
     {
-        MaxGrabsInRow = 3,
-        MinLeftInMarket = 1,
-        PointsToStartHunt = 25,
-        WorkGoat = true,
-        TotalPointsToLoseWithGoat = 125,
-        StarterTiles = ["1-1", "2-2", "3-3", "4-4", "5-5", "6-6"],
-        HuntStarterTiles = ["6-6"],
-        LastTilePoints = new()
+        if(game.GameResult?.IsEnded == true)
         {
-            { "0-0", 25 },
-            { "6-6", 50 }
-        },
-        MorePointToEndWith = new()
-        {
-            { "6-6", 100 }
+            game.GameError = new(ErrorType.GameEnded);
+            throw new GameException(game, "Game has already ended.");
         }
-    };
+    }
 }

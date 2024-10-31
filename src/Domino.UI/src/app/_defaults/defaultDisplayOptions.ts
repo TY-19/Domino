@@ -8,10 +8,10 @@ export const DefaultDisplayOptions: DisplayOptions = {
     menuBgColor: "#ffff99",
     startButtonTextColor: "black",
     startButtonBgColor: "lightgray",
-    dominoTilePrimaryColor: "rgb(234, 179, 8)",
+    dominoTilePrimaryColor: "rgb(245 158 11)",
     dominoTileDotsColor: "rgb(21, 128, 61)",
     dominoTileLineColor: "rgb(22, 163, 74)",
-    dominoTileBackPrimaryColor: "rgb(234, 179, 8)",
+    dominoTileBackPrimaryColor: "rgb(245 158 11)",
     dominoTileBackSecondaryColor: "rgb(21, 128, 61)"
 }
 export const DefaultDisplayOptions2: DisplayOptions = {

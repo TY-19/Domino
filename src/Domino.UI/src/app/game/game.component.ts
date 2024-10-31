@@ -125,7 +125,7 @@ export class GameComponent implements OnInit {
     this.market.displayMarketTiles(this.game.marketTilesCount);
     this.message.hideMessage();
     this.opponentMessage.hideMessage();
-    this.currentTurn = 0;   
+    this.currentTurn = this.game.log.events.length;
   }
   selectTile(tileDetails: TileDetails) {
     this.activeTile = tileDetails;

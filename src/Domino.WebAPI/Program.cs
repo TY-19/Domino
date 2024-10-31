@@ -1,6 +1,7 @@
 using Domino.AITournament.Interfaces;
 using Domino.AITournament.Services;
 using Domino.Application;
+using Domino.Application.Exceptions;
 using Domino.Application.Interfaces;
 using Domino.Application.Services;
 using Domino.Application.Strategies;
@@ -54,6 +55,7 @@ public class Program
         builder.Services.AddSerilog(options => {
             options.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning);
             options.ReadFrom.Configuration(builder.Configuration);
+            options.Filter.ByExcluding(ev => ev.Exception is GameException);
             options.WriteTo.Console(restrictedToMinimumLevel: LogEventLevel.Debug);
         });
 
@@ -64,6 +66,8 @@ public class Program
 
         app.UseSerilogRequestLogging();
         
+        app.UseExceptionHandler(_ => {});
+
         app.UseSwagger();
         app.UseSwaggerUI();
 
@@ -72,7 +76,7 @@ public class Program
 
         if(!HybridSupport.IsElectronActive)
         {
-            // app.UseHttpsRedirection();
+            app.UseHttpsRedirection();
         }
         
         app.MapGet("/api/test", () => new { result = "Succeeded" });
@@ -87,8 +91,8 @@ public class Program
             var browserWindow = await Electron.WindowManager
                 .CreateWindowAsync(new BrowserWindowOptions
                 {
-                    Width = 900,
-                    Height = 720,
+                    Width = 1920,
+                    Height = 1080,
                     Show = false
                 });
             await Task.Run(async () => await browserWindow.WebContents.Session.ClearCacheAsync());
