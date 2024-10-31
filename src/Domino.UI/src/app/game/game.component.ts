@@ -55,8 +55,8 @@ export class GameComponent implements OnInit {
   @ViewChild('opponentInfo') opponentInfo: PlayerInfoComponent = null!;
   game: GameView = null!;
   // game: GameView = TestGame.getGame();
-  showOptions: boolean = true;
-  optionsContent: number = 2;
+  showOptions: boolean = false;
+  optionsContent: number = 1;
   sideBarContent: SideBarType = SideBarType.Market;
   activeTile: TileDetails | null = null;
   currentTurn: number = 0;
@@ -247,11 +247,15 @@ export class GameComponent implements OnInit {
   }
   changeColorScheme() {
     this.displayOptionsService.setVariables(this.elemRef);
+    if(this.optionsContent == 1) {
+      this.showOptions = !this.showOptions;
+    }
     this.optionsContent = 1;
-    this.showOptions = !this.showOptions;
   }
   changeRules() {
+    if(this.optionsContent == 2) {
+      this.showOptions = !this.showOptions;
+    }
     this.optionsContent = 2;
-    this.showOptions = !this.showOptions;
   }
 }

@@ -12,6 +12,7 @@ export interface Translation {
   statistics: StatisticsTranslation;
   log: LogTranslation;
   rules: RulesTranslation;
+  strategyCoeffs: StrategyCoeffsTranslation;
 }
 export interface MenuTranslation {
   startGame: string;
@@ -19,6 +20,8 @@ export interface MenuTranslation {
   typePlayerName: string;
   setOpponent: string;
   selectOpponent: string;
+  createNew: string;
+  create: string;
   save: string;
   statistics: string;
 }
@@ -90,6 +93,7 @@ export interface LogTranslation {
 export interface RulesTranslation {
   instruction: string;
   save: string;
+  default: string;
   maxGrabsInRow: string;
   minLeftInMarket: string;
   pointsToStartHunt: string;
@@ -101,4 +105,22 @@ export interface RulesTranslation {
   remove: string;
   lastTilePoints: string;
   morePointToEndWith: string;
+}
+export interface StrategyCoeffsTranslation {
+  createOpponent: string;
+  opponentName: string;
+  coefficients: string;
+  create: string;
+  cancel: string;
+  randomnessCoef: string;
+  myHandCoeff: string;
+  opponentHandCoeff: string;
+  opponentPossibleHandCoeff: string;
+  leaveOfficerCoeff: string;
+  dontKeepDoublesCoeff: string;
+  getRidOfPointsCoeff: string;
+  cutOpponentDoubleCoeff: string;
+  playSafeCoeff: string;
+  protectWeaknessCoeff: string;
+  notBeatOwnEdgeCoeff: string;
 }

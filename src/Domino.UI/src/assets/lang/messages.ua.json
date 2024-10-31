@@ -5,6 +5,8 @@
     "typePlayerName": "Введіть ім'я гравця",
     "setOpponent": "Обрати суперника",
     "selectOpponent": "Оберіть суперника",
+    "createNew": "Створити нового...",
+    "create": "Створити",
     "save": "Зберегти",
     "statistics": "Статистика"
   },
@@ -93,6 +95,7 @@
   "rules": {
     "instruction": "Виберіть правила, які будуть використовуватись при старті нової гри:",
     "save": "Зберегти",
+    "default": "Стандартні",
     "maxGrabsInRow": "Кількість доміно, які можна добрати підряд:",
     "minLeftInMarket": "Кількість доміно, які не можна добрати з базару:",
     "pointsToStartHunt": "Кількість очок, необхідних для старту полювання:",
@@ -104,5 +107,23 @@
     "remove": "Видалити",
     "lastTilePoints": "Доміно, що вартують додаткових очок, якщо залишились самі:",
     "morePointToEndWith": "Доміно, що додають додаткові очки, якщо завершити гру ними:"
+  },
+  "strategyCoeffs": {
+    "createOpponent": "Створити нового суперника",
+    "opponentName": "Ім'я: ",
+    "coefficients": "Стратегії",
+    "create": "Створити",
+    "cancel": "Скасувати",
+    "randomnessCoef": "Випадковий хід: ",
+    "myHandCoeff": "Свої доміно: ",
+    "opponentHandCoeff": "Відомі чужі доміно: ",
+    "opponentPossibleHandCoeff": "Ймовірні чужі доміно: ",
+    "leaveOfficerCoeff": "Намагатися дати офіцера: ",
+    "dontKeepDoublesCoeff": "Позбуватися дублів: ",
+    "getRidOfPointsCoeff": "Скидати очки: ",
+    "cutOpponentDoubleCoeff": "Відрізати дубль суперника: ",
+    "playSafeCoeff": "Грати обережно: ",
+    "protectWeaknessCoeff": "Уникати слабкостей: ",
+    "notBeatOwnEdgeCoeff": "Не бити власну сторону: "
   }
 }

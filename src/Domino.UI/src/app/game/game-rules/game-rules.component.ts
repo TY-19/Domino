@@ -28,32 +28,36 @@ export class GameRulesComponent {
     this.gameRules = this.localStorageService.getGameRules() ?? defaultRules;
   }
   saveRules() {
-    console.log(this.gameRules);
-    // this.localStorageService.setGameRules(this.gameRules);
+    this.localStorageService.setGameRules(this.gameRules);
   }
-  addStarterTile(element: HTMLInputElement) {
-    if(element.checkValidity() && !this.gameRules.starterTiles.find(t => t == element.value)) {
-      this.gameRules.starterTiles.push(element.value);
+  setDefaultRules() {
+    this.gameRules = defaultRules;
+  }
+  addTile(element: HTMLInputElement, collection: string[]) {
+    if(element.checkValidity() && !collection.find(t => t == element.value)) {
+      collection.push(element.value);
     }
   }
-  removeStarterTile(id: string) {
-    this.gameRules.starterTiles = this.gameRules.starterTiles.filter(t => t !== id);
-  }
-  addHuntStarterTile(element: HTMLInputElement) {
-    if(element.checkValidity() && !this.gameRules.huntStarterTiles.find(t => t == element.value)) {
-      this.gameRules.huntStarterTiles.push(element.value);
+  removeTile(id: string, type: string) {
+    if(type === "starters") {
+      this.gameRules.starterTiles = this.gameRules.starterTiles.filter(t => t !== id);
+    } else if(type === "huntStarters") {
+      this.gameRules.huntStarterTiles = this.gameRules.huntStarterTiles.filter(t => t !== id);
     }
-  }
-  removeHuntStarterTile(id: string) {
-    this.gameRules.huntStarterTiles = this.gameRules.huntStarterTiles.filter(t => t !== id);
   }
   iterateThrough(toIterate: Record<string, number>): { key: string, value: number }[]  {
-    let keyValues: { key: string, value: number }[] = [
-      { key: "", value: 5}
-    ];
+    let keyValues: { key: string, value: number }[] = [];
     for(let key in toIterate) {
       keyValues.push({key: key, value: toIterate[key]})
     }
     return keyValues;
+  }
+  addRecord(keyElem: HTMLInputElement, valueElem: HTMLInputElement, collection: Record<string, number>) {
+    if(keyElem.checkValidity() && valueElem.checkValidity() && Number.isInteger(Number.parseInt(valueElem.value))) {
+      collection[keyElem.value] = Number.parseInt(valueElem.value);
+    }
+  }
+  removeRecord(key: string, collection: Record<string, number>) {
+    delete collection[key];
   }
 }

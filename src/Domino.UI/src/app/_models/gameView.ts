@@ -4,14 +4,14 @@ import { GameRules } from "./gameRules";
 import { GameStatus } from "./gameStatus";
 import { GameTable } from "./gameTable";
 import { LogEvent } from "./logEvent"
-import { Player } from "./player";
+import { PlayerGameView } from "./playerGameView";
 
 export interface GameView {
     id: number;
     error: GameError;
     table: GameTable;
-    player: Player;
-    opponent: Player;
+    player: PlayerGameView;
+    opponent: PlayerGameView;
     marketTilesCount: number;
     gameStatus: GameStatus;
     gameResult?: GameResult;

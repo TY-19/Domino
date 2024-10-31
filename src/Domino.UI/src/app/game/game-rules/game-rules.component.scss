@@ -4,11 +4,15 @@
     margin-left: 2px;
     margin-right: 16px;
     inline-size: 20px;
+    cursor: default;
 }
 .plus {
     background-color: green;
     inline-size: 20px;
-    margin-left: -20px; 
+    height: 1.5rem;
+    padding-left: 0.5rem;
+    padding-right: 1.05rem;
+    cursor: default;
 }
 .elements {
     display: grid;

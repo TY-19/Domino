@@ -1,12 +1,12 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { LocalStorageService } from '../_shared/localstorage.service';
 import { LanguageSwitchComponent } from "./language-switch/language-switch.component";
 import { LanguageService } from '../_shared/language.service';
 import { MenuTranslation } from '../_shared/translations';
 import { VersionComponent } from "./version/version.component";
-import { Player } from '../_models/player';
+import { PlayerGameView } from '../_models/playerGameView';
 import { PlayersService } from '../players-statistics/players.service';
 import { PlayerInfo } from '../_models/playerInfo';
 import { PlayerType } from '../_enums/playerType';
@@ -29,13 +29,16 @@ export class MenuComponent implements OnInit {
   }
   playerName: string = "";
   opponentName: string = "";
+  readonly newOpponent: string = "New...";
   editPlayer: boolean = false;
   editOpponent: boolean = false;
   opponents: PlayerInfo[] = [];
   constructor(
     private playersService: PlayersService,
     private languageService: LanguageService,
-    private localStorageService: LocalStorageService) {
+    private localStorageService: LocalStorageService,
+    private router: Router
+  ) {
 
   }
   ngOnInit() {
@@ -59,6 +62,10 @@ export class MenuComponent implements OnInit {
     this.localStorageService.setPlayerName(newName);
   }
   changeOpponent(newName: string) {
-    this.localStorageService.setOpponentName(newName);
+    if(newName === this.newOpponent) {
+      this.router.navigate(['create-opponent']);
+    } else {
+      this.localStorageService.setOpponentName(newName);
+    }
   }
 }

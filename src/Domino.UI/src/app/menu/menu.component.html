@@ -14,7 +14,7 @@
                 <div class="menu-text">{{playerName}}</div>
             }
             <div class="menu-button" (click)="editPlayer = !editPlayer">
-                {{ editPlayer ? names?.save ?? "Save" : names?.changePlayer ?? "Change player" }}
+                {{ editPlayer ? names?.save : names?.changePlayer }}
             </div>
         </div>
         <div class="flex justify-between items-center my-2 mr-2">
@@ -24,6 +24,7 @@
                     <select [(ngModel)]="opponentName"
                         (ngModelChange)="changeOpponent($event)"
                         class="mr-2 w-full">
+                        <option [value]="newOpponent">{{names?.createNew}}</option>
                         @for(opponent of opponents; track opponent.playerName) {
                             <option [value]="opponent.playerName">{{opponent.playerName}}</option>
                         }
@@ -33,10 +34,10 @@
                 <div class="menu-text">{{opponentName}} </div>   
             }
             <div class="menu-button" (click)="editOpponent = !editOpponent">
-                {{ editOpponent ? names?.save ?? "Save" : names?.setOpponent ?? "Set opponent"}}
+                {{ editOpponent ? names?.save : names?.setOpponent }}
             </div>
         </div>
-        <div [routerLink]="['players-statistics']" class="menu-button-wide">{{ names?.statistics ?? "Statistics" }}</div>
+        <div [routerLink]="['players-statistics']" class="menu-button-wide">{{ names?.statistics }}</div>
     </div>
 </div>
 <Dom-version class="absolute bottom-0 right-4"></Dom-version>

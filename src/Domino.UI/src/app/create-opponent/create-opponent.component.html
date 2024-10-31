@@ -1,0 +1,83 @@
+<form [formGroup]="form" (ngSubmit)="saveOpponent()" class="block m-auto p-10 w-fit">
+    <div class="text-2xl">{{names?.createOpponent}}</div>
+    <div class="flex py-4">
+        <div class="text-xl mr-6">{{names?.opponentName}}</div>
+        <input type="text" formControlName="opponentName" required
+            class="outline-none border-black border-solid border-[2px] invalid:text-red-500 invalid:border-red-600
+                invalid:border-solid">
+    </div>
+    <div class="block w-full">
+        <div class="block w-fit m-auto text-2xl">{{names?.coefficients}}</div>
+    </div>
+    <div class="h-[4px] w-full my-2" [style]="buildStrategyLineStyle()"></div>
+    <div class="flex mt-2">
+        <div class="text-xl min-w-[85%]">{{names?.randomnessCoef}}</div>
+        <input type="number" min="0" max="999" formControlName="randomnessCoef"
+            class="w-12 invalid:text-red-500">
+    </div>
+    <div class="h-[2px] bg-[#808080] my-2" [style]="'width: ' + form.controls['randomnessCoef'].value/11 + '%'"></div>
+    <div class="flex mt-2">
+        <div class="text-xl min-w-[85%]">{{names?.myHandCoeff}}</div>
+        <input type="number" min="0" max="999" formControlName="myHandCoeff"
+            class="w-12 invalid:text-red-500">
+    </div>
+    <div class="h-[2px] bg-[#FF5733] my-2" [style]="'width: ' + form.controls['myHandCoeff'].value/11 + '%'"></div>
+    <div class="flex mt-2">
+        <div class="text-xl min-w-[85%]">{{names?.opponentHandCoeff}}</div>
+        <input type="number" min="0" max="999" formControlName="opponentHandCoeff"
+            class="w-12 invalid:text-red-500">
+    </div>
+    <div class="h-[2px] bg-[#3375FF] my-2" [style]="'width: ' + form.controls['opponentHandCoeff'].value/11 + '%'"></div>
+    <div class="flex mt-2">
+        <div class="text-xl min-w-[85%]">{{names?.opponentPossibleHandCoeff}}</div>
+        <input type="number" min="0" max="999" formControlName="opponentPossibleHandCoeff"
+            class="w-12 invalid:text-red-500">
+    </div>
+    <div class="h-[2px] bg-[#FFBD33] my-2" [style]="'width: ' + form.controls['opponentPossibleHandCoeff'].value/11 + '%'"></div>
+    <div class="flex mt-2">
+        <div class="text-xl min-w-[85%]">{{names?.leaveOfficerCoeff}}</div>
+        <input type="number" min="0" max="999" formControlName="leaveOfficerCoeff"
+            class="w-12 invalid:text-red-500">
+    </div>
+    <div class="h-[2px] bg-[#7533FF] my-2" [style]="'width: ' + form.controls['leaveOfficerCoeff'].value/11 + '%'"></div>
+    <div class="flex mt-2">
+        <div class="text-xl min-w-[85%]">{{names?.dontKeepDoublesCoeff}}</div>
+        <input type="number" min="0" max="999" formControlName="dontKeepDoublesCoeff"
+            class="w-12 invalid:text-red-500">
+    </div>
+    <div class="h-[2px] bg-[#75FF33] my-2" [style]="'width: ' + form.controls['dontKeepDoublesCoeff'].value/11 + '%'"></div>
+    <div class="flex mt-2">
+        <div class="text-xl min-w-[85%]">{{names?.getRidOfPointsCoeff}}</div>
+        <input type="number" min="0" max="999" formControlName="getRidOfPointsCoeff"
+            class="w-12 invalid:text-red-500">
+    </div>
+    <div class="h-[2px] bg-[#FF33BD] my-2" [style]="'width: ' + form.controls['getRidOfPointsCoeff'].value/11 + '%'"></div>
+    <div class="flex mt-2">
+        <div class="text-xl min-w-[85%]">{{names?.cutOpponentDoubleCoeff}}</div>
+        <input type="number" min="0" max="999" formControlName="cutOpponentDoubleCoeff"
+            class="w-12 invalid:text-red-500">
+    </div>
+    <div class="h-[2px] bg-[#266031] my-2" [style]="'width: ' + form.controls['cutOpponentDoubleCoeff'].value/11 + '%'"></div>
+    <div class="flex mt-2">
+        <div class="text-xl min-w-[85%]">{{names?.playSafeCoeff}}</div>
+        <input type="number" min="0" max="999" formControlName="playSafeCoeff"
+            class="w-12 invalid:text-red-500">
+    </div>
+    <div class="h-[2px] bg-[#BD33FF] my-2" [style]="'width: ' + form.controls['playSafeCoeff'].value/11 + '%'"></div>
+    <div class="flex mt-2">
+        <div class="text-xl min-w-[85%]">{{names?.protectWeaknessCoeff}}</div>
+        <input type="number" min="0" max="999" formControlName="protectWeaknessCoeff"
+            class="w-12 invalid:text-red-500">
+    </div>
+    <div class="h-[2px] bg-[#33FFBD] my-2" [style]="'width: ' + form.controls['protectWeaknessCoeff'].value/11 + '%'"></div>
+    <div class="flex mt-2">
+        <div class="text-xl min-w-[85%]">{{names?.notBeatOwnEdgeCoeff}}</div>
+        <input type="number" min="0" max="999" formControlName="notBeatOwnEdgeCoeff"
+            class="w-12 invalid:text-red-500">
+    </div>
+    <div class="h-[2px] bg-[#FF3375] my-2" [style]="'width: ' + form.controls['notBeatOwnEdgeCoeff'].value/11 + '%'"></div>
+    <div class="flex gap-4 justify-center mt-4">
+        <button type="submit" class="text-2xl/10 p-2 bg-green-500 cursor-default">Save</button>
+        <div [routerLink]="['/']" class="text-2xl/10 p-2 bg-pink-500 cursor-default">Cancel</div>
+    </div>
+</form>

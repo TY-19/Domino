@@ -1,0 +1,26 @@
+.line {
+    background: rgb(0,0,0);
+    background: linear-gradient(
+        to right,
+        #FF5733 0%,
+        #FF5733 10%,
+        #3375FF 10%,
+        #3375FF 20%,
+        #FFBD33 20%,
+        #FFBD33 30%,
+        #7533FF 30%,
+        #7533FF 40%,
+        #75FF33 40%,
+        #75FF33 50%,
+        #FF33BD 50%,
+        #FF33BD 60%,
+        #266031 60%,
+        #266031 70%,
+        #BD33FF 70%,
+        #BD33FF 80%,
+        #33FFBD 80%,
+        #33FFBD 90%,
+        #FF3375 90%,
+        #FF3375 100%,
+    );
+}

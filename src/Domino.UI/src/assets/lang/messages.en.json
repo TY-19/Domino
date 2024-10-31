@@ -5,6 +5,8 @@
     "typePlayerName": "Type player name",
     "setOpponent": "Set opponent",
     "selectOpponent": "Select opponent",
+    "createNew": "Create new...",
+    "create": "Create",
     "save": "Save",
     "statistics": "Statistics"
   },
@@ -93,6 +95,7 @@
   "rules": {
     "instruction": "Select set of rules that will be applied when new game starts:",
     "save": "Save",
+    "default": "Default",
     "maxGrabsInRow": "Maximal number of tiles that can be grabbed from the market in a row:",
     "minLeftInMarket": "Minimal number of tiles that must remain on the market and cannot be grabbed:",
     "pointsToStartHunt": "Number of point that player must be left with that starts a hunt:",
@@ -104,5 +107,23 @@
     "remove": "Remove",
     "lastTilePoints": "Tiles that can impose additional points if left in the losing hand by itself:",
     "morePointToEndWith": "Tiles that can impose additional points on the loser if game ended with it:"
+  },
+  "strategyCoeffs": {
+    "createOpponent": "Create a new opponent",
+    "opponentName": "Name: ",
+    "coefficients": "Strategies",
+    "create": "Create",
+    "cancel": "Cancel",
+    "randomnessCoef": "Randomness: ",
+    "myHandCoeff": "Tiles in hand: ",
+    "opponentHandCoeff": "Known opponent tiles: ",
+    "opponentPossibleHandCoeff": "Probable opponent tiles: ",
+    "leaveOfficerCoeff": "Try to give an officer: ",
+    "dontKeepDoublesCoeff": "Get rid of doubles: ",
+    "getRidOfPointsCoeff": "Get rid of points: ",
+    "cutOpponentDoubleCoeff": "Try to cut opponent double: ",
+    "playSafeCoeff": "Play safe: ",
+    "protectWeaknessCoeff": "Protect own weaknesses: ",
+    "notBeatOwnEdgeCoeff": "Preserve own edge: "
   }
 }
