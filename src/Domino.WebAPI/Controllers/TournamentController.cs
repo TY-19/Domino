@@ -16,11 +16,6 @@ public class TournamentController : ControllerBase
     {
         _tournamentService = tournamentService;
     }
-    [HttpGet("game/{id}")]
-    public async Task<ActionResult<Game?>> GetGame(long id)
-    {
-        return Ok(await _tournamentService.GetGameByIdAsync(id));
-    }
     [HttpGet("engines")]
     public async Task<ActionResult<List<Engine>>> GetEngines()
     {
@@ -32,37 +27,14 @@ public class TournamentController : ControllerBase
         return Ok(await _tournamentService.GetEngineAsync(name));
     }
     [HttpPost("engines")]
-    public async Task<ActionResult> CreateEngines()
+    public async Task<ActionResult> CreateEngines(int count = 128)
     {
-        await _tournamentService.CreateEnginesAsync();
+        await _tournamentService.CreateRandomEnginesAsync(count);
         return NoContent();
     }
-    [HttpPost("tournament")]
-    public async Task<ActionResult<List<Engine>>> PlayTournament()
+    [HttpPost("playTournament")]
+    public async Task<ActionResult<List<Engine>>> PlayTournament(IEnumerable<string> engineNames)
     {
-        return Ok(await _tournamentService.CreateTournamentAsync());
-    }
-    [HttpGet("playRealMatch")]
-    public async Task<ActionResult<IEnumerable<Engine>>> PlayMatch(int numberGames, string one, string two)
-    {
-        return Ok(await _tournamentService.PlayMatchAsync(numberGames, one, two));
-    }
-    [HttpPost("playDefaultAI")]
-    public async Task<ActionResult<IEnumerable<Engine>>> PlayDefaultAI(int numberGames = 50)
-    {
-        return Ok(await _tournamentService.PlayDefaultAITournamentAsync(numberGames));
-    }
-    [HttpGet("testplay")]
-    public async Task<ActionResult<GameView?>> PlayTestMatch()
-    {
-        var engineOne = new Engine("test_tournament_1", new StrategyCoefficients());
-        var engineTwo = new Engine("test_tournament_2", new StrategyCoefficients());
-        var game = await _tournamentService.PlayMatchAsync(engineOne, engineTwo);
-        return Ok(game);
-    }
-    [HttpGet("testmatch")]
-    public async Task<ActionResult<List<Engine>>> PlayTest()
-    {
-        return Ok(await _tournamentService.TestPlayMatch());
+        return Ok(await _tournamentService.PlayTournamentAsync(engineNames));
     }
 }

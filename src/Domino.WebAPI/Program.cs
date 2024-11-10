@@ -46,6 +46,7 @@ public class Program
         });
         builder.Services.AddControllers();
         builder.Services.AddScoped<TournamentService>();
+        builder.Services.AddScoped<AIGameService>();
         builder.Services.AddScoped<IGameRepository, GameRepository>();
         builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
         builder.Services.AddScoped<IEngineRepository, EngineRepository>();

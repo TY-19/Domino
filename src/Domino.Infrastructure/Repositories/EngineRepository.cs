@@ -25,7 +25,12 @@ public class EngineRepository : IEngineRepository
         var col = db.GetCollection<Engine>(Engines);
         return Task.FromResult(col.FindAll().ToList());
     }
-    
+    public Task<List<Engine>> GetEngines(IEnumerable<string> names)
+    {
+        using var db = new LiteDatabase(_connectionString);
+        var col = db.GetCollection<Engine>(Engines);
+        return Task.FromResult(col.FindAll().Where(e => names.Contains(e.Name)).ToList());
+    }
     public Task CreateEngineAsync(Engine engine)
     {
         using var db = new LiteDatabase(_connectionString);
