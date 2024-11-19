@@ -45,8 +45,9 @@ public class Program
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "Domino", Version = "v1" });
         });
         builder.Services.AddControllers();
-        builder.Services.AddScoped<TournamentService>();
-        builder.Services.AddScoped<AIGameService>();
+        builder.Services.AddScoped<ITournamentService, TournamentService>();
+        builder.Services.AddScoped<IAiGameService, AiGameService>();
+        builder.Services.AddScoped<IEngineService, EngineService>();
         builder.Services.AddScoped<IGameRepository, GameRepository>();
         builder.Services.AddScoped<IPlayerRepository, PlayerRepository>();
         builder.Services.AddScoped<IEngineRepository, EngineRepository>();

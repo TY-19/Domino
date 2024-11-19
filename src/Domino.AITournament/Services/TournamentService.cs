@@ -1,5 +1,4 @@
 using System.Numerics;
-using Domino.AITournament.Helpers;
 using Domino.AITournament.Interfaces;
 using Domino.AITournament.Models;
 
@@ -7,27 +6,11 @@ namespace Domino.AITournament.Services;
 
 public class TournamentService(
     IEngineRepository engineRepository,
-    AIGameService aIGameService
-    )
+    IAiGameService aIGameService
+    ) : ITournamentService
 {
     private readonly IEngineRepository _engineRepository = engineRepository;
-    private readonly AIGameService _aiGameService = aIGameService;
-    public async Task<List<Engine>> GetEnginesAsync()
-    {
-        return await _engineRepository.GetAllEnginesAsync();
-    }
-    public async Task<Engine?> GetEngineAsync(string name)
-    {
-        return await _engineRepository.GetEngineAsync(name);
-    }
-    public async Task CreateRandomEnginesAsync(int count)
-    {
-        long id = DateTime.UtcNow.Ticks;
-        var samples = new NLHSampler(count).GenerateSamples()
-            .Select((s, i) => new Engine($"{id}_{i}", s))
-            .ToList();
-        await _engineRepository.SaveEnginesAsync(samples);
-    }
+    private readonly IAiGameService _aiGameService = aIGameService;
     public async Task<List<Engine>> PlayTournamentAsync(IEnumerable<string> engineNames, int type = 1, int numberGames = 10)
     {
         List<Engine> engines = await _engineRepository.GetEngines(engineNames);
@@ -48,8 +31,6 @@ public class TournamentService(
                 {
                     await _aiGameService.PlayGameAsync(engines[i], engines[j]);
                 }
-                // await _engineRepository.CreateEngineAsync(engines[i]);
-                // await _engineRepository.CreateEngineAsync(engines[j]);
             }
         }
         await _engineRepository.SaveEnginesAsync(engines);

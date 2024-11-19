@@ -1,7 +1,7 @@
+using Domino.AITournament.Interfaces;
 using Domino.AITournament.Models;
 using Domino.Application.Commands.Games.MakeOpponentMove;
 using Domino.Application.Commands.Games.SaveGame;
-using Domino.Application.Commands.Players.UpdatePlayersStatistic;
 using Domino.Application.Extensions;
 using Domino.Application.Interfaces;
 using Domino.Application.Models;
@@ -11,11 +11,11 @@ using MediatR;
 
 namespace Domino.AITournament.Services;
 
-public class AIGameService(
-    IPlayerRepository playerRepository,
+public class AiGameService(
+    EngineService engineService,
     IMediator mediator,
     IStrategyFactory strategyFactory
-    )
+    ) : IAiGameService
 {
     private static readonly GameRules DefaultRules = new() 
     {
@@ -32,16 +32,43 @@ public class AIGameService(
             { "6-6", 100 }
         }
     };
-    private readonly IPlayerRepository _playerRepository = playerRepository;
+    private readonly EngineService _engineService = engineService;
     private readonly IMediator _mediator = mediator;
     private readonly IStrategyFactory _strategyFactory = strategyFactory;
 
     public async Task<GameView?> PlayGameAsync(Engine one, Engine two)
     {
         long id = DateTime.UtcNow.Ticks;
-        var playerInfo = await _playerRepository.GetPlayerInfoAsync(one.Player.Name) ?? one.Player.Info;
-        var opponentInfo = await _playerRepository.GetPlayerInfoAsync(two.Player.Name) ?? two.Player.Info;
-        var game = new Game(id, new Player(playerInfo), new Player(opponentInfo), DefaultRules);
+        var game = new Game(id, one.Player, two.Player, DefaultRules);
+        Begin(game);
+        bool isEnded = false;
+        int i = 0;
+        while(!isEnded && i < 50)
+        {
+            i++;
+            var activePlayer = game.IsOpponentTurn ? game.Opponent : game.Player;
+            game.TrySetResult();
+            if(game.GameResult?.IsEnded == true)
+            {
+                _engineService.UpdatePlayersStatistic(game, one, two);
+                isEnded = true;
+                continue;
+            }
+            bool isOpponentTurn = game.IsOpponentTurn;
+            int j = 0;
+            while(game.IsOpponentTurn == isOpponentTurn && j < 10)
+            {
+                j++;
+                var strategy = _strategyFactory.SelectStrategy(activePlayer);
+                var move = strategy.SelectMove(game.ToGameView(activePlayer.Name));
+                game = await _mediator.Send(new MakeOpponentMoveCommand() { Game = game, Move = move });
+            }
+            isEnded = game.GameResult?.IsEnded ?? false;
+        }
+        return game.ToGameView(one.Player.Name);
+    }
+    private static void Begin(Game game)
+    {
         if(game.GameStatus.GameType == GameType.Hunt)
         {
             LeaveStarterToHunterAndServeHands(game);
@@ -51,104 +78,6 @@ public class AIGameService(
             ServeStartHands(game);
         }
         game.IsOpponentTurn = !IsPlayerFirst(game);
-        
-        bool isEnded = false;
-        int i = 0;
-        while(!isEnded && i < 50)
-        {
-            i++;
-            var activePlayer = game.IsOpponentTurn ? game.Opponent : game.Player;
-            if(game.IsOpponentTurn)
-            {
-                game.TrySetResult();
-                if(game.GameResult?.IsEnded == true)
-                {
-                    game.IsOpponentTurn = false;
-                    await _mediator.Send(new UpdatePlayersStatisticCommand() { Game = game });
-                    // await _mediator.Send(new SaveGameCommand() { Game = game });
-                    isEnded = true;
-                    continue;
-                }
-                if(!game.IsOpponentTurn)
-                {
-                    continue;
-                }
-                int j = 0;
-                while(game.IsOpponentTurn && j < 10)
-                {
-                    j++;
-                    var strategy = _strategyFactory.SelectStrategy(activePlayer);
-                    var move = strategy.SelectMove(game.ToGameView(activePlayer.Name));
-                    game = await _mediator.Send(new MakeOpponentMoveCommand() { Game = game, Move = move });
-                }
-            }
-            else
-            {
-                game.TrySetResult();
-                if(game.GameResult?.IsEnded == true)
-                {
-                    game.IsOpponentTurn = false;
-                    await _mediator.Send(new UpdatePlayersStatisticCommand() { Game = game });
-                    // await _mediator.Send(new SaveGameCommand() { Game = game });
-                    isEnded = true;
-                    continue;
-                }
-                int j = 0;
-                while(!game.IsOpponentTurn && j < 10)
-                {
-                    j++;
-                    var strategy = _strategyFactory.SelectStrategy(activePlayer);
-                    var move = strategy.SelectMove(game.ToGameView(activePlayer.Name));
-                    game = await _mediator.Send(new MakeOpponentMoveCommand() { Game = game, Move = move });
-                }
-            }
-            isEnded = game.GameResult?.IsEnded ?? false;
-        }
-        if(isEnded)
-        {
-            var oneStat = await _playerRepository.GetPlayerStatisticsAsync(one.Player.Name);
-            if(oneStat != null)
-            {
-                one.Statistic = oneStat;
-            }
-            var twoStat = await _playerRepository.GetPlayerStatisticsAsync(two.Player.Name);
-            if(twoStat != null)
-            {
-                two.Statistic = twoStat;
-            }
-        }
-        else
-        {
-            Console.WriteLine("Game has not ended " + game.Id);
-            await _mediator.Send(new SaveGameCommand() { Game = game });
-        }
-        return game.ToGameView(one.Player.Name);
-    }
-    private static void ServeStartHands(Game game, int tilesNumber = 7)
-    {
-        for (int i = 0; i < tilesNumber; i++)
-        {
-            game.Player.GrabTile(game.Set.ServeTile());
-            game.Opponent.GrabTile(game.Set.ServeTile());
-        }
-        game.Player.GrabInRow = 0;
-        game.Opponent.GrabInRow = 0;
-
-        HashSet<string> ids = new();
-        foreach(var x in game.Opponent.Hand)
-        {
-            if(!ids.Add(x.TileId))
-            {
-                Console.WriteLine("Mistake");
-            }
-        }
-        foreach(var x in game.Player.Hand)
-        {
-            if(!ids.Add(x.TileId))
-            {
-                Console.WriteLine("Mistake");
-            }
-        }
     }
     private static void LeaveStarterToHunterAndServeHands(Game game)
     {
@@ -159,19 +88,34 @@ public class AIGameService(
         hunter.GrabTile(game.Set.LeaveStarterForHunter());
         hunted.GrabTile(game.Set.ServeTile());
         ServeStartHands(game, 6);
-        HashSet<string> ids = new();
+        EnsureValidServing(game);
+    }
+    private static void ServeStartHands(Game game, int tilesNumber = 7)
+    {
+        for (int i = 0; i < tilesNumber; i++)
+        {
+            game.Player.GrabTile(game.Set.ServeTile());
+            game.Opponent.GrabTile(game.Set.ServeTile());
+        }
+        game.Player.GrabInRow = 0;
+        game.Opponent.GrabInRow = 0;
+        EnsureValidServing(game);
+    }
+    private static void EnsureValidServing(Game game)
+    {
+        HashSet<string> ids = [];
         foreach(var x in game.Opponent.Hand)
         {
             if(!ids.Add(x.TileId))
             {
-                Console.WriteLine("Mistake");
+                throw new Exception($"Invalid tile {x.TileId} has been served to the opponent.");
             }
         }
         foreach(var x in game.Player.Hand)
         {
             if(!ids.Add(x.TileId))
             {
-                Console.WriteLine("Mistake");
+                throw new Exception($"Invalid tile {x.TileId} has been served to the player.");
             }
         }
     }

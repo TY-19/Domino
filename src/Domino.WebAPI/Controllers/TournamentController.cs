@@ -1,36 +1,32 @@
+using Domino.AITournament.Interfaces;
 using Domino.AITournament.Models;
-using Domino.AITournament.Services;
-using Domino.Application.Models;
-using Domino.Application.Strategies;
-using Domino.Domain.Entities;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Domino.WebAPI.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class TournamentController : ControllerBase
+public class TournamentController(
+        ITournamentService tournamentService,
+        IEngineService engineService
+        ) : ControllerBase
 {
-    private readonly TournamentService _tournamentService;
-    public TournamentController(TournamentService tournamentService)
-    {
-        _tournamentService = tournamentService;
-    }
+    private readonly ITournamentService _tournamentService = tournamentService;
+    private readonly IEngineService _engineService = engineService;
     [HttpGet("engines")]
     public async Task<ActionResult<List<Engine>>> GetEngines()
     {
-        return Ok(await _tournamentService.GetEnginesAsync());
+        return Ok(await _engineService.GetEnginesAsync());
     }
     [HttpGet("engines/{name}")]
     public async Task<ActionResult<Engine>> GetEngine(string name)
     {
-        return Ok(await _tournamentService.GetEngineAsync(name));
+        return Ok(await _engineService.GetEngineAsync(name));
     }
     [HttpPost("engines")]
     public async Task<ActionResult> CreateEngines(int count = 128)
     {
-        await _tournamentService.CreateRandomEnginesAsync(count);
-        return NoContent();
+        return Ok(await _engineService.CreateRandomEnginesAsync(count));
     }
     [HttpPost("playTournament")]
     public async Task<ActionResult<List<Engine>>> PlayTournament(IEnumerable<string> engineNames)
