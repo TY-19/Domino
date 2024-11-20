@@ -1,0 +1,19 @@
+.flag {
+    display: inline-block;
+    width: 27px;
+    height: 14px;
+    background-image: url('/assets/lang/flags.png');
+    background-size: 54px 14px;
+    vertical-align: middle;
+}
+.ua {
+    background-position: 0px 0px;
+}
+.en {
+    background-position: 27px 0px;
+}
+.lang-name {
+    display: inline-block;
+    margin-left: 4px;
+    vertical-align: middle;
+}

@@ -6,51 +6,154 @@
 <table class="m-5">
     <thead>
         <tr>
-            <th rowspan="2">{{names?.playerName}}</th>
-            <th rowspan="2">{{names?.totalGames}}</th>
-            <th colspan="5">{{names?.wins}}</th>
-            <th rowspan="2">{{names?.draws}}</th>
-            <th colspan="5">{{names?.loses}}</th>
-            <th rowspan="2">{{names?.hunter}}</th>
-            <th rowspan="2">{{names?.succHunt}}</th>
-            <th rowspan="2">{{names?.hunted}}</th>
-            <th rowspan="2">{{names?.clearPoints}}</th>
-            <th rowspan="2">{{names?.totalPoints}}</th>
+            <th rowspan="2"
+                (click)="sort('playerName')"
+                [class]="isActiveColumn('playerName')">
+                {{names?.playerName}}
+            </th>
+            <th rowspan="2"
+                (click)="sort('gamesPlayed')"
+                [class]="isActiveColumn('gamesPlayed')">
+                {{names?.totalGames}}
+            </th>
+            <th colspan="5"
+                (click)="sort('wins')">
+                {{names?.wins}}
+            </th>
+            <th rowspan="2" 
+                (click)="sort('draws')"
+                [class]="isActiveColumn('draws')">
+                {{names?.draws}}</th>
+            <th colspan="5"
+                (click)="sort('loses')">
+                {{names?.loses}}
+            </th>
+            <th rowspan="2"
+                (click)="sort('wasHunter')"
+                [class]="isActiveColumn('wasHunter')">
+                {{names?.hunter}}
+            </th>
+            <th rowspan="2"
+                (click)="sort('successfulHunt')"
+                [class]="isActiveColumn('successfulHunt')">
+                {{names?.succHunt}}
+            </th>
+            <th rowspan="2"
+                (click)="sort('wasHunted')"
+                [class]="isActiveColumn('wasHunted')">
+                {{names?.hunted}}
+            </th>
+            <th rowspan="2"
+                (click)="sort('clearedPoints')"
+                [class]="isActiveColumn('clearedPoints')">
+                {{names?.clearPoints}}
+            </th>
+            <th rowspan="2"
+                (click)="sort('totalPointsLeftWith')"
+                [class]="isActiveColumn('totalPointsLeftWith')">
+                {{names?.totalPoints}}
+            </th>
         </tr>
         <tr>
-            <th>{{names?.winsTotal}}</th>
-            <th>{{names?.normal}}</th>
-            <th>{{names?.goat}}</th>
-            <th>{{names?.officer}}</th>
-            <th>{{names?.general}}</th>
-            <th>{{names?.losesTotal}}</th>
-            <th>{{names?.normal}}</th>
-            <th>{{names?.goat}}</th>
-            <th>{{names?.officer}}</th>
-            <th>{{names?.general}}</th>
+            <th (click)="sort('wins')"
+                [class]="isActiveColumn('wins')">
+                {{names?.winsTotal}}
+            </th>
+            <th (click)="sort('normalVictoryWins')"
+                [class]="isActiveColumn('normalVictoryWins')">
+                {{names?.normal}}
+            </th>
+            <th (click)="sort('goatWins')"
+                [class]="isActiveColumn('goatWins')">
+                {{names?.goat}}
+            </th>
+            <th (click)="sort('officerWins')"
+                [class]="isActiveColumn('officerWins')">
+                {{names?.officer}}
+            </th>
+            <th (click)="sort('generalWins')"
+                [class]="isActiveColumn('generalWins')">
+                {{names?.general}}
+            </th>
+            <th (click)="sort('loses')"
+                [class]="isActiveColumn('loses')">
+                {{names?.losesTotal}}
+            </th>
+            <th (click)="sort('normalVictoryLoses')"
+                [class]="isActiveColumn('normalVictoryLoses')">
+                {{names?.normal}}
+            </th>
+            <th (click)="sort('goatLoses')"
+                [class]="isActiveColumn('goatLoses')">
+                {{names?.goat}}
+            </th>
+            <th (click)="sort('officerLoses')"
+                [class]="isActiveColumn('officerLoses')">
+                {{names?.officer}}
+            </th>
+            <th (click)="sort('generalLoses')"
+                [class]="isActiveColumn('generalLoses')">
+                {{names?.general}}
+            </th>
         </tr>
     </thead>
     @for(stat of playersStatistics; track stat.playerName)
     {
         <tr>
-            <td>{{stat.playerName}}</td>
-            <td>{{stat.gamesPlayed}}</td>
-            <td>{{stat.wins}}</td>
-            <td>{{stat.normalVictoryWins}}</td>
-            <td>{{stat.goatWins}}</td>
-            <td>{{stat.officerWins}}</td>
-            <td>{{stat.generalWins}}</td>
-            <td>{{stat.draws}}</td>
-            <td>{{stat.loses}}</td>
-            <td>{{stat.normalVictoryLoses}}</td>
-            <td>{{stat.goatLoses}}</td>
-            <td>{{stat.officerLoses}}</td>
-            <td>{{stat.generalLoses}}</td>
-            <td>{{stat.wasHunter}}</td>
-            <td>{{stat.successfulHunt}}</td>
-            <td>{{stat.wasHunted}}</td>
-            <td>{{stat.clearedPoints}}</td>
-            <td>{{stat.totalPointsLeftWith}}</td>
+            <td [class]="isActiveColumn('playerName')">
+                {{stat.playerName}}
+            </td>
+            <td [class]="isActiveColumn('gamesPlayed')">
+                {{stat.gamesPlayed}}
+            </td>
+            <td [class]="isActiveColumn('wins')">
+                {{stat.wins}}
+            </td>
+            <td [class]="isActiveColumn('normalVictoryWins')">
+                {{stat.normalVictoryWins}}
+            </td>
+            <td [class]="isActiveColumn('goatWins')">
+                {{stat.goatWins}}
+            </td>
+            <td [class]="isActiveColumn('officerWins')">
+                {{stat.officerWins}}
+            </td>
+            <td [class]="isActiveColumn('generalWins')">
+                {{stat.generalWins}}
+            </td>
+            <td [class]="isActiveColumn('draws')">
+                {{stat.draws}}
+            </td>
+            <td [class]="isActiveColumn('loses')">
+                {{stat.loses}}
+            </td>
+            <td [class]="isActiveColumn('normalVictoryLoses')">
+                {{stat.normalVictoryLoses}}
+            </td>
+            <td [class]="isActiveColumn('goatLoses')">
+                {{stat.goatLoses}}
+            </td>
+            <td [class]="isActiveColumn('officerLoses')">
+                {{stat.officerLoses}}
+            </td>
+            <td [class]="isActiveColumn('generalLoses')">
+                {{stat.generalLoses}}
+            </td>
+            <td [class]="isActiveColumn('wasHunter')">
+                {{stat.wasHunter}}
+            </td>
+            <td [class]="isActiveColumn('successfulHunt')">
+                {{stat.successfulHunt}}
+            </td>
+            <td [class]="isActiveColumn('wasHunted')">
+                {{stat.wasHunted}}
+            </td>
+            <td [class]="isActiveColumn('clearedPoints')">
+                {{stat.clearedPoints}}
+            </td>
+            <td [class]="isActiveColumn('totalPointsLeftWith')">
+                {{stat.totalPointsLeftWith}}
+            </td>
         </tr>
     }
 </table>

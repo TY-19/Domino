@@ -10,38 +10,33 @@ import { VictoryType } from "../_enums/victoryType";
   providedIn: 'root',
 })
 export class LanguageService {
-  languages: { [key: string]: string } = {
+  private languages: LanguageDesc[] = [
+    { code: "en", flag: "en" },
+    { code: "ua", flag: "ua" },
+  ];
+  private messages: { [key: string]: string } = {
     "en": "assets/lang/messages.en.json",
     "ua": "assets/lang/messages.ua.json"
   };
-  currentLanguage: string = "en";
+  currentLanguage: LanguageDesc = this.languages[0];
   translation?: Translation;
   constructor(private http: HttpClient,
     private localStorageService: LocalStorageService) {
-    let lang = localStorageService.getLanguage();
-    if(lang === null) {
-      localStorageService.setLanguage("en");
-      this.currentLanguage = "en";
-    } else {
-      this.currentLanguage = lang;
-    }
-    this.loadLanguage(this.currentLanguage);
+    let lang: string = localStorageService.getLanguage() ?? "en";
+    this.setCurrentLanguage(lang);
+    this.loadLanguage(this.currentLanguage.code);
   }
   getAvailableLanguages(): LanguageDesc[] {
-    return [
-      { code: "en" },
-      { code: "ua" },
-    ];
+    return this.languages;
   }
   switchLanguage(lang: string) {
-    if(this.currentLanguage !== lang) {
-      this.currentLanguage = lang;
-      this.localStorageService.setLanguage(lang);
+    if(this.currentLanguage.code !== lang) {
+      this.setCurrentLanguage(lang);
       this.loadLanguage(lang);
     }
   }
   loadLanguage(lang: string) {
-    let path = this.languages[lang];
+    let path = this.messages[lang];
     this.http.get<any>(path)
       .subscribe((res) => {
         this.translation = res;
@@ -54,6 +49,10 @@ export class LanguageService {
   getErrorTranslation(errorType: ErrorType, data?: Record<string, string>): string {
     let template = this.translation?.errors[errorType];
     return this.fillPlaceHolders(template, data);
+  }
+  private setCurrentLanguage(lang: string) {
+    this.localStorageService.setLanguage(lang);
+    this.currentLanguage = this.languages.find(l => l.code == lang) ?? this.languages[0];
   }
   private fillPlaceHolders(template: string | undefined, data?: Record<string, string>): string {
     if(!template) {
@@ -69,5 +68,4 @@ export class LanguageService {
         return key in data ? data[key] : match;
     });
   }
-  
 }

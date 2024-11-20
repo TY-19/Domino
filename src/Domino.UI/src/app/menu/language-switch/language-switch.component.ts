@@ -11,7 +11,7 @@ import { LanguageDesc } from '../../_shared/languageDesc';
 })
 export class LanguageSwitchComponent {
   showSwitch: boolean = false;
-  currentLang: string = "";
+  currentLang: LanguageDesc = { code: 'en' };
   languages: LanguageDesc[] = [];
   constructor(private languageService: LanguageService) {
 

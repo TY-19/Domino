@@ -12,7 +12,7 @@ using MediatR;
 namespace Domino.AITournament.Services;
 
 public class AiGameService(
-    EngineService engineService,
+    IEngineService engineService,
     IMediator mediator,
     IStrategyFactory strategyFactory
     ) : IAiGameService
@@ -32,7 +32,7 @@ public class AiGameService(
             { "6-6", 100 }
         }
     };
-    private readonly EngineService _engineService = engineService;
+    private readonly IEngineService _engineService = engineService;
     private readonly IMediator _mediator = mediator;
     private readonly IStrategyFactory _strategyFactory = strategyFactory;
 

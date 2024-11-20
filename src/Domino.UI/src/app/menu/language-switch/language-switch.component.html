@@ -1,8 +1,10 @@
-<div (click)="showSwitch = !showSwitch" class="absolute right-4 top-0 cursor-default">
-    <span>{{currentLang}}</span>
+<div (click)="showSwitch = !showSwitch" class="absolute right-4 top-0 cursor-default whitespace-nowrap">
+    <p class="flag" [class]="currentLang.flag"></p><span class="lang-name">{{currentLang.code}}</span>
     <ul [hidden]="!showSwitch">
         @for(lang of languages; track lang.code) {
-            <li (click)="selectLanguage(lang.code)">{{lang.code}}</li>
+            <li (click)="selectLanguage(lang.code)">
+                <p class="flag" [class]="lang.flag"></p><span class="lang-name">{{lang.code}}</span>
+            </li>
         }
     </ul>
 </div>
